@@ -1,25 +1,15 @@
 import dotenv from "dotenv";
 import http from "http";
-import handleTransaction from "./tasks/handleTransaction";
+import cron from "node-cron";
+import { refreshPools } from "./tasks/refreshPools";
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-const main = async () => {
-  console.log("ION Finance Indexer");
-
-  // example hash;
-  const hash =
-    "806f6e9289d0c61f3dd59b2488cfbee8455cdd96dfc2edeb159332e82e98f532";
-  await handleTransaction(hash);
-};
-
-// health check?
-// subscribe websocket
-// pooling pool info
-
-main();
+cron.schedule("*/10 * * * * *", async () => {
+  await refreshPools();
+});
 
 export const server = http.createServer(async (req, res) => {
   res.writeHead(200, { "Content-Type": "application/json" });
