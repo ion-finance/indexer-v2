@@ -1,11 +1,20 @@
-# node-typescript-project-template
-A simple template for a Node + Typescript project
+# Ion Indexer
 
-## Covers All Essential Setup
-- Local run with hot reload
-- Linting and Formatting 
-- Testing
-- Production build/packaging
-- Production run
+## Environment Variables
 
-Read Article about initial setup => [Blog Post](https://medium.com/before-semicolon/how-to-setup-a-typescript-nodejs-server-2023-16f3874f2ce5)g
+```
+DATABASE_URL="postgresql://postgres:1q2w3e4r@localhost:5432/ionfi"
+TON_API_URL="https://testnet.tonapi.io/v2"
+TON_API_WS="wss://testnet.tonapi.io/v2/websocket"
+TON_API_KEY="1111111"
+```
+
+## Getting Started
+
+```
+yarn
+```
+
+```
+yarn local:watch
+```
