@@ -53,12 +53,43 @@ CREATE TABLE "Exchange" (
     "j" INTEGER NOT NULL,
     "amountI" TEXT NOT NULL,
     "amountJ" TEXT NOT NULL,
-    "feeI" TEXT NOT NULL,
-    "feeJ" TEXT NOT NULL,
-    "timestamp" TIMESTAMP(3) NOT NULL,
+    "from" TEXT NOT NULL,
+    "to" TEXT NOT NULL,
 
     CONSTRAINT "Exchange_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Burn" (
+    "id" TEXT NOT NULL,
+    "hash" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "poolId" TEXT NOT NULL,
+    "from" TEXT NOT NULL,
+    "amounts" TEXT[],
+
+    CONSTRAINT "Burn_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Mint" (
+    "id" TEXT NOT NULL,
+    "hash" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "poolId" TEXT NOT NULL,
+    "from" TEXT NOT NULL,
+    "amounts" TEXT[],
+
+    CONSTRAINT "Mint_pkey" PRIMARY KEY ("id")
+);
+
 -- AddForeignKey
 ALTER TABLE "Exchange" ADD CONSTRAINT "Exchange_poolId_fkey" FOREIGN KEY ("poolId") REFERENCES "Pool"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Burn" ADD CONSTRAINT "Burn_poolId_fkey" FOREIGN KEY ("poolId") REFERENCES "Pool"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Mint" ADD CONSTRAINT "Mint_poolId_fkey" FOREIGN KEY ("poolId") REFERENCES "Pool"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

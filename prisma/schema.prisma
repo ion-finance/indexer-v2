@@ -47,8 +47,10 @@ model Pool {
   adminFeeRatio      Int
   isInitialized      Boolean    @default(false)
   totalSupply        String
-  exchanges          Exchange[]
   apy                String
+  exchanges          Exchange[]
+  burns              Burn[]
+  mints              Mint[]
 }
 
 model Exchange {
@@ -62,7 +64,28 @@ model Exchange {
   j         Int
   amountI   String
   amountJ   String
-  feeI      String
-  feeJ      String
-  timestamp DateTime
+  from      String
+  to        String
+}
+
+model Burn {
+  id        String   @id @default(uuid())
+  hash      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  poolId    String
+  pool      Pool     @relation(fields: [poolId], references: [id])
+  from      String
+  amounts   String[]
+}
+
+model Mint {
+  id        String   @id @default(uuid())
+  hash      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  poolId    String
+  pool      Pool     @relation(fields: [poolId], references: [id])
+  from      String
+  amounts   String[]
 }
