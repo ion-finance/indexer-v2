@@ -22,3 +22,6 @@ gen
 dist
 build
 node_modules
+
+
+.env
