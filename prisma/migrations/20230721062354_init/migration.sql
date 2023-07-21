@@ -45,7 +45,6 @@ CREATE TABLE "Pool" (
 -- CreateTable
 CREATE TABLE "Exchange" (
     "id" TEXT NOT NULL,
-    "hash" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "poolId" TEXT NOT NULL,
@@ -62,7 +61,6 @@ CREATE TABLE "Exchange" (
 -- CreateTable
 CREATE TABLE "Burn" (
     "id" TEXT NOT NULL,
-    "hash" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "poolId" TEXT NOT NULL,
@@ -75,7 +73,6 @@ CREATE TABLE "Burn" (
 -- CreateTable
 CREATE TABLE "Mint" (
     "id" TEXT NOT NULL,
-    "hash" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "poolId" TEXT NOT NULL,
@@ -85,11 +82,10 @@ CREATE TABLE "Mint" (
     CONSTRAINT "Mint_pkey" PRIMARY KEY ("id")
 );
 
--- AddForeignKey
-ALTER TABLE "Exchange" ADD CONSTRAINT "Exchange_poolId_fkey" FOREIGN KEY ("poolId") REFERENCES "Pool"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateTable
+CREATE TABLE "IndexerState" (
+    "key" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
 
--- AddForeignKey
-ALTER TABLE "Burn" ADD CONSTRAINT "Burn_poolId_fkey" FOREIGN KEY ("poolId") REFERENCES "Pool"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Mint" ADD CONSTRAINT "Mint_poolId_fkey" FOREIGN KEY ("poolId") REFERENCES "Pool"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+    CONSTRAINT "IndexerState_pkey" PRIMARY KEY ("key")
+);

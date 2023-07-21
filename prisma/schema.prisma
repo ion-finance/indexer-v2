@@ -27,14 +27,14 @@ model Coin {
 }
 
 model Pool {
-  id                 String     @id @default(cuid()) // Pool Address
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @default(now()) @updatedAt
-  type               PoolType   @default(STABLE)
-  name               String     @db.VarChar(255)
-  description        String     @db.VarChar(255)
-  image              String     @db.Text()
-  symbol             String     @db.VarChar(20)
+  id                 String   @id @default(cuid()) // Pool Address
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
+  type               PoolType @default(STABLE)
+  name               String   @db.VarChar(255)
+  description        String   @db.VarChar(255)
+  image              String   @db.Text()
+  symbol             String   @db.VarChar(20)
   coins              String[] // Router's wallet address
   balances           String[]
   rates              String[]
@@ -45,21 +45,16 @@ model Pool {
   futureATime        DateTime
   fee                Int
   adminFeeRatio      Int
-  isInitialized      Boolean    @default(false)
+  isInitialized      Boolean  @default(false)
   totalSupply        String
   apy                String
-  exchanges          Exchange[]
-  burns              Burn[]
-  mints              Mint[]
 }
 
 model Exchange {
   id        String   @id @default(uuid())
-  hash      String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   poolId    String
-  pool      Pool     @relation(fields: [poolId], references: [id])
   i         Int
   j         Int
   amountI   String
@@ -70,22 +65,25 @@ model Exchange {
 
 model Burn {
   id        String   @id @default(uuid())
-  hash      String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   poolId    String
-  pool      Pool     @relation(fields: [poolId], references: [id])
   from      String
   amounts   String[]
 }
 
 model Mint {
   id        String   @id @default(uuid())
-  hash      String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   poolId    String
-  pool      Pool     @relation(fields: [poolId], references: [id])
   from      String
   amounts   String[]
+}
+
+// last block or tx data
+// heath check
+model IndexerState {
+  key   String @id
+  value String
 }
