@@ -32,3 +32,13 @@ export interface TransactionResult {
   transaction: Transaction;
   children?: TransactionResult[];
 }
+
+export interface Event {
+  event_id: string;
+  account: Account;
+  timestamp: number;
+  is_scam: boolean;
+  lt: number;
+  in_progress: boolean;
+  extra: number;
+}

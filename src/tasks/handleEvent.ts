@@ -13,9 +13,11 @@ const BURN = "0x443cf371";
 const EXCHANGE = "0xbd687ba6";
 const POOL_CREATED = "0x7d0e1322";
 
-const handleTransaction = async (hash: string) => {
+const handleEvent = async (event_id: string) => {
   // TODO : handle errors;
-  const res = await axios(`${process.env.TON_API_URL}/traces/${hash}`);
+  // ! FIXME
+  // * traces api response can be pending
+  const res = await axios(`${process.env.TON_API_URL}/traces/${event_id}`);
 
   const transactionRes = res.data as TransactionResult;
 
@@ -85,8 +87,6 @@ const handleTransaction = async (hash: string) => {
       }
     }
   }
-
-  // update IndexerState;
 };
 
-export default handleTransaction;
+export default handleEvent;
