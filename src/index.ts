@@ -1,11 +1,14 @@
 import dotenv from "dotenv";
 import http from "http";
 import cron from "node-cron";
-import { refreshPools } from "./tasks/refreshPools";
 import fetchEvents from "./tasks/fetchEvents";
 import handleEvent from "./tasks/handleEvent";
 import prisma from "./clients/prisma";
 import sleep from "./utils/sleep";
+import {
+  refreshAllPools,
+  refreshPoolsIfRecentEventsExist,
+} from "./tasks/refreshPools";
 
 dotenv.config();
 
@@ -41,11 +44,13 @@ main();
 
 // TOOO
 // 1. set apy (daily, weekly)
-// 2. refresh pool every 10 seconds when pool has new events
 
-// refresh all pool every 1 minutes
+cron.schedule("*/10 * * * * *", async () => {
+  await refreshPoolsIfRecentEventsExist();
+});
+
 cron.schedule("* * * * *", async () => {
-  await refreshPools();
+  await refreshAllPools();
 });
 
 export const server = http.createServer(async (req, res) => {
