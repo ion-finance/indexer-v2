@@ -1,6 +1,7 @@
 export interface Transaction {
   source: string; // pool address
   hash: string; // transaction hash
+  timestamp: number; // timestamp
 }
 
 export interface Event<T> {

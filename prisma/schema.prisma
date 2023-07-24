@@ -54,6 +54,7 @@ model Exchange {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+  timestamp Int
   poolId    String
   i         Int
   j         Int
@@ -67,6 +68,7 @@ model Burn {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+  timestamp Int
   poolId    String
   from      String
   amounts   String[]
@@ -76,6 +78,7 @@ model Mint {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+  timestamp Int
   poolId    String
   from      String
   amounts   String[]

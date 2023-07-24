@@ -23,7 +23,7 @@ export interface Transaction {
   lt: string;
   account: Account;
   success: boolean;
-  uptime: number;
+  utime: number;
   out_msgs: OutMessage[];
   // others.
 }

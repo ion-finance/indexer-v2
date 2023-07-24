@@ -15,6 +15,7 @@ export const handleExchange = async (event: Event<ExchangeParams>) => {
       to: event.params.to,
       poolId: event.transaction.source,
       id: event.transaction.hash,
+      timestamp: event.transaction.timestamp,
     },
   });
 };
@@ -29,6 +30,7 @@ export const handleBurn = async (event: Event<BurnParams>) => {
       poolId: event.transaction.source,
       id: event.transaction.hash,
       amounts: event.params.amounts,
+      timestamp: event.transaction.timestamp,
     },
   });
 };
@@ -43,6 +45,7 @@ export const handleMint = async (event: Event<MintParams>) => {
       poolId: event.transaction.source,
       id: event.transaction.hash,
       amounts: event.params.amounts,
+      timestamp: event.transaction.timestamp,
     },
   });
 };

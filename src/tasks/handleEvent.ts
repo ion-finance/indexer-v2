@@ -50,6 +50,7 @@ const handleEvent = async (event_id: string) => {
       const parseTx = {
         source: Address.parseRaw(tx.transaction.account.address).toString(),
         hash: tx.transaction.hash,
+        timestamp: tx.transaction.utime,
       };
 
       switch (msg.op_code) {
