@@ -11,7 +11,7 @@ async function main() {
         symbol: "iUSDT",
         decimals: 6,
         jettonMinter: "EQBD5rI620ZgEU_0Wy-XMb-Zv56lLP2fHhSqSfxEyrs0OCD5",
-        image: "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png",
+        image: "https://s2.coinmarketcap.com/static/img/coins/128x128/825.png",
       },
       {
         id: "EQDQVcWiKFMIV4kv98tafibynDJaaNTIbam1rBc8WLrjSLzO",
@@ -19,7 +19,7 @@ async function main() {
         symbol: "iUSDC",
         decimals: 6,
         jettonMinter: "EQDjuwnrPsmMO3Z9W0r8ftR-ukQD8JI-elJt_xSjd2gV5Vru",
-        image: "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+        image: "https://s2.coinmarketcap.com/static/img/coins/128x128/3408.png",
       },
       {
         id: "EQBqYsE3MAG1QzW61qY-dXirHxMMliQI20nxVbYhaL1uhbhT",
@@ -27,7 +27,7 @@ async function main() {
         symbol: "iDAI",
         decimals: 18,
         jettonMinter: "EQDUaOnw_q4b8wdrGtLmX_WmLbvHpmomZZkhxcu2m2Q9r1tN",
-        image: "https://s2.coinmarketcap.com/static/img/coins/64x64/4943.png",
+        image: "https://s2.coinmarketcap.com/static/img/coins/128x128/4943.png",
       },
       {
         id: "EQC5qBziTUKBpDOhrrg-zdvaJZSfLKl6Bp-GdGF6n2abh8Pf",
