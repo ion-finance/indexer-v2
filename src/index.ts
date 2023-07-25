@@ -44,7 +44,9 @@ const main = async () => {
   await refreshDailyAPY();
   await refreshWeeklyApy();
   await refreshAllPools();
+  console.log("Initial data is refreshed.");
 
+  console.log("Event pooling is started. ");
   for (;;) {
     await eventPooling();
   }
