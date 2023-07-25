@@ -20,7 +20,10 @@ const calcVolume = async (start: number, end: number) => {
 
       return (
         acc +
-        Number(BigInt(ex.amountJ) / BigInt(10 ** coin.decimals)) * coin.usdPrice
+        Number(
+          (BigInt(ex.amountJ) * BigInt(1000)) / BigInt(10 ** coin.decimals)
+        ) *
+          (coin.usdPrice / 1000)
       );
     }, 0);
 
