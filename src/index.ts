@@ -27,11 +27,11 @@ const eventPooling = async () => {
     return;
   }
 
-  console.debug(`${events.length} events found.`);
+  console.log(`${events.length} events found.`);
   for (let i = 0; i < events.length; i++) {
     await handleEvent(events[events.length - 1 - i].event_id);
   }
-  console.debug(`${events.length} events are indexed.`);
+  console.log(`${events.length} events are indexed.`);
 
   if (events.length > 0) {
     await prisma.indexerState.setLastTimestamp(events[0].timestamp);

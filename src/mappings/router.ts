@@ -4,8 +4,8 @@ import { times } from "lodash";
 import prisma from "../clients/prisma";
 
 export const handlePoolCreated = async (event: Event<PoolCreatedParams>) => {
-  console.debug("PoolCreated event is indexed");
-  console.debug(event);
+  console.log("PoolCreated event is indexed");
+  console.log(event);
 
   await prisma.pool.upsert({
     where: {

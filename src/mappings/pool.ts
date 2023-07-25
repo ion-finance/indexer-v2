@@ -2,8 +2,8 @@ import { Event, BurnParams, ExchangeParams, MintParams } from "../types/events";
 import prisma from "../clients/prisma";
 
 export const handleExchange = async (event: Event<ExchangeParams>) => {
-  console.debug("Exchange event is indexed.");
-  console.debug(event);
+  console.log("Exchange event is indexed.");
+  console.log(event);
 
   await prisma.exchange.upsert({
     where: {
@@ -34,8 +34,8 @@ export const handleExchange = async (event: Event<ExchangeParams>) => {
 };
 
 export const handleBurn = async (event: Event<BurnParams>) => {
-  console.debug("Burn event is indexed.");
-  console.debug(event);
+  console.log("Burn event is indexed.");
+  console.log(event);
 
   await prisma.burn.upsert({
     where: {
@@ -58,8 +58,8 @@ export const handleBurn = async (event: Event<BurnParams>) => {
 };
 
 export const handleMint = async (event: Event<MintParams>) => {
-  console.debug("Mint event is indexed.");
-  console.debug(event);
+  console.log("Mint event is indexed.");
+  console.log(event);
 
   await prisma.mint.upsert({
     where: {
