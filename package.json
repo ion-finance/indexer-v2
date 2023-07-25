@@ -5,7 +5,7 @@
   "scripts": {
     "clean": "rimraf ./build",
     "build": "npm-run-all format lint clean && tsc",
-    "start": "node src",
+    "start": "node build/src",
     "local": "ts-node src",
     "local:watch": "nodemon src -e ts,json --exec 'npm run local'",
     "lint": "eslint src",
