@@ -12,6 +12,7 @@ async function main() {
         decimals: 6,
         jettonMinter: "EQBD5rI620ZgEU_0Wy-XMb-Zv56lLP2fHhSqSfxEyrs0OCD5",
         image: "https://s2.coinmarketcap.com/static/img/coins/128x128/825.png",
+        refId: "tether",
       },
       {
         id: "EQDQVcWiKFMIV4kv98tafibynDJaaNTIbam1rBc8WLrjSLzO",
@@ -20,6 +21,7 @@ async function main() {
         decimals: 6,
         jettonMinter: "EQDjuwnrPsmMO3Z9W0r8ftR-ukQD8JI-elJt_xSjd2gV5Vru",
         image: "https://s2.coinmarketcap.com/static/img/coins/128x128/3408.png",
+        refId: "usd-coin",
       },
       {
         id: "EQBqYsE3MAG1QzW61qY-dXirHxMMliQI20nxVbYhaL1uhbhT",
@@ -28,6 +30,7 @@ async function main() {
         decimals: 18,
         jettonMinter: "EQDUaOnw_q4b8wdrGtLmX_WmLbvHpmomZZkhxcu2m2Q9r1tN",
         image: "https://s2.coinmarketcap.com/static/img/coins/128x128/4943.png",
+        refId: "dai",
       },
       {
         id: "EQC5qBziTUKBpDOhrrg-zdvaJZSfLKl6Bp-GdGF6n2abh8Pf",
@@ -37,6 +40,7 @@ async function main() {
         jettonMinter: "EQBb-3wK3bFV7IceStsrOxNYy4bz-wWy2N9C4imNS1BITDZN",
         image:
           "https://raw.githubusercontent.com/orbit-chain/bridge-token-image/main/ton/usdt.png",
+        refId: "tether",
       },
       {
         id: "EQB7q5dfTXMDJteiBo3wDfi45w4bZQt-MUkpP3EZg4CZxWy2",
@@ -46,6 +50,7 @@ async function main() {
         jettonMinter: "EQBnce2nzsCh1qVE9C4dn73rOLdTnKfGxZvi13U7dcAcOiZH",
         image:
           "https://raw.githubusercontent.com/orbit-chain/bridge-token-image/main/ton/wbtc.png",
+        refId: "wrapped-bitcoin",
       },
       {
         id: "EQCDXnZB8rE-5SK11xw48FRLqGgse4uo93rJDJN9dvTEziw3",
@@ -54,6 +59,7 @@ async function main() {
         decimals: 9,
         jettonMinter: "EQBC8fG0Fw0FWqiaBkTW68_fN_Z2dxbigq4RkqALpoo_Ak6V",
         image: "https://wton.dev/logo192.png",
+        refId: "the-open-network",
       },
       {
         id: "EQAEgTzh4MAAFr35PaeMkOhBgAkqfrj7S1IM-C8yZxGaKtin",
@@ -63,6 +69,7 @@ async function main() {
         jettonMinter: "EQBgDWxHz4Q9BkU9IlqaogD-4xc1AVrG1k1qBmrIthB84DYK",
         image:
           "https://bridge.ton.org/token/1/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599.png",
+        refId: "wrapped-bitcoin",
       },
     ],
   });

@@ -24,6 +24,8 @@ model Coin {
   symbol       String   @db.VarChar(20)
   image        String   @db.Text()
   decimals     Int      @default(9)
+  refId        String?  @default("") // Coingecko coin id
+  usdPrice     Float    @default(0)
 }
 
 model Pool {

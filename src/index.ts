@@ -10,6 +10,7 @@ import {
   refreshPoolsIfRecentEventsExist,
 } from "./tasks/refreshPools";
 import { refreshDailyAPY, refreshWeeklyApy } from "./tasks/refreshAPY";
+import { refreshPrices } from "./tasks/refreshPrices";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ const eventPooling = async () => {
 };
 
 const main = async () => {
+  await refreshPrices();
   await refreshDailyAPY();
   await refreshWeeklyApy();
   await refreshAllPools();
@@ -49,6 +51,7 @@ const main = async () => {
 main();
 
 cron.schedule("0 * * * *", async () => {
+  await refreshPrices();
   await refreshDailyAPY();
   await refreshWeeklyApy();
 });

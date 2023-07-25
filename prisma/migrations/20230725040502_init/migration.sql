@@ -11,6 +11,8 @@ CREATE TABLE "Coin" (
     "symbol" VARCHAR(20) NOT NULL,
     "image" TEXT NOT NULL,
     "decimals" INTEGER NOT NULL DEFAULT 9,
+    "refId" TEXT DEFAULT '',
+    "usdPrice" DOUBLE PRECISION NOT NULL DEFAULT 0,
 
     CONSTRAINT "Coin_pkey" PRIMARY KEY ("id")
 );
