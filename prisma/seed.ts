@@ -94,7 +94,6 @@ async function main() {
         adminFeeRatio: 50,
         isInitialized: true,
         totalSupply: "0",
-        apy: "0.5",
       },
       {
         id: "EQCXIb53XnletXuXG3MvwGJquKEzaoKps7bm6V5PXrWYMenc",
@@ -118,7 +117,6 @@ async function main() {
         adminFeeRatio: 40,
         isInitialized: true,
         totalSupply: "12340000",
-        apy: "1.2",
       },
       {
         id: "EQDUkIRUuXFe0HDF3y1LODmHqLmrPitEZtEDK1XdZWGLDIdT",
@@ -142,7 +140,6 @@ async function main() {
         adminFeeRatio: 50,
         isInitialized: true,
         totalSupply: "123400000",
-        apy: "2.7",
       },
       {
         id: "EQAqI55G0lUCPK6y02kodwHfH8kelL6gv-82-zD2Pf1E9Cnn",
@@ -166,7 +163,6 @@ async function main() {
         adminFeeRatio: 45,
         isInitialized: true,
         totalSupply: "0",
-        apy: "2.7",
       },
     ],
   });

@@ -30,7 +30,6 @@ export const handlePoolCreated = async (event: Event<PoolCreatedParams>) => {
       adminFeeRatio: 0,
       isInitialized: true,
       totalSupply: "0",
-      apy: "0",
     },
     update: {},
   });

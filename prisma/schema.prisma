@@ -47,7 +47,8 @@ model Pool {
   adminFeeRatio      Int
   isInitialized      Boolean  @default(false)
   totalSupply        String
-  apy                String
+  dailyAPY           String   @default("0%")
+  weeklyAPY          String   @default("0%")
 }
 
 model Exchange {

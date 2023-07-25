@@ -37,7 +37,8 @@ CREATE TABLE "Pool" (
     "adminFeeRatio" INTEGER NOT NULL,
     "isInitialized" BOOLEAN NOT NULL DEFAULT false,
     "totalSupply" TEXT NOT NULL,
-    "apy" TEXT NOT NULL,
+    "dailyAPY" TEXT NOT NULL DEFAULT '0%',
+    "weeklyAPY" TEXT NOT NULL DEFAULT '0%',
 
     CONSTRAINT "Pool_pkey" PRIMARY KEY ("id")
 );
