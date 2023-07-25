@@ -51,6 +51,8 @@ model Pool {
   totalSupply        String
   dailyAPY           String   @default("0%")
   weeklyAPY          String   @default("0%")
+  usdTVL             String   @default("0")
+  dailyUsdVolume     String   @default("0")
 }
 
 model Exchange {

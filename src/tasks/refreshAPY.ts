@@ -8,6 +8,7 @@ import moment from "moment";
 // burn & mint fee
 // 1. If balances, free
 // 2. If not, 0.02%
+// TODO : Add Volatile pool apy
 const calcAPY = async (start: number, end: number) => {
   const [exchanges, mints, burns, pools] = await Promise.all([
     prisma.exchange.findMany({
@@ -198,7 +199,7 @@ export const refreshWeeklyApy = async () => {
       await prisma.pool.update({
         where: { id: r.poolId },
         data: {
-          dailyAPY: r.apy,
+          weeklyAPY: r.apy,
         },
       });
     })

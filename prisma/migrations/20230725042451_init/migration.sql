@@ -41,6 +41,8 @@ CREATE TABLE "Pool" (
     "totalSupply" TEXT NOT NULL,
     "dailyAPY" TEXT NOT NULL DEFAULT '0%',
     "weeklyAPY" TEXT NOT NULL DEFAULT '0%',
+    "usdTVL" TEXT NOT NULL DEFAULT '0',
+    "dailyUsdVolume" TEXT NOT NULL DEFAULT '0',
 
     CONSTRAINT "Pool_pkey" PRIMARY KEY ("id")
 );
