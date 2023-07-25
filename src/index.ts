@@ -9,6 +9,7 @@ import {
   refreshAllPools,
   refreshPoolsIfRecentEventsExist,
 } from "./tasks/refreshPools";
+import { refreshDailyAPY, refreshWeeklyApy } from "./tasks/refreshAPY";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ const eventPooling = async () => {
   const events = await fetchEvents();
 
   if (events.length === 0) {
-    console.debug(`No events found. Sleep for ${MIN_POOL / 1000}s.`);
+    // console.debug(`No events found. Sleep for ${MIN_POOL / 1000}s.`);
     sleep(MIN_POOL);
     return;
   }
@@ -35,6 +36,10 @@ const eventPooling = async () => {
 };
 
 const main = async () => {
+  await refreshDailyAPY();
+  await refreshWeeklyApy();
+  await refreshAllPools();
+
   for (;;) {
     await eventPooling();
   }
@@ -42,8 +47,10 @@ const main = async () => {
 
 main();
 
-// TOOO
-// 1. set apy (daily, weekly)
+cron.schedule("0 * * * *", async () => {
+  await refreshDailyAPY();
+  await refreshWeeklyApy();
+});
 
 cron.schedule("*/10 * * * * *", async () => {
   await refreshPoolsIfRecentEventsExist();
