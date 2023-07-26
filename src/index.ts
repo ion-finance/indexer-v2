@@ -16,7 +16,7 @@ import { refreshDailyVolume } from "./tasks/refreshVoulme";
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
-const MIN_POOL = 4000; // 4s
+const MIN_POOL = 2000; // 2s
 
 const eventPooling = async () => {
   const events = await fetchEvents();
