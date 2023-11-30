@@ -27,7 +27,6 @@
     "@types/jest": "^29.4.0",
     "@types/lodash": "^4.14.195",
     "@types/node": "^18.14.0",
-    "@types/node-cron": "^3.0.8",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.52.0",
     "@typescript-eslint/parser": "^5.52.0",
@@ -45,15 +44,16 @@
   },
   "dependencies": {
     "@prisma/client": "5.0.0",
+    "@ton/core": "^0.53.0",
+    "@ton/sandbox": "^0.13.1",
+    "@ton/crypto": "^3.2.0",
+    "@ton/test-utils": "^0.3.1",
+    "@ton/ton": "^13.8.0",
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
-    "node-cron": "^3.0.2",
-    "prisma": "^5.0.0",
-    "ton": "^13.5.0",
-    "ton-core": "^0.49.1",
-    "ton-crypto": "^3.2.0"
+    "prisma": "^5.0.0"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
