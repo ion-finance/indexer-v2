@@ -31,8 +31,6 @@ const eventPooling = async () => {
 };
 
 const main = async () => {
-  console.log("Initial data is refreshed.");
-
   console.log("Event pooling is started. ");
   for (;;) {
     await eventPooling();
