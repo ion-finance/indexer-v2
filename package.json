@@ -45,17 +45,15 @@
   "dependencies": {
     "@prisma/client": "5.0.0",
     "@ton/core": "^0.53.0",
-    "@ton/sandbox": "^0.13.1",
     "@ton/crypto": "^3.2.0",
+    "@ton/sandbox": "^0.13.1",
     "@ton/test-utils": "^0.3.1",
     "@ton/ton": "^13.8.0",
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
-    "prisma": "^5.0.0"
-  },
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "prisma": "^5.0.0",
+    "ton": "^13.9.0"
   }
 }
