@@ -1,5 +1,6 @@
 import { Event, DepositedToBinsParams } from "../types/events";
 import prisma from "../clients/prisma";
+import { Prisma } from "@prisma/client";
 
 export const handleDepositedToBins = async (
   event: Event<DepositedToBinsParams>
@@ -32,7 +33,7 @@ export const handleDepositedToBins = async (
       senderAddress: event.params.senderAddress,
       receiverAddress: event.params.receiverAddress,
       tokenAddress: event.params.tokenAddress,
-      deposited: depositedArray.toString(),
+      deposited: depositedArray as Prisma.JsonArray,
     },
   });
 
