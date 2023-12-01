@@ -1,9 +1,12 @@
 import dotenv from "dotenv";
-import http from "http";
 import fetchEvents from "./tasks/fetchEvents";
 import handleEvent from "./tasks/handleEvent";
 import prisma from "./clients/prisma";
+import express from "express";
+import cors from "cors";
 import sleep from "./utils/sleep";
+import _ from "lodash";
+import { getBinPrice, getNormalPriceByAmountPrice } from "./utils/binMath";
 
 dotenv.config();
 
@@ -39,15 +42,62 @@ const main = async () => {
 
 main();
 
-export const server = http.createServer(async (req, res) => {
-  res.writeHead(200, { "Content-Type": "application/json" });
-  res.end(
-    JSON.stringify({
-      greeting: "hello",
-    })
-  );
+const app = express();
+
+app.use(cors());
+
+app.get("/pool/:pool_address/bins", async function handler(req, res) {
+  const poolAddress = req.params.pool_address;
+
+  const bins = await prisma.bins.findMany({
+    where: {
+      poolAddress,
+    },
+  });
+
+  // TODO : Fix hardcoding
+  const tokenXAddress = "EQCUSDFlV_fD20FmFYTeAnEhcfhB0XhFuhV2GszqgZA_l9fi"; // USDC;
+  const decimal = 6;
+  const binStep = 100; // 1%
+
+  const group = _.groupBy(bins, (bin) => bin.binId);
+
+  const data = _.values(group).map((bins) => {
+    const xBin = bins.find((bin) => bin.tokenAddress === tokenXAddress);
+    const yBin = bins.find((bin) => bin.tokenAddress !== tokenXAddress);
+    const reserveXRaw = xBin?.reserve || "0";
+    const reserveYRaw = yBin?.reserve || "0";
+    const binId = Number(bins[0].binId);
+    const priceXY = getBinPrice(binStep, 2 ** 23 - binId);
+    const priceYX = getBinPrice(binStep, binId - 2 ** 23);
+
+    const normalPriceXY = getNormalPriceByAmountPrice(
+      priceXY, // normalPriceXY is derived from amountPriceYX
+      decimal,
+      decimal
+    );
+    const normalPriceYX = getNormalPriceByAmountPrice(
+      priceYX,
+      decimal,
+      decimal
+    );
+
+    return {
+      binId,
+      priceXY,
+      priceYX,
+      normalPriceXY,
+      normalPriceYX,
+      reserveX: Number(BigInt(reserveXRaw) / BigInt(10 ** decimal)),
+      reserveY: Number(BigInt(reserveYRaw) / BigInt(10 ** decimal)),
+      reserveXRaw,
+      reserveYRaw,
+    };
+  });
+
+  res.json(data);
 });
 
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}/`);
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`);
 });
