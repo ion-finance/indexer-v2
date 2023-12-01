@@ -23,9 +23,10 @@ model DepositedToBins {
 }
 
 model Bins {
-  id           String   @id
+  id           String   @id @default(uuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now()) @updatedAt
+  binId        String
   poolAddress  String
   tokenAddress String
   reserve      String

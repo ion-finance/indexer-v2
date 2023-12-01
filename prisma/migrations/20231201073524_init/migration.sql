@@ -18,6 +18,7 @@ CREATE TABLE "Bins" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "binId" TEXT NOT NULL,
     "poolAddress" TEXT NOT NULL,
     "tokenAddress" TEXT NOT NULL,
     "reserve" TEXT NOT NULL,
