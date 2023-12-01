@@ -1,23 +1,20 @@
 import axios from "axios";
 import { TransactionResult } from "../types/ton-api";
-import parseMint from "../parsers/parseMint";
-import { Address, Cell } from "ton-core";
-import { handleBurn, handleExchange, handleMint } from "../mappings/pool";
-import parseBurn from "../parsers/parseBurn";
-import parseExchange from "../parsers/parseExchange";
-import { handlePoolCreated } from "../mappings/router";
-import parsePoolCreated from "../parsers/parsePoolCreated";
+import { Address, Cell } from "@ton/core";
+import { handleDepositedToBins } from "../mappings/pool";
+import parseDepositedToBins from "../parsers/parseDepositedToBins";
 
-const MINT = "0x12761d14";
-const BURN = "0x443cf371";
-const EXCHANGE = "0xbd687ba6";
-const POOL_CREATED = "0x7d0e1322";
+const DEPOSITED_TO_BINS = "0xafeb11ef";
 
 const handleEvent = async (event_id: string) => {
   // TODO : handle errors;
   // ! FIXME
   // * traces api response can be pending
-  const res = await axios(`${process.env.TON_API_URL}/traces/${event_id}`);
+  const res = await axios(`${process.env.TON_API_URL}/traces/${event_id}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.TON_API_KEY}`,
+    },
+  });
 
   const transactionRes = res.data as TransactionResult;
 
@@ -54,31 +51,10 @@ const handleEvent = async (event_id: string) => {
       };
 
       switch (msg.op_code) {
-        case MINT: {
-          await handleMint({
+        case DEPOSITED_TO_BINS: {
+          await handleDepositedToBins({
             transaction: parseTx,
-            params: parseMint(body),
-          });
-          break;
-        }
-        case BURN: {
-          await handleBurn({
-            transaction: parseTx,
-            params: parseBurn(body),
-          });
-          break;
-        }
-        case EXCHANGE: {
-          await handleExchange({
-            transaction: parseTx,
-            params: parseExchange(body),
-          });
-          break;
-        }
-        case POOL_CREATED: {
-          await handlePoolCreated({
-            transaction: parseTx,
-            params: parsePoolCreated(body),
+            params: parseDepositedToBins(body),
           });
           break;
         }

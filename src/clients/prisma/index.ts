@@ -1,13 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import PoolExtensions from "./extensions/pool";
 import IndexerStateExtenstions from "./extensions/indexer";
 
 const extendedPrismaClient = () => {
   const prisma = new PrismaClient();
 
-  const extendedPrisma = prisma
-    .$extends(PoolExtensions)
-    .$extends(IndexerStateExtenstions);
+  const extendedPrisma = prisma.$extends(IndexerStateExtenstions);
 
   return extendedPrisma;
 };

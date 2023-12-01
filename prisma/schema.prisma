@@ -10,83 +10,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum PoolType {
-  STABLE
-  VOLATILE
+model DepositedToBins {
+  id              String   @id @default(uuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+  timestamp       Int
+  poolAddress     String
+  senderAddress   String
+  receiverAddress String
+  tokenAddress    String
+  deposited       Json     @default("{}")
 }
 
-model Coin {
-  id           String   @id @default(cuid()) // Router's wallet address
+model Bins {
+  id           String   @id
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now()) @updatedAt
-  jettonMinter String
-  name         String   @db.VarChar(255)
-  symbol       String   @db.VarChar(20)
-  image        String   @db.Text()
-  decimals     Int      @default(9)
-  refId        String?  @default("") // Coingecko coin id
-  usdPrice     Float    @default(0)
-}
-
-model Pool {
-  id                 String   @id @default(cuid()) // Pool Address
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @default(now()) @updatedAt
-  type               PoolType @default(STABLE)
-  name               String   @db.VarChar(255)
-  description        String   @db.VarChar(255)
-  image              String   @db.Text()
-  symbol             String   @db.VarChar(20)
-  coins              String[] // Router's wallet address
-  balances           String[]
-  rates              String[]
-  collectedAdminFees String[]
-  initialA           Int
-  initialATime       DateTime
-  futureA            Int
-  futureATime        DateTime
-  fee                Int
-  adminFeeRatio      Int
-  isInitialized      Boolean  @default(false)
-  totalSupply        String
-  dailyAPY           String   @default("0%")
-  weeklyAPY          String   @default("0%")
-  usdTVL             String   @default("0")
-  dailyUsdVolume     String   @default("0")
-}
-
-model Exchange {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  timestamp Int
-  poolId    String
-  i         Int
-  j         Int
-  amountI   String
-  amountJ   String
-  from      String
-  to        String
-}
-
-model Burn {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  timestamp Int
-  poolId    String
-  from      String
-  amounts   String[]
-}
-
-model Mint {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  timestamp Int
-  poolId    String
-  from      String
-  amounts   String[]
+  poolAddress  String
+  tokenAddress String
+  reserve      String
 }
 
 // last block or tx data

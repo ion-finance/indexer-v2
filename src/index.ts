@@ -1,17 +1,9 @@
 import dotenv from "dotenv";
 import http from "http";
-import cron from "node-cron";
 import fetchEvents from "./tasks/fetchEvents";
 import handleEvent from "./tasks/handleEvent";
 import prisma from "./clients/prisma";
 import sleep from "./utils/sleep";
-import {
-  refreshAllPools,
-  refreshPoolsIfRecentEventsExist,
-} from "./tasks/refreshPools";
-import { refreshDailyAPY, refreshWeeklyApy } from "./tasks/refreshAPY";
-import { refreshPrices } from "./tasks/refreshPrices";
-import { refreshDailyVolume } from "./tasks/refreshVoulme";
 
 dotenv.config();
 
@@ -39,11 +31,6 @@ const eventPooling = async () => {
 };
 
 const main = async () => {
-  await refreshPrices();
-  await refreshDailyVolume();
-  await refreshDailyAPY();
-  await refreshWeeklyApy();
-  await refreshAllPools();
   console.log("Initial data is refreshed.");
 
   console.log("Event pooling is started. ");
@@ -53,21 +40,6 @@ const main = async () => {
 };
 
 main();
-
-cron.schedule("0 * * * *", async () => {
-  await refreshPrices();
-  await refreshDailyVolume();
-  await refreshDailyAPY();
-  await refreshWeeklyApy();
-});
-
-cron.schedule("*/10 * * * * *", async () => {
-  await refreshPoolsIfRecentEventsExist();
-});
-
-cron.schedule("* * * * *", async () => {
-  await refreshAllPools();
-});
 
 export const server = http.createServer(async (req, res) => {
   res.writeHead(200, { "Content-Type": "application/json" });
