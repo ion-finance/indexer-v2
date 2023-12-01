@@ -50,13 +50,18 @@ export const handleDepositedToBins = async (
 
   await Promise.all(
     depositedArray.map(async (deposited) => {
-      const bin = bins.find((bin) => bin.binId === deposited.binId);
+      const bin = bins.find(
+        (bin) =>
+          bin.binId === deposited.binId &&
+          bin.tokenAddress === event.params.tokenAddress
+      );
 
       if (bin) {
         return prisma.bins.updateMany({
           where: {
             binId: deposited.binId,
             poolAddress: event.transaction.source,
+            tokenAddress: event.params.tokenAddress,
           },
           data: {
             reserve: (
