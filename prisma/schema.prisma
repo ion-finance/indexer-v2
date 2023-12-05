@@ -10,6 +10,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Pool {
+  id            String   @id // pool address
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+  name          String
+  tokenXAddress String
+  tokenYAddress String
+  binStep       Int // 0 <= binStep <= 2^8 -1 (255)
+  activeBinId   Int // 0 <= activeBinId <= 2^24 -1 (16777215)
+}
+
+model Token {
+  id                  String   @id
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @default(now()) @updatedAt
+  jettonMinterAddress String
+  name                String
+  symbol              String
+  image               String
+  decimals            Int
+}
+
 model DepositedToBins {
   id              String   @id @default(uuid())
   createdAt       DateTime @default(now())
