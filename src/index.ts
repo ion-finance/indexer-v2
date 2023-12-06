@@ -49,29 +49,31 @@ app.use(cors());
 app.get("/pool/:pool_address/bins", async function handler(req, res) {
   const poolAddress = req.params.pool_address;
 
-  const bins = await prisma.bins.findMany({
-    where: {
-      poolAddress,
-    },
-  });
+  const [pool, bins] = await Promise.all([
+    prisma.pool.findFirst({
+      where: {
+        id: poolAddress,
+      },
+    }),
+    prisma.bins.findMany({
+      where: {
+        poolAddress,
+      },
+    }),
+  ]);
 
-  // TODO : Fix hardcoding
-  const tokenXAddress = "EQCUSDFlV_fD20FmFYTeAnEhcfhB0XhFuhV2GszqgZA_l9fi"; // USDC;
+  if (!pool) {
+    return [];
+  }
 
-  /*
-   [
-  { USDC: ‘EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH’ },
-  { USDT: ‘EQAdeMCeWqJ1gcAoDXclahnKicQ7TMZQuDhYbXsD9JhiENT-’ }
-]
-  */
   const decimal = 6;
   const binStep = 100; // 1%
 
   const group = _.groupBy(bins, (bin) => bin.binId);
 
   const data = _.values(group).map((bins) => {
-    const xBin = bins.find((bin) => bin.tokenAddress === tokenXAddress);
-    const yBin = bins.find((bin) => bin.tokenAddress !== tokenXAddress);
+    const xBin = bins.find((bin) => bin.tokenAddress === pool.tokenXAddress);
+    const yBin = bins.find((bin) => bin.tokenAddress === pool.tokenYAddress);
     const reserveXRaw = xBin?.reserve || "0";
     const reserveYRaw = yBin?.reserve || "0";
     const binId = Number(bins[0].binId);
