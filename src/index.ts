@@ -63,7 +63,7 @@ app.get("/pool/:pool_address/bins", async function handler(req, res) {
   ]);
 
   if (!pool) {
-    return [];
+    return res.json([]);
   }
 
   const decimal = 6;
@@ -104,7 +104,7 @@ app.get("/pool/:pool_address/bins", async function handler(req, res) {
     };
   });
 
-  res.json(data);
+  return res.json(data);
 });
 
 app.listen(PORT, () => {
