@@ -57,6 +57,13 @@ app.get("/pool/:pool_address/bins", async function handler(req, res) {
 
   // TODO : Fix hardcoding
   const tokenXAddress = "EQCUSDFlV_fD20FmFYTeAnEhcfhB0XhFuhV2GszqgZA_l9fi"; // USDC;
+
+  /*
+   [
+  { USDC: ‘EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH’ },
+  { USDT: ‘EQAdeMCeWqJ1gcAoDXclahnKicQ7TMZQuDhYbXsD9JhiENT-’ }
+]
+  */
   const decimal = 6;
   const binStep = 100; // 1%
 

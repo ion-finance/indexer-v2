@@ -20,7 +20,13 @@ export const handleInitialized = async (
       where: {
         id: event.params.tokenXAddress,
       },
-      update: {},
+      update: {
+        jettonMinterAddress: tokenXdata.minter_address,
+        name: tokenXdata.metadata.name,
+        symbol: tokenXdata.metadata.symbol,
+        decimals: parseInt(tokenXdata.metadata.decimals),
+        image: tokenXdata.metadata.image,
+      },
       create: {
         id: event.params.tokenXAddress,
         jettonMinterAddress: tokenXdata.minter_address,
@@ -34,7 +40,13 @@ export const handleInitialized = async (
       where: {
         id: event.params.tokenYAddress,
       },
-      update: {},
+      update: {
+        jettonMinterAddress: tokenXdata.minter_address,
+        name: tokenXdata.metadata.name,
+        symbol: tokenXdata.metadata.symbol,
+        decimals: parseInt(tokenXdata.metadata.decimals),
+        image: tokenXdata.metadata.image,
+      },
       create: {
         id: event.params.tokenYAddress,
         jettonMinterAddress: tokenYdata.minter_address,

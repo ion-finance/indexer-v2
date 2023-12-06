@@ -9,28 +9,60 @@ const fetchTokenData = async (walletAddress: string) => {
   );
   const data = await jettonWallet.getWalletData();
 
-  const res = await axios.get(
-    `${process.env.TON_API_URL}/jettons/${data?.minter}`
-  );
+  try {
+    const res = await axios.get(
+      `${process.env.TON_API_URL}/jettons/${data?.minter}`
+    );
 
-  return {
-    minter_address: data?.minter,
-    ...res.data,
-  } as {
-    minter_address: string;
-    mintable: boolean;
-    total_supply: string;
-    metadata: {
-      address: string;
-      name: string;
-      symbol: string;
-      decimals: string;
-      image: string;
-      description: string;
+    return {
+      minter_address: data?.minter?.toString(),
+      ...res.data,
+    } as {
+      minter_address: string;
+      mintable: boolean;
+      total_supply: string;
+      metadata: {
+        address: string;
+        name: string;
+        symbol: string;
+        decimals: string;
+        image: string;
+        description: string;
+      };
+      verification: string;
+      holders_count: number;
     };
-    verification: string;
-    holders_count: number;
-  };
+  } catch {
+    return {
+      minter_address: data?.minter?.toString() || "",
+      mintable: false,
+      total_supply: "0",
+      metadata: {
+        address: "",
+        name: "UNKNOWN",
+        symbol: "UNKNOWN",
+        decimals: "9",
+        image: "",
+        description: "",
+      },
+      verification: "",
+      holders_count: 0,
+    } as {
+      minter_address: string;
+      mintable: boolean;
+      total_supply: string;
+      metadata: {
+        address: string;
+        name: string;
+        symbol: string;
+        decimals: string;
+        image: string;
+        description: string;
+      };
+      verification: string;
+      holders_count: number;
+    };
+  }
 };
 
 export default fetchTokenData;
