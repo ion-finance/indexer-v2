@@ -33,7 +33,7 @@ model Token {
 }
 
 model DepositedToBins {
-  id              String   @id @default(uuid())
+  id              String   @id // txHash
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
   timestamp       Int
@@ -52,6 +52,20 @@ model Bins {
   poolAddress  String
   tokenAddress String
   reserve      String
+}
+
+model Swap {
+  id              String   @id // txHash
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+  timestamp       Int
+  poolAddress     String
+  senderAddress   String
+  receiverAddress String
+  amountIn        String
+  amountOut       String
+  swapForY        Boolean
+  activeBinId     Int
 }
 
 // last block or tx data
