@@ -23,9 +23,21 @@ const eventPooling = async () => {
   }
 
   console.log(`${events.length} events found.`);
+  let error = false;
   for (let i = 0; i < events.length; i++) {
-    await handleEvent(events[events.length - 1 - i].event_id);
+    try {
+      await handleEvent(events[events.length - 1 - i].event_id);
+    } catch (e) {
+      error = true;
+      console.error(`Error when handling event ${events[i].event_id}`);
+    }
   }
+
+  if (error) {
+    sleep(MIN_POOL);
+    return;
+  }
+
   console.log(`${events.length} events are indexed.`);
 
   if (events.length > 0) {
