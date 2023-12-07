@@ -41,11 +41,11 @@ export const handleInitialized = async (
         id: event.params.tokenYAddress,
       },
       update: {
-        jettonMinterAddress: tokenXdata.minter_address,
-        name: tokenXdata.metadata.name,
-        symbol: tokenXdata.metadata.symbol,
-        decimals: parseInt(tokenXdata.metadata.decimals),
-        image: tokenXdata.metadata.image,
+        jettonMinterAddress: tokenYdata.minter_address,
+        name: tokenYdata.metadata.name,
+        symbol: tokenYdata.metadata.symbol,
+        decimals: parseInt(tokenYdata.metadata.decimals),
+        image: tokenYdata.metadata.image,
       },
       create: {
         id: event.params.tokenYAddress,
