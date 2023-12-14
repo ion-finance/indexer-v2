@@ -32,6 +32,16 @@ model Token {
   decimals            Int
 }
 
+model Bins {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  binId       Int
+  poolAddress String
+  reserveX    String
+  reserveY    String
+}
+
 model DepositedToBins {
   id              String   @id // txHash
   createdAt       DateTime @default(now())
@@ -44,14 +54,15 @@ model DepositedToBins {
   deposited       Json     @default("{}")
 }
 
-model Bins {
-  id           String   @id @default(uuid())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now()) @updatedAt
-  binId        String
-  poolAddress  String
-  tokenAddress String
-  reserve      String
+model WithdrawnFromBins {
+  id              String   @id // txHash
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+  timestamp       Int
+  poolAddress     String
+  senderAddress   String
+  receiverAddress String
+  withdrawn       Json     @default("{}")
 }
 
 model Swap {
@@ -66,6 +77,27 @@ model Swap {
   amountOut       String
   swapForY        Boolean
   activeBinId     Int
+}
+
+model TransferBatch {
+  id            String   @id // txHash
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+  timestamp     Int
+  poolAddress   String
+  senderAddress String
+  fromAddress   String
+  toAddress     String
+  amounts       Json     @default("{}")
+}
+
+model LpTokenWallet {
+  id           String   @id @default(uuid()) // TODO use wallet address?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+  poolAddress  String
+  ownerAddress String
+  shares       Json     @default("{}")
 }
 
 // last block or tx data

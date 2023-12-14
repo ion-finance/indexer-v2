@@ -81,16 +81,9 @@ app.get("/pool/:pool_address/bins", async function handler(req, res) {
   const decimal = 6;
   const binStep = 100; // 1%
 
-  const group = _.groupBy(bins, (bin) => bin.binId);
-
-  const data = _.values(group).map((bins) => {
-    const xBin = bins.find((bin) => bin.tokenAddress === pool.tokenXAddress);
-    const yBin = bins.find((bin) => bin.tokenAddress === pool.tokenYAddress);
-    const reserveXRaw = xBin?.reserve || "0";
-    const reserveYRaw = yBin?.reserve || "0";
-    const binId = Number(bins[0].binId);
-    const priceXY = getBinPrice(binStep, 2 ** 23 - binId);
-    const priceYX = getBinPrice(binStep, binId - 2 ** 23);
+  const data = bins.map((bin) => {
+    const priceXY = getBinPrice(binStep, 2 ** 23 - bin.binId);
+    const priceYX = getBinPrice(binStep, bin.binId - 2 ** 23);
 
     const normalPriceXY = getNormalPriceByAmountPrice(
       priceXY, // normalPriceXY is derived from amountPriceYX
@@ -104,15 +97,15 @@ app.get("/pool/:pool_address/bins", async function handler(req, res) {
     );
 
     return {
-      binId,
+      binId: bin.binId,
       priceXY,
       priceYX,
       normalPriceXY,
       normalPriceYX,
-      reserveX: Number(BigInt(reserveXRaw) / BigInt(10 ** decimal)),
-      reserveY: Number(BigInt(reserveYRaw) / BigInt(10 ** decimal)),
-      reserveXRaw,
-      reserveYRaw,
+      reserveX: Number(BigInt(bin.reserveX) / BigInt(10 ** decimal)),
+      reserveY: Number(BigInt(bin.reserveY) / BigInt(10 ** decimal)),
+      reserveXRaw: bin.reserveX,
+      reserveYRaw: bin.reserveY,
     };
   });
 
