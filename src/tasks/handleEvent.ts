@@ -1,9 +1,12 @@
 import axios from "axios";
 import { TransactionResult } from "../types/ton-api";
 import { Address, Cell } from "@ton/core";
-import { handleDepositedToBins, handleInitialized } from "../mappings/pool";
 import parseDepositedToBins from "../parsers/parseDepositedToBins";
 import parseInitialized from "../parsers/parseInitialized";
+import handleDepositedToBins from "../mappings/handleDepositedToBins";
+import handleInitialized from "../mappings/handleInitialized";
+import { handleSwap } from "../mappings/handleSwap";
+import parseSwap from "../parsers/parseSwap";
 
 const DEPOSITED_TO_BINS = "0xafeb11ef";
 const INITIALIZED = "0x9bb3a52e";
@@ -80,6 +83,10 @@ const handleEvent = async (event_id: string) => {
           break;
         }
         case SWAP: {
+          await handleSwap({
+            transaction: parseTx,
+            params: parseSwap(body),
+          });
           break;
         }
         default:
