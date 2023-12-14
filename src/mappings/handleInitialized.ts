@@ -3,21 +3,20 @@ import { Event } from "../types/events";
 import parseInitialized from "../parsers/parseInitialized";
 import fetchTokenData from "../utils/fetchTokenData";
 
-const handleInitialized = async (
-  event: Event<ReturnType<typeof parseInitialized>>
-) => {
+const handleInitialized = async (event: Event) => {
+  const params = parseInitialized(event.body);
   console.log("Initialized event is indexed.");
   console.log(event);
 
   const [tokenXdata, tokenYdata] = await Promise.all([
-    fetchTokenData(event.params.tokenXAddress),
-    fetchTokenData(event.params.tokenYAddress),
+    fetchTokenData(params.tokenXAddress),
+    fetchTokenData(params.tokenYAddress),
   ]);
 
   const [tokenX, tokenY] = await Promise.all([
     prisma.token.upsert({
       where: {
-        id: event.params.tokenXAddress,
+        id: params.tokenXAddress,
       },
       update: {
         jettonMinterAddress: tokenXdata.minter_address,
@@ -27,7 +26,7 @@ const handleInitialized = async (
         image: tokenXdata.metadata.image,
       },
       create: {
-        id: event.params.tokenXAddress,
+        id: params.tokenXAddress,
         jettonMinterAddress: tokenXdata.minter_address,
         name: tokenXdata.metadata.name,
         symbol: tokenXdata.metadata.symbol,
@@ -37,7 +36,7 @@ const handleInitialized = async (
     }),
     prisma.token.upsert({
       where: {
-        id: event.params.tokenYAddress,
+        id: params.tokenYAddress,
       },
       update: {
         jettonMinterAddress: tokenYdata.minter_address,
@@ -47,7 +46,7 @@ const handleInitialized = async (
         image: tokenYdata.metadata.image,
       },
       create: {
-        id: event.params.tokenYAddress,
+        id: params.tokenYAddress,
         jettonMinterAddress: tokenYdata.minter_address,
         name: tokenYdata.metadata.name,
         symbol: tokenYdata.metadata.symbol,
@@ -64,11 +63,11 @@ const handleInitialized = async (
     update: {},
     create: {
       id: event.transaction.source,
-      tokenXAddress: event.params.tokenXAddress,
-      tokenYAddress: event.params.tokenYAddress,
-      binStep: event.params.binStep,
+      tokenXAddress: params.tokenXAddress,
+      tokenYAddress: params.tokenYAddress,
+      binStep: params.binStep,
       name: `${tokenX.symbol}-${tokenY.symbol}`,
-      activeBinId: event.params.activeId,
+      activeBinId: params.activeId,
     },
   });
 };

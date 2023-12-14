@@ -89,7 +89,7 @@ export default parseNewEvent;
 
 <b>4. Implement database mapping </b>
 
-In `src/mappings` create new file `newEvent.ts` and implement mapping. Mapping is a function that takes parsed event and save to database.
+In `src/mappings` create new file `handleNewEvent.ts` and implement mapping. Mapping is a function that takes parsed event and save to database.
 
 ```
 import { Event } from "../types/events";
@@ -98,8 +98,9 @@ import { Prisma } from "@prisma/client";
 import parseNewEvent from "../parsers/parseNewEvent";
 
 export const handleNewEvent = async (
-  event: Event<ReturnType<typeof parseNewEvent>>
+  event: Event
 ) => {
+  const params = parseNewEvent(event.params.message);
   console.log("NewEvent is indexed.");
   console.log(event);
 
@@ -108,12 +109,12 @@ export const handleNewEvent = async (
       id: event.transaction.hash,
     },
     update: {
-      address: event.params.address,
-      value: event.params.value
+      address: params.address,
+      value: params.value
     },
     create: {
-      address: event.params.address,
-      value: event.params.value
+      address: params.address,
+      value: params.value
     },
   })
 );
@@ -130,16 +131,16 @@ const NEW_EVENT = "0x12345678"; // "new_event"c in func
 switch (msg.op_code) {
   case DEPOSITED_TO_BINS: {
     await handleDepositedToBins({
-      transaction: parseTx,
-      params: parseDepositedToBins(body),
+      transaction,
+      body,
     });
     break;
   }
   ...
   case NEW_EVENT: {
     await handleNewEvent({
-      transaction: parseTx,
-      params: parseNewEvent(body),
+      transaction,
+      body,
     });
     break;
   }

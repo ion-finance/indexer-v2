@@ -2,9 +2,8 @@ import { Event } from "../types/events";
 import prisma from "../clients/prisma";
 import parseSwap from "../parsers/parseSwap";
 
-export const handleSwap = async (
-  event: Event<ReturnType<typeof parseSwap>>
-) => {
+const handleSwap = async (event: Event) => {
+  const params = parseSwap(event.body);
   console.log("Swap event is indexed.");
   console.log(event);
 
@@ -15,23 +14,23 @@ export const handleSwap = async (
     update: {
       timestamp: event.transaction.timestamp,
       poolAddress: event.transaction.source,
-      senderAddress: event.params.senderAddress,
-      receiverAddress: event.params.receiverAddress,
-      amountIn: event.params.amountIn.toString(),
-      amountOut: event.params.amountOut.toString(),
-      swapForY: event.params.swapForY,
-      activeBinId: event.params.activeBinId,
+      senderAddress: params.senderAddress,
+      receiverAddress: params.receiverAddress,
+      amountIn: params.amountIn.toString(),
+      amountOut: params.amountOut.toString(),
+      swapForY: params.swapForY,
+      activeBinId: params.activeBinId,
     },
     create: {
       id: event.transaction.hash,
       timestamp: event.transaction.timestamp,
       poolAddress: event.transaction.source,
-      senderAddress: event.params.senderAddress,
-      receiverAddress: event.params.receiverAddress,
-      amountIn: event.params.amountIn.toString(),
-      amountOut: event.params.amountOut.toString(),
-      swapForY: event.params.swapForY,
-      activeBinId: event.params.activeBinId,
+      senderAddress: params.senderAddress,
+      receiverAddress: params.receiverAddress,
+      amountIn: params.amountIn.toString(),
+      amountOut: params.amountOut.toString(),
+      swapForY: params.swapForY,
+      activeBinId: params.activeBinId,
     },
   });
 
@@ -47,8 +46,10 @@ export const handleSwap = async (
         id: event.transaction.source,
       },
       data: {
-        activeBinId: event.params.activeBinId,
+        activeBinId: params.activeBinId,
       },
     });
   }
 };
+
+export default handleSwap;

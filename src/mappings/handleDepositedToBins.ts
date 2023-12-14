@@ -1,15 +1,17 @@
-import { Event, DepositedToBinsParams } from "../types/events";
+import { Event } from "../types/events";
 import prisma from "../clients/prisma";
 import { Prisma } from "@prisma/client";
+import parseDepositedToBins from "../parsers/parseDepositedToBins";
 
-const handleDepositedToBins = async (event: Event<DepositedToBinsParams>) => {
+const handleDepositedToBins = async (event: Event) => {
+  const params = parseDepositedToBins(event.body);
   console.log("DepositedToBins event is indexed.");
   console.log(event);
 
-  const depositedArray = event.params.deposited.keys().map((key) => {
+  const depositedArray = params.deposited.keys().map((key) => {
     return {
       binId: key,
-      amount: event.params.deposited.get(key)?.amount.toString() || "0",
+      amount: params.deposited.get(key)?.amount.toString() || "0",
     };
   });
 
@@ -20,17 +22,17 @@ const handleDepositedToBins = async (event: Event<DepositedToBinsParams>) => {
     update: {
       timestamp: event.transaction.timestamp,
       poolAddress: event.transaction.source,
-      senderAddress: event.params.senderAddress,
-      receiverAddress: event.params.receiverAddress,
-      tokenAddress: event.params.tokenAddress,
+      senderAddress: params.senderAddress,
+      receiverAddress: params.receiverAddress,
+      tokenAddress: params.tokenAddress,
     },
     create: {
       id: event.transaction.hash,
       timestamp: event.transaction.timestamp,
       poolAddress: event.transaction.source,
-      senderAddress: event.params.senderAddress,
-      receiverAddress: event.params.receiverAddress,
-      tokenAddress: event.params.tokenAddress,
+      senderAddress: params.senderAddress,
+      receiverAddress: params.receiverAddress,
+      tokenAddress: params.tokenAddress,
       deposited: depositedArray as Prisma.JsonArray,
     },
   });
@@ -59,7 +61,7 @@ const handleDepositedToBins = async (event: Event<DepositedToBinsParams>) => {
   await Promise.all(
     depositedArray.map(async (deposited) => {
       const bin = bins.find((bin) => bin.binId === deposited.binId);
-      const isX = event.params.tokenAddress === pool?.tokenXAddress;
+      const isX = params.tokenAddress === pool?.tokenXAddress;
 
       if (bin) {
         return prisma.bins.updateMany({

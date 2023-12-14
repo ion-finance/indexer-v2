@@ -1,16 +1,17 @@
 import axios from "axios";
 import { TransactionResult } from "../types/ton-api";
 import { Address, Cell } from "@ton/core";
-import parseDepositedToBins from "../parsers/parseDepositedToBins";
-import parseInitialized from "../parsers/parseInitialized";
 import handleDepositedToBins from "../mappings/handleDepositedToBins";
 import handleInitialized from "../mappings/handleInitialized";
-import { handleSwap } from "../mappings/handleSwap";
-import parseSwap from "../parsers/parseSwap";
+import handleSwap from "../mappings/handleSwap";
+import handleTransferBatch from "../mappings/handleTransferBatch";
+import handleWithdrawnFromBins from "../mappings/handleWithdrawnFromBins";
 
 const DEPOSITED_TO_BINS = "0xafeb11ef";
 const INITIALIZED = "0x9bb3a52e";
 const SWAP = "0x25938561";
+const TRANSFER_BATCH = "0x5b8fa78c";
+const WITHDRAWN_FROM_BINS = "0xf6172b31";
 
 const handleEvent = async (event_id: string) => {
   // TODO : handle errors;
@@ -61,7 +62,7 @@ const handleEvent = async (event_id: string) => {
     for (let j = 0; j < tx.transaction.out_msgs.length; j++) {
       const msg = tx.transaction.out_msgs[j];
       const body = Cell.fromBoc(Buffer.from(msg.raw_body, "hex"))[0];
-      const parseTx = {
+      const transaction = {
         source: Address.parseRaw(tx.transaction.account.address).toString(),
         hash: tx.transaction.hash,
         timestamp: tx.transaction.utime,
@@ -70,22 +71,36 @@ const handleEvent = async (event_id: string) => {
       switch (msg.op_code) {
         case DEPOSITED_TO_BINS: {
           await handleDepositedToBins({
-            transaction: parseTx,
-            params: parseDepositedToBins(body),
+            transaction,
+            body,
           });
           break;
         }
         case INITIALIZED: {
           await handleInitialized({
-            transaction: parseTx,
-            params: parseInitialized(body),
+            transaction,
+            body,
           });
           break;
         }
         case SWAP: {
           await handleSwap({
-            transaction: parseTx,
-            params: parseSwap(body),
+            transaction,
+            body,
+          });
+          break;
+        }
+        case TRANSFER_BATCH: {
+          await handleTransferBatch({
+            transaction,
+            body,
+          });
+          break;
+        }
+        case WITHDRAWN_FROM_BINS: {
+          await handleWithdrawnFromBins({
+            transaction,
+            body,
           });
           break;
         }

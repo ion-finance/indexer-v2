@@ -1,4 +1,4 @@
-import { Dictionary } from "@ton/core";
+import { Cell } from "@ton/core";
 
 export interface Transaction {
   source: string; // pool address
@@ -6,14 +6,7 @@ export interface Transaction {
   timestamp: number; // timestamp
 }
 
-export interface Event<T> {
+export interface Event {
   transaction: Transaction;
-  params: T;
-}
-
-export interface DepositedToBinsParams {
-  senderAddress: string;
-  receiverAddress: string;
-  tokenAddress: string;
-  deposited: Dictionary<number, { amount: bigint }>;
+  body: Cell;
 }

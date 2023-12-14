@@ -4,16 +4,15 @@ import { Prisma } from "@prisma/client";
 import parseTransferBatch from "../parsers/parseTransferBatch";
 import _ from "lodash";
 
-export const handleTransferBatch = async (
-  event: Event<ReturnType<typeof parseTransferBatch>>
-) => {
+const handleTransferBatch = async (event: Event) => {
   console.log("TransferBatch event is indexed.");
   console.log(event);
+  const params = parseTransferBatch(event.body);
 
-  const amountArray = event.params.amounts.keys().map((key) => {
+  const amountArray = params.amounts.keys().map((key) => {
     return {
       binId: key,
-      amount: event.params.amounts.get(key)?.amount.toString() || "0",
+      amount: params.amounts.get(key)?.amount.toString() || "0",
     };
   });
 
@@ -22,9 +21,9 @@ export const handleTransferBatch = async (
       id: event.transaction.hash,
       timestamp: event.transaction.timestamp,
       poolAddress: event.transaction.source,
-      senderAddress: event.params.senderAddress,
-      fromAddress: event.params.fromAddress,
-      toAddress: event.params.toAddress,
+      senderAddress: params.senderAddress,
+      fromAddress: params.fromAddress,
+      toAddress: params.toAddress,
       amounts: amountArray as Prisma.JsonArray,
     },
   });
@@ -32,7 +31,7 @@ export const handleTransferBatch = async (
   const lpTokenWalletFrom = await prisma.lpTokenWallet.findFirst({
     where: {
       poolAddress: event.transaction.source,
-      ownerAddress: event.params.fromAddress,
+      ownerAddress: params.fromAddress,
     },
   });
 
@@ -64,14 +63,14 @@ export const handleTransferBatch = async (
     });
   }
 
-  if (event.params.toAddress === event.transaction.source) {
+  if (params.toAddress === event.transaction.source) {
     return;
   }
 
   const lpTokenWalletTo = await prisma.lpTokenWallet.findFirst({
     where: {
       poolAddress: event.transaction.source,
-      ownerAddress: event.params.toAddress,
+      ownerAddress: params.toAddress,
     },
   });
 
@@ -108,9 +107,11 @@ export const handleTransferBatch = async (
     await prisma.lpTokenWallet.create({
       data: {
         poolAddress: event.transaction.source,
-        ownerAddress: event.params.toAddress,
+        ownerAddress: params.toAddress,
         shares: amountArray as Prisma.JsonArray,
       },
     });
   }
 };
+
+export default handleTransferBatch;

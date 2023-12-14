@@ -3,17 +3,16 @@ import prisma from "../clients/prisma";
 import { Prisma } from "@prisma/client";
 import parseWithdrawnFromBins from "../parsers/parseWithdrawnFromBins";
 
-const handleWithdrawnFromBins = async (
-  event: Event<ReturnType<typeof parseWithdrawnFromBins>>
-) => {
+const handleWithdrawnFromBins = async (event: Event) => {
+  const params = parseWithdrawnFromBins(event.body);
   console.log("WithdrawnFromBins event is indexed.");
   console.log(event);
 
-  const withdrawnArray = event.params.withdrawn.keys().map((key) => {
+  const withdrawnArray = params.withdrawn.keys().map((key) => {
     return {
       binId: key,
-      amountX: event.params.withdrawn.get(key)?.amountX.toString() || "0",
-      amount: event.params.withdrawn.get(key)?.amountY.toString() || "0",
+      amountX: params.withdrawn.get(key)?.amountX.toString() || "0",
+      amount: params.withdrawn.get(key)?.amountY.toString() || "0",
     };
   });
 
@@ -24,15 +23,15 @@ const handleWithdrawnFromBins = async (
     update: {
       timestamp: event.transaction.timestamp,
       poolAddress: event.transaction.source,
-      senderAddress: event.params.senderAddress,
-      receiverAddress: event.params.receiverAddress,
+      senderAddress: params.senderAddress,
+      receiverAddress: params.receiverAddress,
     },
     create: {
       id: event.transaction.hash,
       timestamp: event.transaction.timestamp,
       poolAddress: event.transaction.source,
-      senderAddress: event.params.senderAddress,
-      receiverAddress: event.params.receiverAddress,
+      senderAddress: params.senderAddress,
+      receiverAddress: params.receiverAddress,
       withdrawn: withdrawnArray as Prisma.JsonArray,
     },
   });
