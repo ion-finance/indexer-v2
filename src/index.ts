@@ -262,7 +262,7 @@ app.get("/pools", async function handler(req, res) {
         liquidityUsd: 17732929.594,
         volumeUsd: 18123142.156,
         feesUsd: 12123,
-        apy: 12.15,
+        apy: 12.16,
       };
     })
   );
