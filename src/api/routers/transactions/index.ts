@@ -14,6 +14,8 @@ const transactions = [
     timestamp: 1701863435,
     tokenAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
     poolAddress: "EQDeFZXkU2eMz8PRSkt6tEJaQgV2WU2BBMBZEQqVl4KVaAp_",
+    senderAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
+    recevierAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
     deposited: [
       { binId: 8388604, amount: "10000000" },
       { binId: 8388605, amount: "10000000" },
@@ -28,6 +30,8 @@ const transactions = [
     createdAt: "2023-12-21 10:00:27.451",
     timestamp: 1701865435,
     poolAddress: "EQDeFZXkU2eMz8PRSkt6tEJaQgV2WU2BBMBZEQqVl4KVaAp_",
+    senderAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
+    recevierAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
     withdrawn: [
       { binId: 8388604, amount: "10000000" },
       { binId: 8388605, amount: "10000000" },
