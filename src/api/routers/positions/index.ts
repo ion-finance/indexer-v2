@@ -20,8 +20,9 @@ router.get("/positions/:address", async function handler(req, res) {
   // Mock data
   return res.json({
     summary: {
-      balanceUsd: "100000",
-      earnedUsd: "0",
+      balanceUsd: 100000,
+      apy: 12.2,
+      earnedUsd: 0,
     },
     positions: [
       {
@@ -32,8 +33,8 @@ router.get("/positions/:address", async function handler(req, res) {
           { binId: 8388607, amount: "4000000" },
           { binId: 8388608, amount: "2000000" },
         ],
-        feeUsd: "0",
-        balanceUsd: "100000",
+        feeUsd: 0,
+        balanceUsd: 100000,
       },
     ],
   });
