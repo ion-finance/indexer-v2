@@ -62,7 +62,7 @@ const transactions = [
 */
 
 router.get("/transactions", async function handler(req, res) {
-  const { poolAddress, senderAddress } = req.query;
+  const { poolAddress, senderAddress, type } = req.query;
 
   const query = {} as { poolAddress?: string; senderAddress?: string };
 
@@ -81,9 +81,13 @@ router.get("/transactions", async function handler(req, res) {
   }
 
   const [deposit, withdraw, swap] = await Promise.all([
-    prisma.depositedToBins.findMany({ where: query }),
-    prisma.withdrawnFromBins.findMany({ where: query }),
-    prisma.swap.findMany({ where: query }),
+    !type || type === "deposit"
+      ? prisma.depositedToBins.findMany({ where: query })
+      : [],
+    !type || type === "withdraw"
+      ? prisma.withdrawnFromBins.findMany({ where: query })
+      : [],
+    !type || type === "swap" ? prisma.swap.findMany({ where: query }) : [],
   ]);
 
   const transactions = _.sortBy(
