@@ -8,7 +8,7 @@ const router = Router();
 TEST Data
 const transactions = [
   {
-    type: "deposit",
+    type: "add",
     id: "395a8f0f33ef97d67e2b17114bfd3007dbca6f5f915f7a975ba8bfe9ec015117",
     createdAt: "2023-12-20 10:00:27.451",
     timestamp: 1701863435,
@@ -25,7 +25,7 @@ const transactions = [
     ],
   },
   {
-    type: "withdraw",
+    type: "remove",
     id: "9f29502d94e83da176f7bab3d242902a4af212dc53c01e15673954f3a5a87229",
     createdAt: "2023-12-21 10:00:27.451",
     timestamp: 1701865435,
@@ -92,8 +92,8 @@ router.get("/transactions", async function handler(req, res) {
 
   const transactions = _.sortBy(
     [
-      ...deposit.map((t) => ({ ...t, type: "deposit" })),
-      ...withdraw.map((t) => ({ ...t, type: "withdraw" })),
+      ...deposit.map((t) => ({ ...t, type: "add" })),
+      ...withdraw.map((t) => ({ ...t, type: "remove" })),
       ...swap.map((t) => ({ ...t, type: "swap" })),
     ],
     "timestamp"
