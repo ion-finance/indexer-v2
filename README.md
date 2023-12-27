@@ -6,6 +6,9 @@ Ion Indexer is a indexer to index events of Ion contracts. It is used to provide
 
 - DepositedToBins
 - Initialized
+- WithdrawnFromBins
+- Swap
+- TransferBatch
 
 ## Getting Started
 
