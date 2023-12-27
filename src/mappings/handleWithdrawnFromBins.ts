@@ -12,7 +12,7 @@ const handleWithdrawnFromBins = async (event: Event) => {
     return {
       binId: key,
       amountX: params.withdrawn.get(key)?.amountX.toString() || "0",
-      amount: params.withdrawn.get(key)?.amountY.toString() || "0",
+      amountY: params.withdrawn.get(key)?.amountY.toString() || "0",
     };
   });
 
@@ -62,7 +62,7 @@ const handleWithdrawnFromBins = async (event: Event) => {
               BigInt(bin.reserveX) - BigInt(withdrawn.amountX)
             ).toString(),
             reserveY: (
-              BigInt(bin.reserveY) - BigInt(withdrawn.amount)
+              BigInt(bin.reserveY) - BigInt(withdrawn.amountY)
             ).toString(),
           },
         });

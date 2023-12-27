@@ -33,11 +33,11 @@ const transactions = [
     senderAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
     recevierAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
     withdrawn: [
-      { binId: 8388604, amount: "10000000" },
-      { binId: 8388605, amount: "10000000" },
-      { binId: 8388606, amount: "10000000" },
-      { binId: 8388607, amount: "10000000" },
-      { binId: 8388608, amount: "10000000" },
+      { binId: 8388604, amountX: "10000000", amountY: "10000000" },
+      { binId: 8388605, amountX: "10000000", amountY: "10000000" },
+      { binId: 8388606, amountX: "10000000", amountY: "10000000" },
+      { binId: 8388607, amountX: "10000000", amountY: "10000000" },
+      { binId: 8388608, amountX: "10000000", amountY: "10000000" },
     ],
   },
   {
