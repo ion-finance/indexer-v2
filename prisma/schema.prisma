@@ -100,6 +100,43 @@ model LpTokenWallet {
   shares       Json     @default("{}")
 }
 
+enum OrderType {
+  PLACED
+  CANCLLED
+  EXECUTED
+  CLAIMED
+}
+
+model OrderHistory {
+  id                 String    @id // txHash
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @default(now()) @updatedAt
+  timestamp          Int
+  poolAddress        String
+  senderAddress      String
+  relatedOwnerAddres String? // In case of executed order, tx is only one but there are many order owners
+  binId              Int
+  orderForY          Boolean
+  positionId         Int
+  amountX            String
+  amountY            String
+  orderType          OrderType
+}
+
+model Order {
+  id           String    @id @default(uuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now()) @updatedAt
+  timestamp    Int
+  poolAddress  String
+  ownerAddress String
+  binId        Int
+  positionId   Int
+  amountX      String    @default("0")
+  amountY      String    @default("0")
+  status       OrderType @default(PLACED)
+}
+
 // last block or tx data
 // heath check
 model IndexerState {

@@ -6,12 +6,20 @@ import handleInitialized from "../mappings/handleInitialized";
 import handleSwap from "../mappings/handleSwap";
 import handleTransferBatch from "../mappings/handleTransferBatch";
 import handleWithdrawnFromBins from "../mappings/handleWithdrawnFromBins";
+import handleOrderPlaced from "../mappings/handleOrderPlaced";
+import handleOrderCancelled from "../mappings/handleOrderCancelled";
+import handleOrderClaimed from "../mappings/handleOrderClaimed";
+import handleOrderExecuted from "../mappings/handleOrderExecuted";
 
 const DEPOSITED_TO_BINS = "0xafeb11ef";
 const INITIALIZED = "0x9bb3a52e";
 const SWAP = "0x25938561";
 const TRANSFER_BATCH = "0x5b8fa78c";
 const WITHDRAWN_FROM_BINS = "0xf6172b31";
+const ORDER_PLACED = "0xbef3f947";
+const ORDER_CANCELLED = "0x4572803f";
+const ORDER_EXECUTED = "0x18b134be";
+const ORDER_CLAIMED = "0x5e586bc8";
 
 const handleEvent = async (event_id: string) => {
   // TODO : handle errors;
@@ -99,6 +107,34 @@ const handleEvent = async (event_id: string) => {
         }
         case WITHDRAWN_FROM_BINS: {
           await handleWithdrawnFromBins({
+            transaction,
+            body,
+          });
+          break;
+        }
+        case ORDER_PLACED: {
+          await handleOrderPlaced({
+            transaction,
+            body,
+          });
+          break;
+        }
+        case ORDER_CANCELLED: {
+          await handleOrderCancelled({
+            transaction,
+            body,
+          });
+          break;
+        }
+        case ORDER_CLAIMED: {
+          await handleOrderClaimed({
+            transaction,
+            body,
+          });
+          break;
+        }
+        case ORDER_EXECUTED: {
+          await handleOrderExecuted({
             transaction,
             body,
           });
