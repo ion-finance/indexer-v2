@@ -147,6 +147,7 @@ CREATE TABLE "Order" (
     "amountX" TEXT NOT NULL DEFAULT '0',
     "amountY" TEXT NOT NULL DEFAULT '0',
     "status" "OrderType" NOT NULL DEFAULT 'PLACED',
+    "orderForY" BOOLEAN NOT NULL,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );

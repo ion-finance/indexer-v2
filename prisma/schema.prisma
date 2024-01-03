@@ -135,6 +135,7 @@ model Order {
   amountX      String    @default("0")
   amountY      String    @default("0")
   status       OrderType @default(PLACED)
+  orderForY    Boolean
 }
 
 // last block or tx data

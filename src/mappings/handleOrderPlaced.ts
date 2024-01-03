@@ -39,6 +39,7 @@ const handleOrderPlaced = async (event: Event) => {
         binId: params.binId,
         timestamp: event.transaction.timestamp,
         status: OrderType.PLACED,
+        orderForY: params.orderForY,
       },
     });
   }
