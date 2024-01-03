@@ -51,7 +51,7 @@ router.get("/transactions", async function handler(req, res) {
       : [],
   ]);
 
-  const transactions = _.sortBy(
+  const transactions = _.orderBy(
     [
       ...deposit.map((t) => ({ ...t, type: "add" })),
       ...withdraw.map((t) => ({ ...t, type: "remove" })),
