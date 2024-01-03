@@ -58,7 +58,8 @@ router.get("/transactions", async function handler(req, res) {
       ...swap.map((t) => ({ ...t, type: "swap" })),
       ...orderHistory.map((t) => ({ ...t, type: "order" })),
     ],
-    "timestamp"
+    "timestamp",
+    "desc"
   );
 
   return res.json({
