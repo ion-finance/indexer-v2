@@ -26,6 +26,7 @@ const eventPooling = async () => {
       await handleEvent(events[events.length - 1 - i].event_id);
     } catch (e) {
       error = true;
+      console.error(e);
       console.error(`Error when handling event ${events[i].event_id}`);
     }
   }
