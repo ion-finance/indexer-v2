@@ -15,7 +15,7 @@ const fetchEvents = async () => {
     );
 
     const events = res.data.events as Event[];
-    return events;
+    return events.filter((event) => event.in_progress === false);
   } catch (e) {
     return [];
   }
