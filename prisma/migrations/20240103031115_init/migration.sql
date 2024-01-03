@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "OrderType" AS ENUM ('PLACED', 'CANCLLED', 'EXECUTED', 'CLAIMED');
+
 -- CreateTable
 CREATE TABLE "Pool" (
     "id" TEXT NOT NULL,
@@ -110,6 +113,42 @@ CREATE TABLE "LpTokenWallet" (
     "shares" JSONB NOT NULL DEFAULT '{}',
 
     CONSTRAINT "LpTokenWallet_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "OrderHistory" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "timestamp" INTEGER NOT NULL,
+    "poolAddress" TEXT NOT NULL,
+    "senderAddress" TEXT NOT NULL,
+    "relatedOwnerAddres" TEXT,
+    "binId" INTEGER NOT NULL,
+    "orderForY" BOOLEAN NOT NULL,
+    "positionId" INTEGER NOT NULL,
+    "amountX" TEXT NOT NULL,
+    "amountY" TEXT NOT NULL,
+    "orderType" "OrderType" NOT NULL,
+
+    CONSTRAINT "OrderHistory_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Order" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "timestamp" INTEGER NOT NULL,
+    "poolAddress" TEXT NOT NULL,
+    "ownerAddress" TEXT NOT NULL,
+    "binId" INTEGER NOT NULL,
+    "positionId" INTEGER NOT NULL,
+    "amountX" TEXT NOT NULL DEFAULT '0',
+    "amountY" TEXT NOT NULL DEFAULT '0',
+    "status" "OrderType" NOT NULL DEFAULT 'PLACED',
+
+    CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
