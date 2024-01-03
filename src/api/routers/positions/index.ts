@@ -1,42 +1,48 @@
 import { Router } from "express";
+import prisma from "../../../clients/prisma";
+import { parseUnits } from "ethers";
 const router = Router();
 
-// TODO
-// 1. calc balances usd
-// 2. remove mock data
 router.get("/positions/:address", async function handler(req, res) {
   const address = req.params.address;
 
-  /*
-    const lpTokenWallets = await prisma.lpTokenWallet.findMany({
+  const [tokens, pools, lpTokenWallets] = await Promise.all([
+    prisma.token.findMany(),
+    prisma.pool.findMany(),
+    prisma.lpTokenWallet.findMany({
       where: {
         ownerAddress: address,
       },
-    });
+    }),
+  ]);
 
-    return res.json(lpTokenWallets);
-    */
+  const data = lpTokenWallets.map((wallet) => {
+    const pool = pools.find((p) => p.id === wallet.poolAddress);
+    const tokenY = tokens.find((t) => t.id === pool?.tokenYAddress);
 
-  // Mock data
+    const totalBalance = (wallet.shares as { amount: string }[]).reduce(
+      (res, cur) => {
+        return (
+          res + (tokenY ? Number(parseUnits(cur.amount, tokenY.decimals)) : 0)
+        );
+      },
+      0
+    );
+
+    return {
+      ...wallet,
+      feeUsd: 0,
+      balanceUsd: totalBalance, // TODO apply token price
+    };
+  });
+
   return res.json({
     summary: {
-      balanceUsd: 100000,
+      balanceUsd: data.reduce((res, cur) => res + cur.balanceUsd, 0),
       apy: 12.2,
       earnedUsd: 0,
     },
-    positions: [
-      {
-        poolAddress: "EQDeFZXkU2eMz8PRSkt6tEJaQgV2WU2BBM1BZEQqVl4KVaAp_",
-        ownerAddress: address,
-        amounts: [
-          { binId: 8388606, amount: "4000000" },
-          { binId: 8388607, amount: "4000000" },
-          { binId: 8388608, amount: "2000000" },
-        ],
-        feeUsd: 0,
-        balanceUsd: 100000,
-      },
-    ],
+    positions: data,
   });
 });
 
