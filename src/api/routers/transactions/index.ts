@@ -1,70 +1,16 @@
 import { Router } from "express";
 import prisma from "../../../clients/prisma";
+import { Prisma } from "@prisma/client";
 import _ from "lodash";
 
 const router = Router();
-
-/*
-TEST Data
-const transactions = [
-  {
-    type: "add",
-    id: "395a8f0f33ef97d67e2b17114bfd3007dbca6f5f915f7a975ba8bfe9ec015117",
-    createdAt: "2023-12-20 10:00:27.451",
-    timestamp: 1701863435,
-    tokenAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
-    poolAddress: "EQDeFZXkU2eMz8PRSkt6tEJaQgV2WU2BBMBZEQqVl4KVaAp_",
-    senderAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
-    recevierAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
-    deposited: [
-      { binId: 8388604, amount: "10000000" },
-      { binId: 8388605, amount: "10000000" },
-      { binId: 8388606, amount: "10000000" },
-      { binId: 8388607, amount: "10000000" },
-      { binId: 8388608, amount: "10000000" },
-    ],
-  },
-  {
-    type: "remove",
-    id: "9f29502d94e83da176f7bab3d242902a4af212dc53c01e15673954f3a5a87229",
-    createdAt: "2023-12-21 10:00:27.451",
-    timestamp: 1701865435,
-    poolAddress: "EQDeFZXkU2eMz8PRSkt6tEJaQgV2WU2BBMBZEQqVl4KVaAp_",
-    senderAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
-    recevierAddress: "EQBDjGFi2J4uEvqHI66qX_PA5M2T0yHzdKnLDThoHLUdgcGH",
-    withdrawn: [
-      { binId: 8388604, amountX: "10000000", amountY: "10000000" },
-      { binId: 8388605, amountX: "10000000", amountY: "10000000" },
-      { binId: 8388606, amountX: "10000000", amountY: "10000000" },
-      { binId: 8388607, amountX: "10000000", amountY: "10000000" },
-      { binId: 8388608, amountX: "10000000", amountY: "10000000" },
-    ],
-  },
-  {
-    type: "swap",
-    id: "395f12454c0910b25a39ced728ac296f51f79c786f9322074dd54801af59f904",
-    timestamp: 1701865435,
-    poolAddress: "EQDeFZXkU2eMz8PRSkt6tEJaQgV2WU2BBMBZEQqVl4KVaAp_",
-    amountIn: "10000000",
-    amountOut: "10000000",
-    swapForY: true,
-  },
-  {
-    type: "swap",
-    id: "7b066c7c1186bfa897854f0afbf0c1484cdad5b6b0a7063ef5f5b78ce4d066f0",
-    timestamp: 1701866435,
-    poolAddress: "EQDeFZXkU2eMz8PRSkt6tEJaQgV2WU2BBMBZEQqVl4KVaAp_",
-    amountIn: "10000000",
-    amountOut: "10000000",
-    swapForY: false,
-  },
-];
-*/
 
 router.get("/transactions", async function handler(req, res) {
   const { poolAddress, senderAddress, type } = req.query;
 
   const query = {} as { poolAddress?: string; senderAddress?: string };
+  let orderQuery = {} as Prisma.OrderHistoryWhereInput;
+  prisma.orderHistory;
 
   if (!poolAddress && !senderAddress) {
     return res.json({
@@ -75,12 +21,22 @@ router.get("/transactions", async function handler(req, res) {
 
   if (poolAddress) {
     query.poolAddress = poolAddress as string;
+    orderQuery.poolAddress = poolAddress as string;
   }
   if (senderAddress) {
     query.senderAddress = senderAddress as string;
+    orderQuery = {
+      ...orderQuery,
+      AND: {
+        OR: [
+          { senderAddress: senderAddress as string },
+          { relatedOwnerAddres: { contains: senderAddress as string } },
+        ],
+      },
+    };
   }
 
-  const [deposit, withdraw, swap] = await Promise.all([
+  const [deposit, withdraw, swap, orderHistory] = await Promise.all([
     !type || type === "deposit"
       ? prisma.depositedToBins.findMany({ where: query })
       : [],
@@ -88,6 +44,11 @@ router.get("/transactions", async function handler(req, res) {
       ? prisma.withdrawnFromBins.findMany({ where: query })
       : [],
     !type || type === "swap" ? prisma.swap.findMany({ where: query }) : [],
+    !type || type === "order"
+      ? prisma.orderHistory.findMany({
+          where: orderQuery,
+        })
+      : [],
   ]);
 
   const transactions = _.sortBy(
@@ -95,6 +56,7 @@ router.get("/transactions", async function handler(req, res) {
       ...deposit.map((t) => ({ ...t, type: "add" })),
       ...withdraw.map((t) => ({ ...t, type: "remove" })),
       ...swap.map((t) => ({ ...t, type: "swap" })),
+      ...orderHistory.map((t) => ({ ...t, type: "order" })),
     ],
     "timestamp"
   );
