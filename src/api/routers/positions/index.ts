@@ -1,6 +1,6 @@
 import { Router } from "express";
 import prisma from "../../../clients/prisma";
-import { parseUnits } from "ethers";
+import { formatUnits } from "ethers";
 const router = Router();
 
 router.get("/positions/:address", async function handler(req, res) {
@@ -23,7 +23,7 @@ router.get("/positions/:address", async function handler(req, res) {
     const totalBalance = (wallet.shares as { amount: string }[]).reduce(
       (res, cur) => {
         return (
-          res + (tokenY ? Number(parseUnits(cur.amount, tokenY.decimals)) : 0)
+          res + (tokenY ? Number(formatUnits(cur.amount, tokenY.decimals)) : 0)
         );
       },
       0

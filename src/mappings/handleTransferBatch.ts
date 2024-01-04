@@ -6,7 +6,6 @@ import _ from "lodash";
 
 const handleTransferBatch = async (event: Event) => {
   console.log("TransferBatch event is indexed.");
-  console.log(event);
   const params = parseTransferBatch(event.body);
 
   const amountArray = params.amounts.keys().map((key) => {
