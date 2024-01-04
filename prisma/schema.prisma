@@ -44,6 +44,7 @@ model Bins {
 
 model DepositedToBins {
   id              String   @id // txHash
+  eventId         String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
   timestamp       Int
@@ -56,6 +57,7 @@ model DepositedToBins {
 
 model WithdrawnFromBins {
   id              String   @id // txHash
+  eventId         String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
   timestamp       Int
@@ -67,6 +69,7 @@ model WithdrawnFromBins {
 
 model Swap {
   id              String   @id // txHash
+  eventId         String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
   timestamp       Int
@@ -81,6 +84,7 @@ model Swap {
 
 model TransferBatch {
   id            String   @id // txHash
+  eventId       String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
   timestamp     Int
@@ -109,6 +113,7 @@ enum OrderType {
 
 model OrderHistory {
   id                 String    @id // txHash
+  eventId            String
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @default(now()) @updatedAt
   timestamp          Int

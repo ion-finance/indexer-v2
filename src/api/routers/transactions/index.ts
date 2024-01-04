@@ -51,21 +51,28 @@ router.get("/transactions", async function handler(req, res) {
       : [],
   ]);
 
-  const transactions = _.orderBy(
-    [
-      ...deposit.map((t) => ({ ...t, type: "add" })),
-      ...withdraw.map((t) => ({ ...t, type: "remove" })),
-      ...swap.map((t) => ({ ...t, type: "swap" })),
-      ...orderHistory.map((t) => ({ ...t, type: "order" })),
-    ],
-    "timestamp",
-    "desc"
-  );
+  const transactions = [
+    ...deposit.map((t) => ({ ...t, type: "add" })),
+    ...withdraw.map((t) => ({ ...t, type: "remove" })),
+    ...swap.map((t) => ({ ...t, type: "swap" })),
+    ...orderHistory.map((t) => ({ ...t, type: "order" })),
+  ];
 
   return res.json({
     // TODO
     // 1. pagenation
-    data: transactions,
+    data: _.orderBy(
+      _.values(_.groupBy(transactions, "eventId")).map((txs) => {
+        const first = _.orderBy(txs, "timestamp", "asc")[0];
+
+        return {
+          ...first,
+          children: txs.filter((tx) => tx.id !== first.id),
+        };
+      }),
+      "timestamp",
+      "desc"
+    ),
   });
 });
 

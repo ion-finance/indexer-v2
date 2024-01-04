@@ -33,6 +33,7 @@ const handleOrderClaimed = async (event: Event) => {
   await prisma.orderHistory.create({
     data: {
       id: event.transaction.hash,
+      eventId: event.transaction.eventId,
       amountX: params.amountX.toString(),
       amountY: params.amountY.toString(),
       senderAddress: params.senderAddress,

@@ -45,6 +45,7 @@ CREATE TABLE "Bins" (
 -- CreateTable
 CREATE TABLE "DepositedToBins" (
     "id" TEXT NOT NULL,
+    "eventId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "timestamp" INTEGER NOT NULL,
@@ -60,6 +61,7 @@ CREATE TABLE "DepositedToBins" (
 -- CreateTable
 CREATE TABLE "WithdrawnFromBins" (
     "id" TEXT NOT NULL,
+    "eventId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "timestamp" INTEGER NOT NULL,
@@ -74,6 +76,7 @@ CREATE TABLE "WithdrawnFromBins" (
 -- CreateTable
 CREATE TABLE "Swap" (
     "id" TEXT NOT NULL,
+    "eventId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "timestamp" INTEGER NOT NULL,
@@ -91,6 +94,7 @@ CREATE TABLE "Swap" (
 -- CreateTable
 CREATE TABLE "TransferBatch" (
     "id" TEXT NOT NULL,
+    "eventId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "timestamp" INTEGER NOT NULL,
@@ -118,6 +122,7 @@ CREATE TABLE "LpTokenWallet" (
 -- CreateTable
 CREATE TABLE "OrderHistory" (
     "id" TEXT NOT NULL,
+    "eventId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "timestamp" INTEGER NOT NULL,

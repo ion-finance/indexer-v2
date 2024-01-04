@@ -23,6 +23,7 @@ const handleSwap = async (event: Event) => {
     },
     create: {
       id: event.transaction.hash,
+      eventId: event.transaction.eventId,
       timestamp: event.transaction.timestamp,
       poolAddress: event.transaction.source,
       senderAddress: params.senderAddress,

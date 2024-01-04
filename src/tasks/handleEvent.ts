@@ -74,6 +74,7 @@ const handleEvent = async (event_id: string) => {
         source: Address.parseRaw(tx.transaction.account.address).toString(),
         hash: tx.transaction.hash,
         timestamp: tx.transaction.utime,
+        eventId: event_id,
       };
 
       switch (msg.op_code) {
