@@ -14,7 +14,7 @@ router.get("/transactions", async function handler(req, res) {
 
   if (!poolAddress && !senderAddress) {
     return res.json({
-      status: "bad request",
+      status: 400,
       data: [],
     });
   }
@@ -73,6 +73,49 @@ router.get("/transactions", async function handler(req, res) {
       "timestamp",
       "desc"
     ),
+  });
+});
+
+router.get("/transactions/:event_id", async function handler(req, res) {
+  const { event_id } = req.params;
+
+  if (!event_id) {
+    return res.json({
+      status: 400,
+      data: [],
+    });
+  }
+
+  const query = {
+    eventId: event_id as string,
+  };
+
+  const [deposit, withdraw, swap, orderHistory] = await Promise.all([
+    prisma.depositedToBins.findMany({ where: query }),
+    prisma.withdrawnFromBins.findMany({ where: query }),
+    prisma.swap.findMany({ where: query }),
+    prisma.orderHistory.findMany({
+      where: query,
+    }),
+  ]);
+
+  const transactions = [
+    ...deposit.map((t) => ({ ...t, type: "add" })),
+    ...withdraw.map((t) => ({ ...t, type: "remove" })),
+    ...swap.map((t) => ({ ...t, type: "swap" })),
+    ...orderHistory.map((t) => ({ ...t, type: "order" })),
+  ];
+
+  return res.json({
+    status: 200,
+    data: transactions[0]
+      ? [
+          {
+            ...transactions[0],
+            children: transactions.slice(1),
+          },
+        ]
+      : [],
   });
 });
 
