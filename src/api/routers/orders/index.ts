@@ -1,6 +1,7 @@
 import { Router } from "express";
 import prisma from "../../../clients/prisma";
 import { Prisma } from "@prisma/client";
+import { orderBy } from "lodash";
 
 const router = Router();
 
@@ -24,11 +25,12 @@ router.get("/orders", async function handler(req, res) {
   }
 
   const orders = await prisma.order.findMany({ where: query });
+  const sorted = orderBy(orders, ["timestamp"], ["desc"]);
 
   return res.json({
     // TODO
     // 1. pagenation
-    data: orders,
+    data: sorted,
   });
 });
 
