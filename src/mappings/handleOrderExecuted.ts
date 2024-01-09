@@ -35,6 +35,7 @@ const handleOrderExecuted = async (event: Event) => {
       amountY: params.amountY.toString(),
       senderAddress: params.senderAddress,
       poolAddress: params.poolAddress,
+      positionAddress: params.positionAddress,
       positionId: params.positionId,
       orderForY: params.orderForY,
       binId: params.binId,

@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "OrderType" AS ENUM ('PLACED', 'CANCLLED', 'EXECUTED', 'CLAIMED');
+CREATE TYPE "OrderType" AS ENUM ('PLACED', 'CANCELLED', 'EXECUTED', 'CLAIMED');
 
 -- CreateTable
 CREATE TABLE "Pool" (
@@ -128,6 +128,7 @@ CREATE TABLE "OrderHistory" (
     "timestamp" INTEGER NOT NULL,
     "poolAddress" TEXT NOT NULL,
     "senderAddress" TEXT NOT NULL,
+    "positionAddress" TEXT NOT NULL,
     "relatedOwnerAddres" TEXT,
     "binId" INTEGER NOT NULL,
     "orderForY" BOOLEAN NOT NULL,
@@ -147,6 +148,7 @@ CREATE TABLE "Order" (
     "timestamp" INTEGER NOT NULL,
     "poolAddress" TEXT NOT NULL,
     "ownerAddress" TEXT NOT NULL,
+    "positionAddress" TEXT NOT NULL,
     "binId" INTEGER NOT NULL,
     "positionId" INTEGER NOT NULL,
     "amountX" TEXT NOT NULL DEFAULT '0',

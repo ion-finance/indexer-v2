@@ -106,7 +106,7 @@ model LpTokenWallet {
 
 enum OrderType {
   PLACED
-  CANCLLED
+  CANCELLED
   EXECUTED
   CLAIMED
 }
@@ -119,6 +119,7 @@ model OrderHistory {
   timestamp          Int
   poolAddress        String
   senderAddress      String
+  positionAddress    String
   relatedOwnerAddres String? // In case of executed order, tx is only one but there are many order owners
   binId              Int
   orderForY          Boolean
@@ -129,18 +130,19 @@ model OrderHistory {
 }
 
 model Order {
-  id           String    @id @default(uuid())
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @default(now()) @updatedAt
-  timestamp    Int
-  poolAddress  String
-  ownerAddress String
-  binId        Int
-  positionId   Int
-  amountX      String    @default("0")
-  amountY      String    @default("0")
-  status       OrderType @default(PLACED)
-  orderForY    Boolean
+  id              String    @id @default(uuid())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+  timestamp       Int
+  poolAddress     String
+  ownerAddress    String
+  positionAddress String
+  binId           Int
+  positionId      Int
+  amountX         String    @default("0")
+  amountY         String    @default("0")
+  status          OrderType @default(PLACED)
+  orderForY       Boolean
 }
 
 // last block or tx data

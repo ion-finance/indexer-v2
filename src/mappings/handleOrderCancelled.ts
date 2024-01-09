@@ -11,6 +11,7 @@ const handleOrderCancelled = async (event: Event) => {
   const order = await prisma.order.findFirst({
     where: {
       poolAddress: params.poolAddress,
+      positionAddress: params.positionAddress,
       ownerAddress: params.senderAddress,
       positionId: params.positionId,
       binId: params.binId,
@@ -23,7 +24,7 @@ const handleOrderCancelled = async (event: Event) => {
         id: order.id,
       },
       data: {
-        status: OrderType.CANCLLED,
+        status: OrderType.CANCELLED,
       },
     });
   } else {
@@ -38,11 +39,12 @@ const handleOrderCancelled = async (event: Event) => {
       amountY: params.amountY.toString(),
       senderAddress: params.senderAddress,
       poolAddress: params.poolAddress,
+      positionAddress: params.positionAddress,
       positionId: params.positionId,
       orderForY: params.orderForY,
       binId: params.binId,
       timestamp: event.transaction.timestamp,
-      orderType: OrderType.CANCLLED,
+      orderType: OrderType.CANCELLED,
     },
   });
 };

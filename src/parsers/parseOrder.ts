@@ -5,6 +5,7 @@ const parseOrder = (message: Cell) => {
   const logCode = body.loadUint(32);
   const senderAddress = body.loadAddress().toString();
   const poolAddress = body.loadAddress().toString();
+  const positionAddress = body.loadAddress().toString();
   const binId = body.loadUint(24);
   const orderForY = body.loadBoolean();
   const positionId = body.loadUint(32);
@@ -15,6 +16,7 @@ const parseOrder = (message: Cell) => {
     logCode,
     senderAddress,
     poolAddress,
+    positionAddress,
     binId,
     orderForY,
     positionId,
