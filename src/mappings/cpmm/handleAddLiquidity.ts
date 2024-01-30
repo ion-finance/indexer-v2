@@ -5,8 +5,8 @@ import parseAddLiquidity from "../../parsers/cpmm/parseAddLiquidity";
 export const handleAddLiquidity = async (event: Event) => {
   const params = parseAddLiquidity(event.body);
   console.log("Add liquidity event is indexed.");
-  console.log(event);
-  const { from, amountX, amountY, minted } = params;
+  console.log(params);
+  const { senderAddress, amountX, amountY, minted } = params;
   const { hash, source, timestamp } = event.transaction;
   const pool = await prisma.pool.findFirst({
     where: {
@@ -25,8 +25,8 @@ export const handleAddLiquidity = async (event: Event) => {
       eventId: event.transaction.eventId,
     },
     update: {
-      senderAddress: from,
-      receiverAddress: from,
+      senderAddress: senderAddress,
+      receiverAddress: senderAddress,
       poolAddress: source,
       tokenAddress: pool.tokenXAddress, // TODO : In case of cpmm, tokenXAddress is unnecessary.
       amountX,
@@ -36,8 +36,8 @@ export const handleAddLiquidity = async (event: Event) => {
     create: {
       id: hash,
       eventId: event.transaction.eventId,
-      senderAddress: from,
-      receiverAddress: from,
+      senderAddress: senderAddress,
+      receiverAddress: senderAddress,
       poolAddress: source,
       tokenAddress: pool.tokenXAddress, // TODO : In case of cpmm, tokenXAddress is unnecessary.
       amountX,
@@ -46,7 +46,31 @@ export const handleAddLiquidity = async (event: Event) => {
     },
   });
 
-  // TODO : LpWallet
+  const lpTokenWallet = await prisma.lpTokenWallet.findFirst({
+    where: {
+      poolAddress: event.transaction.source,
+      ownerAddress: senderAddress,
+    },
+  });
+
+  if (lpTokenWallet) {
+    await prisma.lpTokenWallet.update({
+      where: {
+        id: lpTokenWallet.id,
+      },
+      data: {
+        amount: (BigInt(lpTokenWallet.amount) + BigInt(minted)).toString(),
+      },
+    });
+  } else {
+    await prisma.lpTokenWallet.create({
+      data: {
+        poolAddress: event.transaction.source,
+        ownerAddress: senderAddress,
+        amount: minted,
+      },
+    });
+  }
 };
 
 export default handleAddLiquidity;
