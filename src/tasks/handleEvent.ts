@@ -12,7 +12,14 @@ import {
   handleOrderClaimed,
   handleOrderExecuted,
 } from "../mappings/clmm";
+import {
+  handleAddLiquidity,
+  handleExchange,
+  handlePoolCreated,
+  handleRemoveLiquidity,
+} from "../mappings/cpmm";
 
+// CLMM
 const DEPOSITED_TO_BINS = "0xafeb11ef";
 const INITIALIZED = "0x9bb3a52e";
 const SWAP = "0x25938561";
@@ -22,6 +29,12 @@ const ORDER_PLACED = "0xbef3f947";
 const ORDER_CANCELLED = "0x4572803f";
 const ORDER_EXECUTED = "0x18b134be";
 const ORDER_CLAIMED = "0x5e586bc8";
+
+// CPMM
+const ADD_LIQUIDITY = "0x1d3037e";
+const REMOVE_LIQUIDITY = "0xa95d7721";
+const EXCHANGE = "0xbd687ba6";
+const POOL_CREATED = "0x7d0e1322";
 
 const handleEvent = async (event_id: string) => {
   // TODO : handle errors;
@@ -138,6 +151,34 @@ const handleEvent = async (event_id: string) => {
         }
         case ORDER_EXECUTED: {
           await handleOrderExecuted({
+            transaction,
+            body,
+          });
+          break;
+        }
+        case ADD_LIQUIDITY: {
+          await handleAddLiquidity({
+            transaction,
+            body,
+          });
+          break;
+        }
+        case REMOVE_LIQUIDITY: {
+          await handleRemoveLiquidity({
+            transaction,
+            body,
+          });
+          break;
+        }
+        case EXCHANGE: {
+          await handleExchange({
+            transaction,
+            body,
+          });
+          break;
+        }
+        case POOL_CREATED: {
+          await handlePoolCreated({
             transaction,
             body,
           });

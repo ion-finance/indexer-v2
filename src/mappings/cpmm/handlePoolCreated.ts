@@ -71,3 +71,5 @@ export const handlePoolCreated = async (event: Event) => {
     update: {},
   });
 };
+
+export default handlePoolCreated;

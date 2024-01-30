@@ -2,7 +2,7 @@ import { Event } from "../../types/events";
 import prisma from "../../clients/prisma";
 import parseRemoveLiquidity from "../../parsers/cpmm/parseRemoveLiquidity";
 
-export const handleAddLiquidity = async (event: Event) => {
+export const handleRemoveLiquidity = async (event: Event) => {
   const params = parseRemoveLiquidity(event.body);
   console.log("Remove liquidity event is indexed.");
   console.log(params);
@@ -64,4 +64,4 @@ export const handleAddLiquidity = async (event: Event) => {
   }
 };
 
-export default handleAddLiquidity;
+export default handleRemoveLiquidity;
