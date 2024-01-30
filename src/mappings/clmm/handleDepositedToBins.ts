@@ -1,6 +1,6 @@
-import { Event } from "../types/events";
-import prisma from "../clients/prisma";
-import parseDepositedToBins from "../parsers/parseDepositedToBins";
+import { Event } from "../../types/events";
+import prisma from "../../clients/prisma";
+import parseDepositedToBins from "../../parsers/clmm/parseDepositedToBins";
 
 const handleDepositedToBins = async (event: Event) => {
   const params = parseDepositedToBins(event.body);

@@ -1,35 +1,31 @@
-import { Event } from "../types/events";
-import prisma from "../clients/prisma";
+import { Event } from "../../types/events";
+import prisma from "../../clients/prisma";
 import { OrderType } from "@prisma/client";
-import parseOrder from "../parsers/parseOrder";
+import parseOrder from "../../parsers/clmm/parseOrder";
 
-const handleOrderClaimed = async (event: Event) => {
+const handleOrderExecuted = async (event: Event) => {
   const params = parseOrder(event.body);
-  console.log("OrderClaimed event is indexed.");
+  console.log("OrderExecuted event is indexed.");
   console.log(event);
 
-  const order = await prisma.order.findFirst({
+  const orders = await prisma.order.findMany({
     where: {
       poolAddress: params.poolAddress,
-      ownerAddress: params.senderAddress,
-      positionAddress: params.positionAddress,
       positionId: params.positionId,
       binId: params.binId,
     },
   });
 
-  if (order) {
-    await prisma.order.update({
-      where: {
-        id: order.id,
+  await prisma.orderHistory.updateMany({
+    where: {
+      id: {
+        in: orders.map((order) => order.id),
       },
-      data: {
-        status: OrderType.CLAIMED,
-      },
-    });
-  } else {
-    // error
-  }
+    },
+    data: {
+      orderType: OrderType.EXECUTED,
+    },
+  });
 
   await prisma.orderHistory.create({
     data: {
@@ -44,9 +40,10 @@ const handleOrderClaimed = async (event: Event) => {
       orderForY: params.orderForY,
       binId: params.binId,
       timestamp: event.transaction.timestamp,
-      orderType: OrderType.CLAIMED,
+      orderType: OrderType.PLACED,
+      relatedOwnerAddres: orders.map((order) => order.ownerAddress).join(","),
     },
   });
 };
 
-export default handleOrderClaimed;
+export default handleOrderExecuted;

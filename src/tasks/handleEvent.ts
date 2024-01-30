@@ -1,15 +1,17 @@
 import axios from "axios";
 import { TransactionResult } from "../types/ton-api";
 import { Address, Cell } from "@ton/core";
-import handleDepositedToBins from "../mappings/handleDepositedToBins";
-import handleInitialized from "../mappings/handleInitialized";
-import handleSwap from "../mappings/handleSwap";
-import handleTransferBatch from "../mappings/handleTransferBatch";
-import handleWithdrawnFromBins from "../mappings/handleWithdrawnFromBins";
-import handleOrderPlaced from "../mappings/handleOrderPlaced";
-import handleOrderCancelled from "../mappings/handleOrderCancelled";
-import handleOrderClaimed from "../mappings/handleOrderClaimed";
-import handleOrderExecuted from "../mappings/handleOrderExecuted";
+import {
+  handleDepositedToBins,
+  handleInitialized,
+  handleSwap,
+  handleTransferBatch,
+  handleWithdrawnFromBins,
+  handleOrderPlaced,
+  handleOrderCancelled,
+  handleOrderClaimed,
+  handleOrderExecuted,
+} from "../mappings/clmm";
 
 const DEPOSITED_TO_BINS = "0xafeb11ef";
 const INITIALIZED = "0x9bb3a52e";

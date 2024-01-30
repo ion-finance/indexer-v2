@@ -1,18 +1,18 @@
-import { Event } from "../types/events";
-import prisma from "../clients/prisma";
+import { Event } from "../../types/events";
+import prisma from "../../clients/prisma";
 import { OrderType } from "@prisma/client";
-import parseOrder from "../parsers/parseOrder";
+import parseOrder from "../../parsers/clmm/parseOrder";
 
-const handleOrderCancelled = async (event: Event) => {
+const handleOrderClaimed = async (event: Event) => {
   const params = parseOrder(event.body);
-  console.log("OrderCancelled event is indexed.");
+  console.log("OrderClaimed event is indexed.");
   console.log(event);
 
   const order = await prisma.order.findFirst({
     where: {
       poolAddress: params.poolAddress,
-      positionAddress: params.positionAddress,
       ownerAddress: params.senderAddress,
+      positionAddress: params.positionAddress,
       positionId: params.positionId,
       binId: params.binId,
     },
@@ -24,7 +24,7 @@ const handleOrderCancelled = async (event: Event) => {
         id: order.id,
       },
       data: {
-        status: OrderType.CANCELLED,
+        status: OrderType.CLAIMED,
       },
     });
   } else {
@@ -44,9 +44,9 @@ const handleOrderCancelled = async (event: Event) => {
       orderForY: params.orderForY,
       binId: params.binId,
       timestamp: event.transaction.timestamp,
-      orderType: OrderType.CANCELLED,
+      orderType: OrderType.CLAIMED,
     },
   });
 };
 
-export default handleOrderCancelled;
+export default handleOrderClaimed;

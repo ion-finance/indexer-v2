@@ -1,7 +1,7 @@
-import { Event } from "../types/events";
-import prisma from "../clients/prisma";
+import { Event } from "../../types/events";
+import prisma from "../../clients/prisma";
 import { Prisma } from "@prisma/client";
-import parseTransferBatch from "../parsers/parseTransferBatch";
+import parseTransferBatch from "../../parsers/clmm/parseTransferBatch";
 import _ from "lodash";
 
 const handleTransferBatch = async (event: Event) => {

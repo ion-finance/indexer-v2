@@ -1,7 +1,7 @@
-import { Event } from "../types/events";
-import prisma from "../clients/prisma";
+import { Event } from "../../types/events";
+import prisma from "../../clients/prisma";
 import { OrderType } from "@prisma/client";
-import parseOrder from "../parsers/parseOrder";
+import parseOrder from "../../parsers/clmm/parseOrder";
 
 const handleOrderPlaced = async (event: Event) => {
   const params = parseOrder(event.body);
