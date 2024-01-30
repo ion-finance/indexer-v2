@@ -4,9 +4,8 @@ import parseExchange from "../../parsers/cpmm/parseExchange";
 
 export const handleExchange = async (event: Event) => {
   const params = parseExchange(event.body);
-
   console.log("Exchange event is indexed.");
-  console.log(event);
+  console.log(params);
 
   await prisma.swap.upsert({
     where: {

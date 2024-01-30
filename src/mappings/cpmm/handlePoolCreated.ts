@@ -4,14 +4,10 @@ import parsePoolCreated from "../../parsers/cpmm/parsePoolCreated";
 import fetchTokenData from "../../utils/fetchTokenData";
 import { PoolType } from "@prisma/client";
 
-// TODO
-// Refactor event args
-// coins => tokenX, tokenY
 export const handlePoolCreated = async (event: Event) => {
-  console.log("PoolCreated event is indexed");
-  console.log(event);
-
   const params = parsePoolCreated(event.body);
+  console.log("PoolCreated event is indexed");
+  console.log(params);
 
   const [tokenXdata, tokenYdata] = await Promise.all([
     fetchTokenData(params.tokenXAddress),
