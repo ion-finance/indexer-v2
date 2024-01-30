@@ -38,10 +38,10 @@ router.get("/transactions", async function handler(req, res) {
 
   const [deposit, withdraw, swap, orderHistory] = await Promise.all([
     !type || type === "deposit"
-      ? prisma.depositedToBins.findMany({ where: query })
+      ? prisma.deposit.findMany({ where: query })
       : [],
     !type || type === "withdraw"
-      ? prisma.withdrawnFromBins.findMany({ where: query })
+      ? prisma.withdraw.findMany({ where: query })
       : [],
     !type || type === "swap" ? prisma.swap.findMany({ where: query }) : [],
     !type || type === "order"
@@ -91,8 +91,8 @@ router.get("/transactions/:event_id", async function handler(req, res) {
   };
 
   const [deposit, withdraw, swap, orderHistory] = await Promise.all([
-    prisma.depositedToBins.findMany({ where: query }),
-    prisma.withdrawnFromBins.findMany({ where: query }),
+    prisma.deposit.findMany({ where: query }),
+    prisma.withdraw.findMany({ where: query }),
     prisma.swap.findMany({ where: query }),
     prisma.orderHistory.findMany({
       where: query,

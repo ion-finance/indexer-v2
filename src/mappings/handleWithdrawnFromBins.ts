@@ -1,6 +1,5 @@
 import { Event } from "../types/events";
 import prisma from "../clients/prisma";
-import { Prisma } from "@prisma/client";
 import parseWithdrawnFromBins from "../parsers/parseWithdrawnFromBins";
 
 const handleWithdrawnFromBins = async (event: Event) => {
@@ -16,7 +15,7 @@ const handleWithdrawnFromBins = async (event: Event) => {
     };
   });
 
-  await prisma.withdrawnFromBins.upsert({
+  await prisma.withdraw.upsert({
     where: {
       id: event.transaction.hash,
     },
@@ -33,7 +32,16 @@ const handleWithdrawnFromBins = async (event: Event) => {
       poolAddress: event.transaction.source,
       senderAddress: params.senderAddress,
       receiverAddress: params.receiverAddress,
-      withdrawn: withdrawnArray as Prisma.JsonArray,
+      amountX: withdrawnArray
+        .reduce((res, cur) => {
+          return res + BigInt(cur.amountX);
+        }, BigInt(0))
+        .toString(),
+      amountY: withdrawnArray
+        .reduce((res, cur) => {
+          return res + BigInt(cur.amountY);
+        }, BigInt(0))
+        .toString(),
     },
   });
 

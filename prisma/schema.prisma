@@ -10,6 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PoolType {
+  CPMM
+  CLMM
+}
+
 model Pool {
   id            String   @id // pool address
   createdAt     DateTime @default(now())
@@ -17,8 +22,9 @@ model Pool {
   name          String
   tokenXAddress String
   tokenYAddress String
-  binStep       Int // 0 <= binStep <= 2^8 -1 (255)
-  activeBinId   Int // 0 <= activeBinId <= 2^24 -1 (16777215)
+  binStep       Int      @default(0) // 0 <= binStep <= 2^8 -1 (255)
+  activeBinId   Int      @default(0) // 0 <= activeBinId <= 2^24 -1 (16777215)
+  type          PoolType @default(CLMM)
 }
 
 model Token {
@@ -42,7 +48,7 @@ model Bins {
   reserveY    String
 }
 
-model DepositedToBins {
+model Deposit {
   id              String   @id // txHash
   eventId         String
   createdAt       DateTime @default(now())
@@ -52,10 +58,11 @@ model DepositedToBins {
   senderAddress   String
   receiverAddress String
   tokenAddress    String
-  deposited       Json     @default("{}")
+  amountX         String   @default("0")
+  amountY         String   @default("0")
 }
 
-model WithdrawnFromBins {
+model Withdraw {
   id              String   @id // txHash
   eventId         String
   createdAt       DateTime @default(now())
@@ -64,7 +71,8 @@ model WithdrawnFromBins {
   poolAddress     String
   senderAddress   String
   receiverAddress String
-  withdrawn       Json     @default("{}")
+  amountX         String   @default("0")
+  amountY         String   @default("0")
 }
 
 model Swap {
@@ -79,7 +87,7 @@ model Swap {
   amountIn        String
   amountOut       String
   swapForY        Boolean
-  activeBinId     Int
+  activeBinId     Int      @default(0)
 }
 
 model TransferBatch {
@@ -101,7 +109,8 @@ model LpTokenWallet {
   updatedAt    DateTime @default(now()) @updatedAt
   poolAddress  String
   ownerAddress String
-  shares       Json     @default("{}")
+  amount       String   @default("0") // CPMM
+  shares       Json     @default("{}") // CLMM
 }
 
 enum OrderType {

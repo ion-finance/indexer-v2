@@ -1,12 +1,24 @@
 import { Event } from "../types/events";
 import prisma from "../clients/prisma";
-import { Prisma } from "@prisma/client";
 import parseDepositedToBins from "../parsers/parseDepositedToBins";
 
 const handleDepositedToBins = async (event: Event) => {
   const params = parseDepositedToBins(event.body);
   console.log("DepositedToBins event is indexed.");
   console.log(event);
+
+  const pool = await prisma.pool.findFirst({
+    where: {
+      id: event.transaction.source,
+    },
+  });
+
+  if (!pool) {
+    console.log("Pool not found.");
+    return;
+  }
+
+  const isX = params.tokenAddress === pool?.tokenXAddress;
 
   const depositedArray = params.deposited.keys().map((key) => {
     return {
@@ -15,7 +27,7 @@ const handleDepositedToBins = async (event: Event) => {
     };
   });
 
-  await prisma.depositedToBins.upsert({
+  await prisma.deposit.upsert({
     where: {
       id: event.transaction.hash,
     },
@@ -34,19 +46,18 @@ const handleDepositedToBins = async (event: Event) => {
       senderAddress: params.senderAddress,
       receiverAddress: params.receiverAddress,
       tokenAddress: params.tokenAddress,
-      deposited: depositedArray as Prisma.JsonArray,
+      amountX: isX
+        ? depositedArray
+            .reduce((res, cur) => res + BigInt(cur.amount), BigInt(0))
+            .toString()
+        : "0",
+      amountY: !isX
+        ? depositedArray
+            .reduce((res, cur) => res + BigInt(cur.amount), BigInt(0))
+            .toString()
+        : "0",
     },
   });
-
-  const pool = await prisma.pool.findFirst({
-    where: {
-      id: event.transaction.source,
-    },
-  });
-
-  if (!pool) {
-    return;
-  }
 
   const bins = await prisma.bins.findMany({
     where: {

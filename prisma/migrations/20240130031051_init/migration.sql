@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "PoolType" AS ENUM ('CPMM', 'CLMM');
+
+-- CreateEnum
 CREATE TYPE "OrderType" AS ENUM ('PLACED', 'CANCELLED', 'EXECUTED', 'CLAIMED');
 
 -- CreateTable
@@ -9,8 +12,9 @@ CREATE TABLE "Pool" (
     "name" TEXT NOT NULL,
     "tokenXAddress" TEXT NOT NULL,
     "tokenYAddress" TEXT NOT NULL,
-    "binStep" INTEGER NOT NULL,
-    "activeBinId" INTEGER NOT NULL,
+    "binStep" INTEGER NOT NULL DEFAULT 0,
+    "activeBinId" INTEGER NOT NULL DEFAULT 0,
+    "type" "PoolType" NOT NULL DEFAULT 'CLMM',
 
     CONSTRAINT "Pool_pkey" PRIMARY KEY ("id")
 );
@@ -43,7 +47,7 @@ CREATE TABLE "Bins" (
 );
 
 -- CreateTable
-CREATE TABLE "DepositedToBins" (
+CREATE TABLE "Deposit" (
     "id" TEXT NOT NULL,
     "eventId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -53,13 +57,14 @@ CREATE TABLE "DepositedToBins" (
     "senderAddress" TEXT NOT NULL,
     "receiverAddress" TEXT NOT NULL,
     "tokenAddress" TEXT NOT NULL,
-    "deposited" JSONB NOT NULL DEFAULT '{}',
+    "amountX" TEXT NOT NULL DEFAULT '0',
+    "amountY" TEXT NOT NULL DEFAULT '0',
 
-    CONSTRAINT "DepositedToBins_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Deposit_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "WithdrawnFromBins" (
+CREATE TABLE "Withdraw" (
     "id" TEXT NOT NULL,
     "eventId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -68,9 +73,10 @@ CREATE TABLE "WithdrawnFromBins" (
     "poolAddress" TEXT NOT NULL,
     "senderAddress" TEXT NOT NULL,
     "receiverAddress" TEXT NOT NULL,
-    "withdrawn" JSONB NOT NULL DEFAULT '{}',
+    "amountX" TEXT NOT NULL DEFAULT '0',
+    "amountY" TEXT NOT NULL DEFAULT '0',
 
-    CONSTRAINT "WithdrawnFromBins_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Withdraw_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -86,7 +92,7 @@ CREATE TABLE "Swap" (
     "amountIn" TEXT NOT NULL,
     "amountOut" TEXT NOT NULL,
     "swapForY" BOOLEAN NOT NULL,
-    "activeBinId" INTEGER NOT NULL,
+    "activeBinId" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "Swap_pkey" PRIMARY KEY ("id")
 );
@@ -114,6 +120,7 @@ CREATE TABLE "LpTokenWallet" (
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "poolAddress" TEXT NOT NULL,
     "ownerAddress" TEXT NOT NULL,
+    "amount" TEXT NOT NULL DEFAULT '0',
     "shares" JSONB NOT NULL DEFAULT '{}',
 
     CONSTRAINT "LpTokenWallet_pkey" PRIMARY KEY ("id")
