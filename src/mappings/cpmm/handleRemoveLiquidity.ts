@@ -1,12 +1,12 @@
 import { Event } from "../../types/events";
 import prisma from "../../clients/prisma";
-import parseAddLiquidity from "../../parsers/cpmm/parseAddLiquidity";
+import parseRemoveLiquidity from "../../parsers/cpmm/parseRemoveLiquidity";
 
 export const handleAddLiquidity = async (event: Event) => {
-  const params = parseAddLiquidity(event.body);
-  console.log("Add liquidity event is indexed.");
+  const params = parseRemoveLiquidity(event.body);
+  console.log("Remove liquidity event is indexed.");
   console.log(event);
-  const { from, jettonAmount, minLpOut, intendedAmounts } = params;
+  const { from, amountX, amountY, burned } = params;
   const { hash, source, timestamp } = event.transaction;
   const pool = await prisma.pool.findFirst({
     where: {
@@ -19,7 +19,7 @@ export const handleAddLiquidity = async (event: Event) => {
     return;
   }
 
-  await prisma.deposit.upsert({
+  await prisma.withdraw.upsert({
     where: {
       id: hash,
       eventId: event.transaction.eventId,
@@ -28,9 +28,8 @@ export const handleAddLiquidity = async (event: Event) => {
       senderAddress: from,
       receiverAddress: from,
       poolAddress: source,
-      tokenAddress: pool.tokenXAddress, // TODO : In case of cpmm, tokenXAddress is unnecessary.
-      amountX: intendedAmounts[0],
-      amountY: intendedAmounts[1],
+      amountX,
+      amountY,
       timestamp,
     },
     create: {
@@ -39,9 +38,8 @@ export const handleAddLiquidity = async (event: Event) => {
       senderAddress: from,
       receiverAddress: from,
       poolAddress: source,
-      tokenAddress: pool.tokenXAddress, // TODO : In case of cpmm, tokenXAddress is unnecessary.
-      amountX: intendedAmounts[0],
-      amountY: intendedAmounts[1],
+      amountX,
+      amountY,
       timestamp,
     },
   });

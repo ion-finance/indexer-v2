@@ -3,20 +3,18 @@ import { Cell } from "@ton/core";
 const parseExchange = (message: Cell) => {
   const body = message.beginParse();
   body.loadUint(32); // skip log code
-  const from = body.loadAddress().toString();
-  const i = body.loadUint(2);
-  const j = body.loadUint(2);
-  const amountI = body.loadCoins().toString();
-  const amountJ = body.loadCoins().toString();
-  const to = body.loadAddress().toString();
+  const senderAddress = body.loadAddress().toString();
+  const receiverAddress = body.loadAddress().toString();
+  const amountIn = body.loadCoins();
+  const amountOut = body.loadCoins();
+  const swapForY = body.loadUint(1) ? true : false;
 
   return {
-    from,
-    i,
-    j,
-    amountI,
-    amountJ,
-    to,
+    senderAddress,
+    receiverAddress,
+    amountIn,
+    amountOut,
+    swapForY,
   };
 };
 

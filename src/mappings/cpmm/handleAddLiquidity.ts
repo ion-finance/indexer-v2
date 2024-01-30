@@ -6,7 +6,7 @@ export const handleAddLiquidity = async (event: Event) => {
   const params = parseAddLiquidity(event.body);
   console.log("Add liquidity event is indexed.");
   console.log(event);
-  const { from, jettonAmount, minLpOut, intendedAmounts } = params;
+  const { from, amountX, amountY, minted } = params;
   const { hash, source, timestamp } = event.transaction;
   const pool = await prisma.pool.findFirst({
     where: {
@@ -29,8 +29,8 @@ export const handleAddLiquidity = async (event: Event) => {
       receiverAddress: from,
       poolAddress: source,
       tokenAddress: pool.tokenXAddress, // TODO : In case of cpmm, tokenXAddress is unnecessary.
-      amountX: intendedAmounts[0],
-      amountY: intendedAmounts[1],
+      amountX,
+      amountY,
       timestamp,
     },
     create: {
@@ -40,8 +40,8 @@ export const handleAddLiquidity = async (event: Event) => {
       receiverAddress: from,
       poolAddress: source,
       tokenAddress: pool.tokenXAddress, // TODO : In case of cpmm, tokenXAddress is unnecessary.
-      amountX: intendedAmounts[0],
-      amountY: intendedAmounts[1],
+      amountX,
+      amountY,
       timestamp,
     },
   });

@@ -12,18 +12,16 @@ export const handlePoolCreated = async (event: Event) => {
   console.log(event);
 
   const params = parsePoolCreated(event.body);
-  const tokenXAddress = params.coins[0];
-  const tokenYAddress = params.coins[1];
 
   const [tokenXdata, tokenYdata] = await Promise.all([
-    fetchTokenData(tokenXAddress),
-    fetchTokenData(tokenYAddress),
+    fetchTokenData(params.tokenXAddress),
+    fetchTokenData(params.tokenYAddress),
   ]);
 
   const [tokenX, tokenY] = await Promise.all([
     prisma.token.upsert({
       where: {
-        id: tokenXAddress,
+        id: params.tokenXAddress,
       },
       update: {
         jettonMinterAddress: tokenXdata.minter_address,
@@ -33,7 +31,7 @@ export const handlePoolCreated = async (event: Event) => {
         image: tokenXdata.metadata.image,
       },
       create: {
-        id: tokenXAddress,
+        id: params.tokenXAddress,
         jettonMinterAddress: tokenXdata.minter_address,
         name: tokenXdata.metadata.name,
         symbol: tokenXdata.metadata.symbol,
@@ -43,7 +41,7 @@ export const handlePoolCreated = async (event: Event) => {
     }),
     prisma.token.upsert({
       where: {
-        id: tokenYAddress,
+        id: params.tokenYAddress,
       },
       update: {
         jettonMinterAddress: tokenYdata.minter_address,
@@ -53,7 +51,7 @@ export const handlePoolCreated = async (event: Event) => {
         image: tokenYdata.metadata.image,
       },
       create: {
-        id: tokenYAddress,
+        id: params.tokenYAddress,
         jettonMinterAddress: tokenYdata.minter_address,
         name: tokenYdata.metadata.name,
         symbol: tokenYdata.metadata.symbol,
@@ -71,8 +69,8 @@ export const handlePoolCreated = async (event: Event) => {
       id: event.transaction.source,
       name: `${tokenX.symbol}-${tokenY.symbol}`,
       type: PoolType.CPMM,
-      tokenXAddress: tokenXAddress,
-      tokenYAddress: tokenYAddress,
+      tokenXAddress: params.tokenXAddress,
+      tokenYAddress: params.tokenYAddress,
     },
     update: {},
   });
