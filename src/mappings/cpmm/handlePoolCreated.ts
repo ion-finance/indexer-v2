@@ -62,7 +62,7 @@ export const handlePoolCreated = async (event: Event) => {
       id: params.poolAddress,
     },
     create: {
-      id: event.transaction.source,
+      id: params.poolAddress,
       name: `${tokenX.symbol}-${tokenY.symbol}`,
       type: PoolType.CPMM,
       tokenXAddress: params.tokenXAddress,
