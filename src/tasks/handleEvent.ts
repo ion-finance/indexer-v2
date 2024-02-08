@@ -31,7 +31,7 @@ const ORDER_EXECUTED = "0x18b134be";
 const ORDER_CLAIMED = "0x5e586bc8";
 
 // CPMM
-const ADD_LIQUIDITY = "0x1d3037e";
+const ADD_LIQUIDITY = "0x01d3037e";
 const REMOVE_LIQUIDITY = "0xa95d7721";
 const EXCHANGE = "0xbd687ba6";
 const POOL_CREATED = "0x7d0e1322";
@@ -185,7 +185,7 @@ const handleEvent = async (event_id: string) => {
           break;
         }
         default:
-          console.log("UNKNOWN");
+          console.log("UNKNOWN OP_CODE:", msg.op_code);
           break;
       }
     }
