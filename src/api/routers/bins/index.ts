@@ -1,9 +1,6 @@
 import { Router } from "express";
 import prisma from "../../../clients/prisma";
-import {
-  getBinPrice,
-  getNormalPriceByAmountPrice,
-} from "../../../utils/binMath";
+import { getBinPrice, getNormalPriceByPrice } from "../../../utils/binMath";
 const router = Router();
 
 router.get("/bins", async function handler(req, res) {
@@ -13,7 +10,7 @@ router.get("/bins", async function handler(req, res) {
     return res.json([]);
   }
 
-  const [pool, bins] = await Promise.all([
+  const [pool, bins, tokens] = await Promise.all([
     prisma.pool.findFirst({
       where: {
         id: poolAddress as string,
@@ -24,29 +21,30 @@ router.get("/bins", async function handler(req, res) {
         poolAddress: poolAddress as string,
       },
     }),
+    prisma.token.findMany(),
   ]);
 
   if (!pool) {
     return res.json([]);
   }
 
-  const decimal = 6;
-  const binStep = 100; // 1%
+  const tokenX = tokens.find((token) => token.id === pool.tokenXAddress);
+  const tokenY = tokens.find((token) => token.id === pool.tokenYAddress);
+
+  if (!tokenX || !tokenY) {
+    return res.json([]);
+  }
 
   const data = bins.map((bin) => {
-    const priceXY = getBinPrice(binStep, 2 ** 23 - bin.binId);
-    const priceYX = getBinPrice(binStep, bin.binId - 2 ** 23);
+    const priceXY = getBinPrice(pool.binStep, bin.binId);
+    const priceYX = 1 / priceXY;
 
-    const normalPriceXY = getNormalPriceByAmountPrice(
+    const normalPriceXY = getNormalPriceByPrice(
       priceXY, // normalPriceXY is derived from amountPriceYX
-      decimal,
-      decimal
+      tokenX.decimals,
+      tokenY.decimals
     );
-    const normalPriceYX = getNormalPriceByAmountPrice(
-      priceYX,
-      decimal,
-      decimal
-    );
+    const normalPriceYX = 1 / normalPriceXY;
 
     return {
       binId: bin.binId,
@@ -54,10 +52,10 @@ router.get("/bins", async function handler(req, res) {
       priceYX,
       normalPriceXY,
       normalPriceYX,
-      reserveX: Number(BigInt(bin.reserveX) / BigInt(10 ** decimal)),
-      reserveY: Number(BigInt(bin.reserveY) / BigInt(10 ** decimal)),
       reserveXRaw: bin.reserveX,
       reserveYRaw: bin.reserveY,
+      reserveX: Number(BigInt(bin.reserveX) / BigInt(10 ** tokenX.decimals)),
+      reserveY: Number(BigInt(bin.reserveY) / BigInt(10 ** tokenY.decimals)),
     };
   });
 
