@@ -122,10 +122,11 @@ const handleEvent = async (event_id: string) => {
           break;
         }
         case WITHDRAWN_FROM_BINS: {
-          await handleWithdrawnFromBins({
-            transaction,
-            body,
-          });
+          // !NOTE: disable withdraw on version pre-alpha-contract
+          // await handleWithdrawnFromBins({
+          //   transaction,
+          //   body,
+          // });
           break;
         }
         case ORDER_PLACED: {
