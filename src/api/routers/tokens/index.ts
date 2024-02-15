@@ -1,5 +1,6 @@
 import { Router } from "express";
 import prisma from "../../../clients/prisma";
+import { getPriceUsd } from "../../../mocks/price";
 const router = Router();
 
 router.get("/tokens", async function handler(req, res) {
@@ -7,9 +8,11 @@ router.get("/tokens", async function handler(req, res) {
 
   return res.json(
     tokens.map((token) => {
+      const priceUsd = getPriceUsd(token?.symbol);
+
       return {
         ...token,
-        priceUsd: 0.999967, // mock
+        priceUsd,
         apy: 7.23, // mock
       };
     })
