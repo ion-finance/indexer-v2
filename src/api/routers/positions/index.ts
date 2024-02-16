@@ -1,6 +1,7 @@
 import { Router } from "express";
 import prisma from "../../../clients/prisma";
 import { formatUnits } from "ethers";
+import { PoolType } from "@prisma/client";
 const router = Router();
 
 router.get("/positions/:address", async function handler(req, res) {
@@ -20,15 +21,17 @@ router.get("/positions/:address", async function handler(req, res) {
     const pool = pools.find((p) => p.id === wallet.poolAddress);
     const tokenY = tokens.find((t) => t.id === pool?.tokenYAddress);
 
-    const totalBalance = (wallet.shares as { amount: string }[]).reduce(
-      (res, cur) => {
+    const totalBalance = (function () {
+      if (pool?.type === PoolType.CPMM) {
+        return Number(wallet.amount);
+      }
+      const shares = wallet.shares as { amount: string }[];
+      return shares.reduce((res, cur) => {
         return (
           res + (tokenY ? Number(formatUnits(cur.amount, tokenY.decimals)) : 0)
         );
-      },
-      0
-    );
-
+      }, 0);
+    })();
     return {
       ...wallet,
       feeUsd: 0,
