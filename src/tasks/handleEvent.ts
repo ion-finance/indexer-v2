@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { TransactionResult } from "../types/ton-api";
 import { Address, Cell } from "@ton/core";
 import {
@@ -52,7 +52,8 @@ const handleEvent = async (event_id: string) => {
 
     transactionRes = res.data as TransactionResult;
   } catch (e) {
-    console.log("Fetch trace error");
+    const error = e as AxiosError;
+    console.error(error.message);
   }
 
   if (!transactionRes) {
