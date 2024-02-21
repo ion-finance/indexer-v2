@@ -23,13 +23,20 @@ router.get("/positions/:address", async function handler(req, res) {
     }),
   ]);
 
-  const xSum = deposits.reduce((res, cur) => res + Number(cur.amountX), 0);
-  const ySum = deposits.reduce((res, cur) => res + Number(cur.amountY), 0);
-
   const data = lpTokenWallets.map((wallet) => {
     const pool = pools.find((p) => p.id === wallet.poolAddress);
     const tokenX = tokens.find((t) => t.id === pool?.tokenXAddress);
     const tokenY = tokens.find((t) => t.id === pool?.tokenYAddress);
+
+    const depositsOfPool = deposits.filter((d) => d.poolAddress === pool?.id);
+    const xSum = depositsOfPool.reduce(
+      (res, cur) => res + Number(cur.amountX),
+      0
+    );
+    const ySum = depositsOfPool.reduce(
+      (res, cur) => res + Number(cur.amountY),
+      0
+    );
 
     const lpBalance = (function () {
       if (pool?.type === PoolType.CPMM) {
