@@ -46,6 +46,17 @@ export const handleAddLiquidity = async (event: Event) => {
     },
   });
 
+  await prisma.pool.update({
+    where: {
+      id: pool.id,
+    },
+    data: {
+      reserveX: (BigInt(pool.reserveX) + BigInt(amountX)).toString(),
+      reserveY: (BigInt(pool.reserveY) + BigInt(amountY)).toString(),
+      lpSupply: (BigInt(pool.lpSupply) + BigInt(minted)).toString(),
+    },
+  });
+
   const lpTokenWallet = await prisma.lpTokenWallet.findFirst({
     where: {
       poolAddress: event.transaction.source,

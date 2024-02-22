@@ -25,6 +25,9 @@ model Pool {
   binStep       Int      @default(0) // 0 <= binStep <= 2^8 -1 (255)
   activeBinId   Int      @default(0) // 0 <= activeBinId <= 2^24 -1 (16777215)
   type          PoolType @default(CLMM)
+  reserveX      String   @default("0")
+  reserveY      String   @default("0")
+  lpSupply      String   @default("0")
 }
 
 model Token {

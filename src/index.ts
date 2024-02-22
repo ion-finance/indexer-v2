@@ -28,6 +28,7 @@ const eventPooling = async () => {
       error = true;
       console.error(e);
       console.error(`Error when handling event ${events[i].event_id}`);
+      break;
     }
   }
 

@@ -15,7 +15,9 @@ CREATE TABLE "Pool" (
     "binStep" INTEGER NOT NULL DEFAULT 0,
     "activeBinId" INTEGER NOT NULL DEFAULT 0,
     "type" "PoolType" NOT NULL DEFAULT 'CLMM',
-
+    "lpSupply" TEXT NOT NULL DEFAULT '0',
+    "reserveX" TEXT NOT NULL DEFAULT '0',
+    "reserveY" TEXT NOT NULL DEFAULT '0',
     CONSTRAINT "Pool_pkey" PRIMARY KEY ("id")
 );
 
