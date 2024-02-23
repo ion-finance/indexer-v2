@@ -16,6 +16,7 @@ const usdFormatter = new Intl.NumberFormat("en", {
   notation: "compact",
   style: "currency",
   currency: "USD",
+  maximumFractionDigits: 2,
 });
 
 const getUser = (token: string) => {
@@ -73,7 +74,7 @@ router.get("/bot/positions", async function handler(req, res) {
   if (lpTokenWallets.length === 0) {
     return res.json({});
   }
-  let msg = "*Positions*\n=== Existing Liquidity Positions ===\n";
+  let msg = "*⛵Positions*\n══ Existing Liquidity Positions ══\n";
 
   lpTokenWallets.map((lpTokenWallet, index) => {
     const pool = pools.find((pool) => pool.id === lpTokenWallet.poolAddress);
@@ -158,7 +159,7 @@ router.get("/bot/orders", async function handler(req, res) {
   if (orders.length === 0) {
     return res.json({});
   }
-  let msg = "*Orders*\n=== Existing Orders ===\n";
+  let msg = "*📜Orders*\n══ Existing Orders ══\n";
 
   _.sortBy(orders, ["timestamp"], ["asc"]).map((order, index) => {
     const pool = pools.find((pool) => pool.id === order.poolAddress);
