@@ -34,8 +34,8 @@ router.get("/bins", async function handler(req, res) {
   const binStep = 100; // 1%
 
   const data = bins.map((bin) => {
-    const priceXY = getBinPrice(binStep, -bin.binId);
-    const priceYX = getBinPrice(binStep, bin.binId);
+    const priceXY = getBinPrice(binStep, 2 ** 23 - bin.binId);
+    const priceYX = getBinPrice(binStep, bin.binId - 2 ** 23);
 
     const normalPriceXY = getNormalPriceByAmountPrice(
       priceXY, // normalPriceXY is derived from amountPriceYX

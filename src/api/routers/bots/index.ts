@@ -177,7 +177,7 @@ router.get("/bot/orders", async function handler(req, res) {
     const amountIn = order.orderForY ? order.amountX : order.amountY;
     const tokenIn = order.orderForY ? tokenX : tokenY;
     const poolAddress = `${pool.id.slice(0, 4)}...${pool.id.slice(-4)}`;
-    const price = getBinPrice(pool.binStep, order.binId);
+    const price = getBinPrice(pool.binStep, order.binId - 2 ** 23); // priceYX
 
     // TODO check amountIn & usd value
     msg += `${index + 1}. ${
