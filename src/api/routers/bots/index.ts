@@ -88,35 +88,26 @@ router.get("/bot/positions", async function handler(req, res) {
       lpTokenWallet.shares as { binId: number; amount: number }[],
       pool.binStep
     );
-    const tokenXBalance = compactFormatter.format(
-      parseFloat(
-        formatUnits(
-          amounts.reduce((acc, amount) => acc + amount.amountX, BigInt(0)),
-          tokenX.decimals
-        )
+    const balanceX = parseFloat(
+      formatUnits(
+        amounts.reduce((acc, amount) => acc + amount.amountX, BigInt(0)),
+        tokenX.decimals
       )
     );
-    const tokenYBalance = compactFormatter.format(
-      parseFloat(
-        formatUnits(
-          amounts.reduce((acc, amount) => acc + amount.amountY, BigInt(0)),
-          tokenY.decimals
-        )
+    const balanceY = parseFloat(
+      formatUnits(
+        amounts.reduce((acc, amount) => acc + amount.amountY, BigInt(0)),
+        tokenY.decimals
       )
     );
-    const tvlY = formatUnits(
-      bins.reduce((acc, bin) => acc + BigInt(bin.reserveY), BigInt(0)),
-      tokenY.decimals
-    );
-    const tvlX = formatUnits(
-      bins.reduce((acc, bin) => acc + BigInt(bin.reserveX), BigInt(0)),
-      tokenX.decimals
-    );
-    const tvl = usdFormatter.format(parseFloat(tvlX) + parseFloat(tvlY));
 
-    msg += `${index + 1}. ${pool.name} ${tokenX.symbol}: ${tokenXBalance} ${
+    msg += `${index + 1}. ${pool.name} ${
+      tokenX.symbol
+    }: ${compactFormatter.format(balanceX)} ${
       tokenY.symbol
-    }: ${tokenYBalance} TVL: ${tvl} Fees: $0\n`;
+    }: ${compactFormatter.format(balanceY)} Value: ${usdFormatter.format(
+      balanceX + balanceY
+    )} Fees: $0\n`;
   });
 
   await bot.api.sendMessage(user.id, msg, {
@@ -184,7 +175,7 @@ router.get("/bot/orders", async function handler(req, res) {
     // TODO check amountIn & usd value
     msg += `${index + 1}. ${
       pool.name
-    }(${poolAddress}) amount: ${compactFormatter.format(
+    }(${poolAddress}) Amount: ${compactFormatter.format(
       parseFloat(formatUnits(amountIn, tokenIn.decimals))
     )} ${tokenIn.symbol} | Limit: ${usdFormatter.format(price)}\n`;
   });
