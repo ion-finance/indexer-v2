@@ -32,6 +32,7 @@ const getUser = (token: string) => {
     user = jwt.verify(token, process.env.JWT_SECRET as string) as any;
   } catch (error) {
     console.log("jwt error");
+    return null;
   }
 
   return user;

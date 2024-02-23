@@ -19,7 +19,7 @@ const calcAmountsFromPosition = (
       };
     }
 
-    const price = getBinPrice(binStep, bin.binId);
+    const price = getBinPrice(binStep, bin.binId - 2 ** 23);
 
     const liquidity =
       (BigInt(bin.reserveX) * BigInt(Math.floor(price * BINSTEP_NUMERATOR))) /
