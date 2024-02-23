@@ -7,6 +7,7 @@ const router = Router();
 router.get("/pools", async function handler(req, res) {
   const pools = await prisma.pool.findMany();
   const tokens = await prisma.token.findMany();
+  const bins = await prisma.bins.findMany();
 
   return res.json(
     pools.map((pool) => {
@@ -15,6 +16,31 @@ router.get("/pools", async function handler(req, res) {
 
       const priceXUsd = getPriceUsd(tokenX?.symbol);
       const priceYUsd = getPriceUsd(tokenY?.symbol);
+
+      let reserveData = {};
+
+      if (pool.type === "CLMM") {
+        const poolBins = bins.filter((bin) => bin.poolAddress === pool.id);
+
+        reserveData = {
+          reserveX: poolBins.reduce(
+            (acc, bin) => acc + BigInt(bin.reserveX),
+            BigInt(0)
+          ),
+          reserveY: poolBins.reduce(
+            (acc, bin) => acc + BigInt(bin.reserveY),
+            BigInt(0)
+          ),
+          totalSupply: "2550988259892", // TODO
+        };
+      } else {
+        reserveData = {
+          reserveX: pool.reserveX,
+          reserveY: pool.reserveY,
+          totalSupply: pool.lpSupply,
+        };
+      }
+
       return {
         ...pool,
         tokenX: {
@@ -27,10 +53,8 @@ router.get("/pools", async function handler(req, res) {
           priceUsd: priceYUsd,
           apy: 7.23, // mock
         },
+        ...reserveData,
         // mock data
-        reserveX: "4254160587174121",
-        reserveY: "8354160587174",
-        totalSupply: "2550988259892",
         liquidityUsd: 17732929.594,
         volumeUsd: 18123142.156,
         feesUsd: 12123,
