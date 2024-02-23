@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import { Bot } from "grammy";
 import { OrderType } from "@prisma/client";
 import { getBinPrice } from "../../../utils/binMath";
+import _ from "lodash";
 
 const router = Router();
 export const bot = new Bot(process.env.BOT_TOKEN as string);
@@ -168,7 +169,7 @@ router.get("/bot/orders", async function handler(req, res) {
   }
   let msg = "*Orders*\n=== Existing Orders ===\n";
 
-  orders.map((order, index) => {
+  _.sortBy(orders, ["timestamp"], ["asc"]).map((order, index) => {
     const pool = pools.find((pool) => pool.id === order.poolAddress);
     if (!pool) return;
     const tokenX = tokens.find((token) => token.id === pool.tokenXAddress);
