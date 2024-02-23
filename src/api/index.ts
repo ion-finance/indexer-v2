@@ -5,6 +5,7 @@ import tokenRouter from "./routers/tokens";
 import transactionRouter from "./routers/transactions";
 import binRouter from "./routers/bins";
 import orderRouter from "./routers/orders";
+import botRouter from "./routers/bots";
 import cors from "cors";
 
 const api = express();
@@ -16,5 +17,6 @@ api.use(tokenRouter);
 api.use(transactionRouter);
 api.use(binRouter);
 api.use(orderRouter);
+api.use(botRouter);
 
 export default api;
