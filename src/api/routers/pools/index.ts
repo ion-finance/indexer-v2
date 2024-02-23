@@ -23,14 +23,12 @@ router.get("/pools", async function handler(req, res) {
         const poolBins = bins.filter((bin) => bin.poolAddress === pool.id);
 
         reserveData = {
-          reserveX: poolBins.reduce(
-            (acc, bin) => acc + BigInt(bin.reserveX),
-            BigInt(0)
-          ),
-          reserveY: poolBins.reduce(
-            (acc, bin) => acc + BigInt(bin.reserveY),
-            BigInt(0)
-          ),
+          reserveX: poolBins
+            .reduce((acc, bin) => acc + BigInt(bin.reserveX), BigInt(0))
+            .toString(),
+          reserveY: poolBins
+            .reduce((acc, bin) => acc + BigInt(bin.reserveY), BigInt(0))
+            .toString(),
           totalSupply: "2550988259892", // TODO
         };
       } else {
