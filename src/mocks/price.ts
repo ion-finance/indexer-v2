@@ -3,6 +3,6 @@ export const getPriceUsd = (symbol?: string) => {
   if (symbol === "iUSDT") return 0.9967;
   if (symbol === "iUSDC") return 0.9967;
   if (symbol === "ION") return 0.9967;
-  if (symbol === "pTON") return USD_PRICE_OF_TON;
+  if (symbol === "TON") return USD_PRICE_OF_TON;
   return 0;
 };
