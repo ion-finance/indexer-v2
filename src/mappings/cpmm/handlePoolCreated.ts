@@ -14,6 +14,20 @@ export const handlePoolCreated = async (event: Event) => {
     fetchTokenData(params.tokenYAddress),
   ]);
 
+  const changeNameOfProxyTon = (name: string) => {
+    if (name === "Proxy TON") {
+      return "TON";
+    }
+    return name;
+  };
+
+  const changeSymbolOfProxyTon = (symbol: string) => {
+    if (symbol === "pTON") {
+      return "TON";
+    }
+    return symbol;
+  };
+
   const [tokenX, tokenY] = await Promise.all([
     prisma.token.upsert({
       where: {
@@ -21,16 +35,16 @@ export const handlePoolCreated = async (event: Event) => {
       },
       update: {
         jettonMinterAddress: tokenXdata.minter_address,
-        name: tokenXdata.metadata.name,
-        symbol: tokenXdata.metadata.symbol,
+        name: changeNameOfProxyTon(tokenXdata.metadata.name),
+        symbol: changeSymbolOfProxyTon(tokenXdata.metadata.symbol),
         decimals: parseInt(tokenXdata.metadata.decimals),
         image: tokenXdata.metadata.image,
       },
       create: {
         id: params.tokenXAddress,
         jettonMinterAddress: tokenXdata.minter_address,
-        name: tokenXdata.metadata.name,
-        symbol: tokenXdata.metadata.symbol,
+        name: changeNameOfProxyTon(tokenXdata.metadata.name),
+        symbol: changeSymbolOfProxyTon(tokenXdata.metadata.symbol),
         decimals: parseInt(tokenXdata.metadata.decimals),
         image: tokenXdata.metadata.image,
       },
@@ -41,16 +55,16 @@ export const handlePoolCreated = async (event: Event) => {
       },
       update: {
         jettonMinterAddress: tokenYdata.minter_address,
-        name: tokenYdata.metadata.name,
-        symbol: tokenYdata.metadata.symbol,
+        name: changeNameOfProxyTon(tokenYdata.metadata.name),
+        symbol: changeSymbolOfProxyTon(tokenYdata.metadata.symbol),
         decimals: parseInt(tokenYdata.metadata.decimals),
         image: tokenYdata.metadata.image,
       },
       create: {
         id: params.tokenYAddress,
         jettonMinterAddress: tokenYdata.minter_address,
-        name: tokenYdata.metadata.name,
-        symbol: tokenYdata.metadata.symbol,
+        name: changeNameOfProxyTon(tokenYdata.metadata.name),
+        symbol: changeSymbolOfProxyTon(tokenYdata.metadata.symbol),
         decimals: parseInt(tokenYdata.metadata.decimals),
         image: tokenYdata.metadata.image,
       },
