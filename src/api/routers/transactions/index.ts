@@ -12,7 +12,7 @@ router.get("/transactions", async function handler(req, res) {
   let orderQuery = {} as Prisma.OrderHistoryWhereInput;
   prisma.orderHistory;
 
-  if (!poolAddress && !senderAddress) {
+  if (!senderAddress) {
     return res.json({
       status: 400,
       data: [],
