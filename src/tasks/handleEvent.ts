@@ -36,29 +36,16 @@ const REMOVE_LIQUIDITY = "0xa95d7721";
 const EXCHANGE = "0xbd687ba6";
 const POOL_CREATED = "0x7d0e1322";
 
+// Info
+// * This method can throw an error if the event is processing
 const handleEvent = async (event_id: string) => {
-  // TODO : handle errors;
-  // ! FIXME
-  // * traces api response can be pending
+  const res = await axios(`${process.env.TON_API_URL}/traces/${event_id}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.TON_API_KEY}`,
+    },
+  });
 
-  let transactionRes: TransactionResult | undefined;
-
-  try {
-    const res = await axios(`${process.env.TON_API_URL}/traces/${event_id}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.TON_API_KEY}`,
-      },
-    });
-
-    transactionRes = res.data as TransactionResult;
-  } catch (e) {
-    const error = e as AxiosError;
-    console.error(error.message);
-  }
-
-  if (!transactionRes) {
-    return;
-  }
+  const transactionRes = res.data as TransactionResult;
 
   let txs = [transactionRes];
   const txsHasOutMsgs: TransactionResult[] = [];

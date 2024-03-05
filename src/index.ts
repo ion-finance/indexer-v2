@@ -21,18 +21,25 @@ const eventPooling = async () => {
 
   console.log(`${events.length} events found.`);
   let error = false;
+  let lastIndex = events.length;
   for (let i = 0; i < events.length; i++) {
+    const index = events.length - 1 - i;
+
     try {
-      await handleEvent(events[events.length - 1 - i].event_id);
+      await handleEvent(events[index].event_id);
     } catch (e) {
       error = true;
       console.error(e);
-      console.error(`Error when handling event ${events[i].event_id}`);
+      console.error(`Error when handling event ${events[index].event_id}`);
+      lastIndex = index + 1;
       break;
     }
   }
 
   if (error) {
+    if (lastIndex <= events.length - 1) {
+      await prisma.indexerState.setLastTimestamp(events[lastIndex].timestamp);
+    }
     sleep(MIN_POOL);
     return;
   }
