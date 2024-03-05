@@ -29,7 +29,7 @@ const fetchEvents = async (): Promise<Event[]> => {
         // If 100 events are found, we need to fetch evetns more precisely.
         // It we don't this, we may miss some events.
         console.log("More than 100 events found.");
-        endDate = parsedEvents[parsedEvents.length % 50].timestamp;
+        endDate = parsedEvents[Math.floor(parsedEvents.length / 2)].timestamp;
         console.log("Try to fetch events endData ", endDate);
         continue;
       }
