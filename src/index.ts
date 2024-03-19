@@ -37,7 +37,7 @@ const eventPooling = async () => {
       console.error(e);
       console.error(`Error when handling event ${events[index].event_id}`);
       lastIndex = index + 1;
-      break;
+      throw e;
     }
   }
 

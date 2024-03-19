@@ -41,7 +41,7 @@ const fetchEvents = async (): Promise<Event[]> => {
       break;
     } catch (e) {
       console.error("Error fetching events", e);
-      break;
+      throw e;
     }
   }
 
