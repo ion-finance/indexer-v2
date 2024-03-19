@@ -1,6 +1,7 @@
 import axios from "axios";
 import prisma from "../clients/prisma";
 import { Event } from "../types/ton-api";
+import * as Sentry from "@sentry/node";
 
 const fetchEvents = async (): Promise<Event[]> => {
   const timestamp = await prisma.indexerState.getLastTimestamp();
@@ -41,7 +42,7 @@ const fetchEvents = async (): Promise<Event[]> => {
       break;
     } catch (e) {
       console.error("Error fetching events", e);
-      throw e;
+      Sentry.captureException(e);
     }
   }
 
