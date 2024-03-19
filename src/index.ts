@@ -4,11 +4,16 @@ import handleEvent from "./tasks/handleEvent";
 import prisma from "./clients/prisma";
 import sleep from "./utils/sleep";
 import api from "./api";
+import * as Sentry from "@sentry/node";
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 const MIN_POOL = 2000; // 2s
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+});
 
 const eventPooling = async () => {
   const events = await fetchEvents();
