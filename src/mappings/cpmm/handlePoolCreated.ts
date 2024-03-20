@@ -22,7 +22,8 @@ export const handlePoolCreated = async (event: Event) => {
   };
 
   const changeSymbolOfProxyTon = (symbol: string) => {
-    if (symbol === "pTON") {
+    if (symbol === "pTON" || symbol === "SCAM") {
+      console.warn(`Symbol is wrong. Change to ${symbol} to TON`);
       return "TON";
     }
     return symbol;
