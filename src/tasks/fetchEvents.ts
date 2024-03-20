@@ -31,7 +31,11 @@ const fetchEvents = async (): Promise<Event[]> => {
         // It we don't this, we may miss some events.
         console.log("More than 100 events found.");
         endDate = parsedEvents[Math.floor(parsedEvents.length / 2)].timestamp;
-        console.log("Try to fetch events endData ", endDate);
+        console.log(
+          "Try to fetch events endData ",
+          endDate,
+          new Date(endDate * 1000)
+        );
         continue;
       }
 
@@ -42,7 +46,8 @@ const fetchEvents = async (): Promise<Event[]> => {
       break;
     } catch (e) {
       console.error("Error fetching events", e);
-      Sentry.captureException(e);
+      // Sentry.captureException(e);
+      break;
     }
   }
 
