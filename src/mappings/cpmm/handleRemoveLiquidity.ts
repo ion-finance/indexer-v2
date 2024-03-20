@@ -19,6 +19,13 @@ export const handleRemoveLiquidity = async (event: Event) => {
     return;
   }
 
+  const withdraw = await prisma.withdraw.findFirst({where: {id: event.transaction.hash, eventId: event.transaction.eventId}});
+
+  if(withdraw) {
+    console.log("withdraw already exists.")
+    return
+  }
+
   await prisma.withdraw.upsert({
     where: {
       id: hash,

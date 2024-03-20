@@ -19,6 +19,13 @@ export const handleAddLiquidity = async (event: Event) => {
     return;
   }
 
+  const deposit = await prisma.deposit.findFirst({where: {id: event.transaction.hash, eventId: event.transaction.eventId}});
+
+  if(deposit) {
+    console.log("deposit already exists.")
+    return
+  }
+
   await prisma.deposit.upsert({
     where: {
       id: hash,

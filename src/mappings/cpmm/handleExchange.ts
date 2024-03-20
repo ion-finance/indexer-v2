@@ -18,6 +18,13 @@ export const handleExchange = async (event: Event) => {
     return;
   }
 
+  const swap = await prisma.swap.findFirst({where: {id: event.transaction.hash, eventId: event.transaction.eventId}});
+
+  if(swap) {
+    console.log("Swap already exists.")
+    return
+  }
+
   await prisma.swap.upsert({
     where: {
       id: event.transaction.hash,
