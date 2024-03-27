@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import fetchEvents from "./tasks/fetchEvents";
 import handleEvent from "./tasks/handleEvent";
+import handleEventCLMM from "./tasks/handleEventCLMM";
 import prisma from "./clients/prisma";
 import sleep from "./utils/sleep";
 import api from "./api";
@@ -15,6 +16,7 @@ Sentry.init({
   dsn: process.env.SENTRY_DSN,
 });
 
+const isCLMM = process.env.IS_CLMM === "true";
 const eventPooling = async () => {
   const events = await fetchEvents();
 
@@ -30,8 +32,13 @@ const eventPooling = async () => {
   for (let i = 0; i < events.length; i++) {
     const index = events.length - 1 - i;
 
+    const event = events[index];
     try {
-      await handleEvent(events[index].event_id);
+      if (isCLMM) {
+        await handleEventCLMM(event.event_id);
+      } else {
+        await handleEvent(event);
+      }
     } catch (e) {
       error = true;
       console.error(e);
