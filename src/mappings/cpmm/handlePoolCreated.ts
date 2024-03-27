@@ -1,17 +1,71 @@
-import { Event } from "../../types/events";
 import prisma from "../../clients/prisma";
-import parsePoolCreated from "../../parsers/cpmm/parsePoolCreated";
 import fetchTokenData from "../../utils/fetchTokenData";
 import { PoolType } from "@prisma/client";
+import { AccountEvent } from "../../types/ton-api";
+import { Cell, address } from "@ton/core";
+import { BiDirectionalOP } from "../../tasks/handleEvent";
+import {
+  findTracesByOpCode,
+  parseRaw,
+  sortByAddress,
+} from "../../utils/address";
+const parseTransferNotification = (raw_body: string) => {
+  const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];
+  const body = message.beginParse();
+  const op = body.loadUint(32);
+  const queryId = body.loadUint(64);
+  const jettonAmount = body.loadCoins();
+  const fromUser = body.loadAddress().toString();
+  const c = body.loadRef();
+  const cs = c.beginParse();
+  const transferredOp = cs.loadUint(32);
+  const tokenWallet1 = cs.loadAddress().toString(); // router jetton wallet
+  const minLpOut = cs.loadCoins();
 
-export const handlePoolCreated = async (event: Event) => {
-  const params = parsePoolCreated(event.body);
-  console.log("PoolCreated event is indexed");
-  console.log(params);
+  return {
+    op,
+    queryId,
+    jettonAmount,
+    fromUser,
+    transferredOp,
+    tokenWallet1,
+    minLpOut,
+  };
+};
+
+export const handlePoolCreated = async ({
+  event,
+  traces,
+}: {
+  event: AccountEvent;
+  traces: any;
+}) => {
+  const provideLpTrace = findTracesByOpCode(
+    traces,
+    BiDirectionalOP.PROVIDE_LP
+  )?.[0];
+  const poolAddress = parseRaw(
+    provideLpTrace.transaction.in_msg.destination.address
+  );
+
+  const transferNotificationTrace = findTracesByOpCode(
+    traces,
+    BiDirectionalOP.TRANSFER_NOTIFICATION
+  )?.[0];
+  // router jetton wallets
+  const { tokenWallet1 } = parseTransferNotification(
+    transferNotificationTrace.transaction.in_msg.raw_body
+  );
+  const sourceAddress = parseRaw(
+    transferNotificationTrace.transaction.in_msg.source.address
+  );
+  const sorted = sortByAddress([address(tokenWallet1), address(sourceAddress)]);
+  const tokenXAddress = sorted[0].toString();
+  const tokenYAddress = sorted[1].toString();
 
   const [tokenXdata, tokenYdata] = await Promise.all([
-    fetchTokenData(params.tokenXAddress),
-    fetchTokenData(params.tokenYAddress),
+    fetchTokenData(tokenXAddress),
+    fetchTokenData(tokenYAddress),
   ]);
 
   const changeNameOfProxyTon = (name: string) => {
@@ -32,7 +86,7 @@ export const handlePoolCreated = async (event: Event) => {
   const [tokenX, tokenY] = await Promise.all([
     prisma.token.upsert({
       where: {
-        id: params.tokenXAddress,
+        id: tokenXAddress,
       },
       update: {
         jettonMinterAddress: tokenXdata.minter_address,
@@ -42,7 +96,7 @@ export const handlePoolCreated = async (event: Event) => {
         image: tokenXdata.metadata.image,
       },
       create: {
-        id: params.tokenXAddress,
+        id: tokenXAddress,
         jettonMinterAddress: tokenXdata.minter_address,
         name: changeNameOfProxyTon(tokenXdata.metadata.name),
         symbol: changeSymbolOfProxyTon(tokenXdata.metadata.symbol),
@@ -52,7 +106,7 @@ export const handlePoolCreated = async (event: Event) => {
     }),
     prisma.token.upsert({
       where: {
-        id: params.tokenYAddress,
+        id: tokenYAddress,
       },
       update: {
         jettonMinterAddress: tokenYdata.minter_address,
@@ -62,7 +116,7 @@ export const handlePoolCreated = async (event: Event) => {
         image: tokenYdata.metadata.image,
       },
       create: {
-        id: params.tokenYAddress,
+        id: tokenYAddress,
         jettonMinterAddress: tokenYdata.minter_address,
         name: changeNameOfProxyTon(tokenYdata.metadata.name),
         symbol: changeSymbolOfProxyTon(tokenYdata.metadata.symbol),
@@ -74,14 +128,14 @@ export const handlePoolCreated = async (event: Event) => {
 
   await prisma.pool.upsert({
     where: {
-      id: params.poolAddress,
+      id: poolAddress,
     },
     create: {
-      id: params.poolAddress,
+      id: poolAddress,
       name: `${tokenX.symbol}-${tokenY.symbol}`,
       type: PoolType.CPMM,
-      tokenXAddress: params.tokenXAddress,
-      tokenYAddress: params.tokenYAddress,
+      tokenXAddress: tokenXAddress,
+      tokenYAddress: tokenYAddress,
     },
     update: {},
   });
