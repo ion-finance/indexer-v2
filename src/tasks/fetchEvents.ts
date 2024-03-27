@@ -3,10 +3,10 @@ import prisma from "../clients/prisma";
 import { Event } from "../types/ton-api";
 import * as Sentry from "@sentry/node";
 
-const fetchEvents = async (): Promise<Event[]> => {
+const fetchEvents = async () => {
   const timestamp = await prisma.indexerState.getLastTimestamp();
   let endDate = 0;
-  let events: Event[] = [];
+  let events = [];
 
   for (;;) {
     try {
