@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AccountEvent, TransactionResult } from "../types/ton-api";
+import { AccountEvent, Trace } from "../types/ton-api";
 
 import {
   handleAddLiquidity,
@@ -58,7 +58,7 @@ const handleEvent = async (event: AccountEvent) => {
   const firstActionType = actions[0].type;
   const isSwap = firstActionType === "JettonSwap";
 
-  const traces = res.data as TransactionResult;
+  const traces = res.data as Trace;
 
   // Extract paths
   // TODO: implement test code
@@ -149,17 +149,20 @@ const handleEvent = async (event: AccountEvent) => {
 
 export default handleEvent;
 
-// function extractPaths(node: TransactionResult): string[][] {
-function extractPaths(node: TransactionResult): Ops[][] {
+// function extractPaths(node: Trace): string[][] {
+function extractPaths(node: Trace): Ops[][] {
   // This function recursively extracts the paths using the spread operator.
   function recurse(
-    currentNode: TransactionResult,
-    parentNode: TransactionResult | null,
+    currentNode: Trace,
+    parentNode: Trace | null,
     path: Ops[],
     isFirst?: boolean
   ): void {
     // If there's no op_code in the in_msg, use 'ext_in_msg' as op_code for the root transaction.
     const { transaction } = currentNode;
+    if (!transaction?.in_msg) {
+      return;
+    }
     const opCode = transaction.in_msg.op_code || "";
     const customOp = (function () {
       if (isFirst) {
@@ -169,9 +172,9 @@ function extractPaths(node: TransactionResult): Ops[][] {
         parentNode?.interfaces?.includes("jetton_master");
       const { orig_status, end_status } = transaction;
       if (orig_status === "nonexist" && end_status === "active") {
-        const sourceAddress = parseRaw(transaction.in_msg.source.address);
+        const sourceAddress = parseRaw(transaction.in_msg.source?.address);
         const destinationAddress = parseRaw(
-          transaction.in_msg.destination.address
+          transaction.in_msg?.destination?.address
         );
         // TODO: consider case of router jetton wallet deploy
         if (destinationAddress === ROUTER_ADDRESS) {

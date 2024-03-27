@@ -1,15 +1,100 @@
-import { Event } from "../../types/events";
 import prisma from "../../clients/prisma";
-import parseExchange from "../../parsers/cpmm/parseExchange";
+import { AccountEvent } from "../../types/ton-api";
+import { Cell } from "@ton/core";
+import { BiDirectionalOP } from "../../tasks/handleEvent";
+import { findTracesByOpCode, parseRaw } from "../../utils/address";
 
-export const handleExchange = async (event: Event) => {
-  const params = parseExchange(event.body);
-  console.log("Exchange event is indexed.");
-  console.log(params);
+const parseSwap = (raw_body: string) => {
+  const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];
+  const body = message.beginParse();
+  const op = body.loadUint(32);
+  const queryId = body.loadUint(64);
+  const toAddress = body.loadAddress().toString();
+  const senderAddress = body.loadAddress().toString();
+  const jettonAmount = body.loadCoins();
+  const minOut = body.loadCoins();
+  const hasRef = body.loadUint(1);
+
+  return {
+    op,
+    queryId,
+    toAddress,
+    senderAddress,
+    jettonAmount,
+    minOut,
+    hasRef,
+  };
+};
+
+const parsePayTo = (raw_body: string) => {
+  const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];
+  const body = message.beginParse();
+  const op = body.loadUint(32);
+  const queryId = body.loadUint(64);
+  const toAddress = body.loadAddress().toString();
+  const exitCode = body.loadUint(32);
+  const hasMore = body.loadUint(0);
+  const ref = body.loadRef().beginParse();
+  const amount0Out = ref.loadCoins();
+  const token0Address = ref.loadAddress().toString();
+  const amount1Out = ref.loadCoins();
+  const token1Address = ref.loadAddress().toString();
+
+  return {
+    op,
+    queryId,
+    toAddress,
+    exitCode,
+    hasMore,
+    amount0Out,
+    token0Address,
+    amount1Out,
+    token1Address,
+  };
+};
+
+export const handleExchange = async ({
+  event,
+  traces,
+}: {
+  event: AccountEvent;
+  traces: any;
+}) => {
+  const eventId = event.event_id;
+  const { hash, utime } = traces.transaction;
+  const jettonSwapAction = event.actions[0].JettonSwap;
+  if (!jettonSwapAction) {
+    return;
+  }
+  const {
+    amount_in,
+    amount_out,
+    ton_in,
+    ton_out,
+    jetton_master_in,
+    jetton_master_out,
+  } = jettonSwapAction;
+
+  const amountIn = String(amount_in || ton_in);
+  const amountOut = String(amount_out || ton_out);
+
+  const swapTrace = findTracesByOpCode(traces, BiDirectionalOP.SWAP)?.[0];
+  const payToTrace = findTracesByOpCode(traces, BiDirectionalOP.PAY_TO)?.[0];
+  const { senderAddress } = parseSwap(swapTrace?.transaction.in_msg.raw_body);
+  const { exitCode } = parsePayTo(payToTrace?.transaction.in_msg.raw_body);
+  const receiverAddress = senderAddress;
+  const poolAddress = parseRaw(swapTrace?.transaction.account.address);
+
+  // const summary = (function () {
+  //   const inToken = jetton_master_in?.name || "TON";
+  //   const outToken = jetton_master_out?.name || "TON";
+  //   return `${amountIn} ${inToken} -> ${amountOut} ${outToken}`;
+  // })();
+  // console.log("summary", summary);
 
   const pool = await prisma.pool.findFirst({
     where: {
-      id: event.transaction.source,
+      id: poolAddress,
     },
   });
 
@@ -17,58 +102,62 @@ export const handleExchange = async (event: Event) => {
     console.log("Pool not found.");
     return;
   }
+  const { tokenXAddress, tokenYAddress } = pool;
+  const swapForY = senderAddress === tokenXAddress;
 
-  const swap = await prisma.swap.findFirst({where: {id: event.transaction.hash, eventId: event.transaction.eventId}});
+  // swap_ok_ref = 0x45078540 = 1158120768
+  // swap_ok = 0xc64370e5 = 3326308581
+  const validExitCodes = [1158120768, 3326308581];
+  if (!validExitCodes.includes(exitCode)) {
+    console.warn("Swap failed. Skip current indexing.");
+    return;
+  }
 
-  if(swap) {
-    console.log("Swap already exists.")
-    return
+  const swap = await prisma.swap.findFirst({
+    where: { id: hash, eventId: event.event_id },
+  });
+
+  if (swap) {
+    console.log("Swap already exists.");
+    return;
   }
 
   await prisma.swap.upsert({
     where: {
-      id: event.transaction.hash,
-      eventId: event.transaction.eventId,
+      id: hash,
+      eventId,
     },
     update: {
-      timestamp: event.transaction.timestamp,
-      poolAddress: event.transaction.source,
-      senderAddress: params.senderAddress,
-      receiverAddress: params.receiverAddress,
-      amountIn: params.amountIn.toString(),
-      amountOut: params.amountOut.toString(),
-      swapForY: params.swapForY,
+      timestamp: utime,
+      poolAddress,
+      senderAddress,
+      receiverAddress,
+      amountIn,
+      amountOut,
+      swapForY,
     },
     create: {
-      id: event.transaction.hash,
-      eventId: event.transaction.eventId,
-      timestamp: event.transaction.timestamp,
-      poolAddress: event.transaction.source,
-      senderAddress: params.senderAddress,
-      receiverAddress: params.receiverAddress,
-      amountIn: params.amountIn.toString(),
-      amountOut: params.amountOut.toString(),
-      swapForY: params.swapForY,
+      id: hash,
+      eventId,
+      timestamp: utime,
+      poolAddress,
+      senderAddress,
+      receiverAddress,
+      amountIn,
+      amountOut,
+      swapForY,
     },
   });
-
-  // swapForY true
-  // reserveX = reserveX + amountIn
-  // reserveY = reserveY - amountOut
-
-  // swapForY false
-  // reserveX = reserveX - amountOut
-  // reserveY = reserveY + amountIn
 
   let reserveX = BigInt(pool.reserveX);
   let reserveY = BigInt(pool.reserveY);
 
-  if (params.swapForY) {
-    reserveX = reserveX + BigInt(params.amountIn);
-    reserveY = reserveY - BigInt(params.amountOut);
+  if (swapForY) {
+    reserveX = reserveX + BigInt(amountIn);
+    reserveY = reserveY - BigInt(amountOut);
   } else {
-    reserveX = reserveX - BigInt(params.amountOut);
-    reserveY = reserveY + BigInt(params.amountIn);
+    reserveX = reserveX - BigInt(amountOut);
+    reserveY = reserveY + BigInt(amountIn);
   }
 
   await prisma.pool.update({
