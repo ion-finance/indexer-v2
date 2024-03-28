@@ -91,10 +91,10 @@ export const handleAddLiquidity = async ({
   }
 
   const { amount: minted, to } = parseMint(mintRawBody);
-  if (!to) {
-    console.warn("Initial Liquidity found. Skip this event.");
-    return;
-  }
+  // if (!to) {
+  //   console.warn("Initial Liquidity found. Skip this event.");
+  //   return;
+  // }
 
   const pool = await prisma.pool.findFirst({
     where: {
