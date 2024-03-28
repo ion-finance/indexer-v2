@@ -5,6 +5,8 @@ import { AccountEvent, Trace } from "../../types/ton-api";
 import { Cell, address } from "@ton/core";
 import { BiDirectionalOP } from "../../tasks/handleEvent";
 import {
+  changeNameOfProxyTon,
+  changeSymbolOfProxyTon,
   findTracesByOpCode,
   parseRaw,
   sortByAddress,
@@ -75,24 +77,11 @@ export const handlePoolCreated = async ({
     fetchTokenData(tokenXAddress),
     fetchTokenData(tokenYAddress),
   ]);
+  console.log("tokenXdata", tokenXdata);
+  console.log("tokenYdata", tokenYdata);
 
-  const changeNameOfProxyTon = (name: string) => {
-    if (name === "Proxy TON") {
-      return "TON";
-    }
-    return name;
-  };
-
-  const changeSymbolOfProxyTon = (symbol: string) => {
-    if (symbol === "pTON" || symbol === "SCAM") {
-      console.warn(`Symbol is wrong. Change to ${symbol} to TON`);
-      return "TON";
-    }
-    return symbol;
-  };
-
-  const [tokenX, tokenY] = await Promise.all([
-    prisma.token.upsert({
+  if (tokenXdata) {
+    await prisma.token.upsert({
       where: {
         id: tokenXAddress,
       },
@@ -111,8 +100,11 @@ export const handlePoolCreated = async ({
         decimals: parseInt(tokenXdata.metadata.decimals),
         image: tokenXdata.metadata.image,
       },
-    }),
-    prisma.token.upsert({
+    });
+  }
+
+  if (tokenYdata) {
+    await prisma.token.upsert({
       where: {
         id: tokenYAddress,
       },
@@ -131,8 +123,14 @@ export const handlePoolCreated = async ({
         decimals: parseInt(tokenYdata.metadata.decimals),
         image: tokenYdata.metadata.image,
       },
-    }),
-  ]);
+    });
+  }
+  const tokenXSymbol = changeSymbolOfProxyTon(
+    tokenXdata?.metadata?.symbol || ""
+  );
+  const tokenYSymbol = changeSymbolOfProxyTon(
+    tokenYdata?.metadata?.symbol || ""
+  );
 
   await prisma.pool.upsert({
     where: {
@@ -140,7 +138,7 @@ export const handlePoolCreated = async ({
     },
     create: {
       id: poolAddress,
-      name: `${tokenX.symbol}-${tokenY.symbol}`,
+      name: `${tokenXSymbol}-${tokenYSymbol}`,
       type: PoolType.CPMM,
       tokenXAddress: tokenXAddress,
       tokenYAddress: tokenYAddress,

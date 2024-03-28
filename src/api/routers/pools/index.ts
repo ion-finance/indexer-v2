@@ -13,6 +13,15 @@ router.get("/pools", async function handler(req, res) {
     pools.map((pool) => {
       const tokenX = tokens.find((token) => token.id === pool.tokenXAddress);
       const tokenY = tokens.find((token) => token.id === pool.tokenYAddress);
+      if (!tokenX) {
+        console.warn("TokenX not found", pool.tokenXAddress);
+        return;
+      }
+
+      if (!tokenY) {
+        console.warn("TokenY not found", pool.tokenYAddress);
+        return;
+      }
 
       const priceXUsd = getPriceUsd(tokenX?.symbol);
       const priceYUsd = getPriceUsd(tokenY?.symbol);

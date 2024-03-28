@@ -112,7 +112,7 @@ const handleEvent = async (event: AccountEvent) => {
   }
   if (isPoolDeployed) {
     console.log(`Pool deploy event: ${event_id}`);
-    handlePoolCreated({ event, traces });
+    await handlePoolCreated({ event, traces });
   }
   if (isLpWalletDeployed) {
     console.log(`LpWallet deploy event: ${event_id}`);
@@ -126,12 +126,12 @@ const handleEvent = async (event: AccountEvent) => {
 
   if (isSwap) {
     console.log(`Exchange event: ${event_id}`);
-    handleExchange({ event, traces });
+    await handleExchange({ event, traces });
   } else if (isProvideLp) {
     console.log(`Provide Lp event: ${event_id}`);
   } else if (isProvideLpConfirmed) {
     console.log(`Provide Lp Confirmed: ${event_id}`);
-    handleAddLiquidity({ event, traces });
+    await handleAddLiquidity({ event, traces });
   }
 
   if (

@@ -1,8 +1,15 @@
 import prisma from "../../clients/prisma";
 import { AccountEvent, Trace } from "../../types/ton-api";
-import { findTracesByOpCode, parseRaw } from "../../utils/address";
+import {
+  changeNameOfProxyTon,
+  changeSymbolOfProxyTon,
+  findTracesByOpCode,
+  parseRaw,
+} from "../../utils/address";
 import { BiDirectionalOP } from "../../tasks/handleEvent";
 import { Cell } from "@ton/core";
+import fetchTokenData from "../../utils/fetchTokenData";
+import { upsertToken } from "./upsertToken";
 
 const parseMint = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];
@@ -142,11 +149,22 @@ export const handleAddLiquidity = async ({
     },
   });
 
+  const tokens = await prisma.token.findMany();
+  const { tokenXAddress, tokenYAddress } = pool;
+  const tokenX = tokens.find((token) => token.id === tokenXAddress);
+  const tokenY = tokens.find((token) => token.id === tokenYAddress);
+
+  // if tokenX is empty, it means router_token_x is not initilized yet.
+  const updatedTokenX = tokenX ? tokenX : await upsertToken(tokenXAddress);
+  const updatedTokenY = tokenY ? tokenY : await upsertToken(tokenYAddress);
+  const name = `${updatedTokenX?.symbol}-${updatedTokenY?.symbol}`;
+
   await prisma.pool.update({
     where: {
       id: pool.id,
     },
     data: {
+      name,
       reserveX: (BigInt(pool.reserveX) + BigInt(amountX)).toString(),
       reserveY: (BigInt(pool.reserveY) + BigInt(amountY)).toString(),
       lpSupply: (BigInt(pool.lpSupply) + BigInt(minted)).toString(),

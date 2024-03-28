@@ -13,8 +13,8 @@ const handleInitialized = async (event: Event) => {
     fetchTokenData(params.tokenYAddress),
   ]);
 
-  const [tokenX, tokenY] = await Promise.all([
-    prisma.token.upsert({
+  if (tokenXdata) {
+    await prisma.token.upsert({
       where: {
         id: params.tokenXAddress,
       },
@@ -33,8 +33,10 @@ const handleInitialized = async (event: Event) => {
         decimals: parseInt(tokenXdata.metadata.decimals),
         image: tokenXdata.metadata.image,
       },
-    }),
-    prisma.token.upsert({
+    });
+  }
+  if (tokenYdata) {
+    await prisma.token.upsert({
       where: {
         id: params.tokenYAddress,
       },
@@ -53,8 +55,11 @@ const handleInitialized = async (event: Event) => {
         decimals: parseInt(tokenYdata.metadata.decimals),
         image: tokenYdata.metadata.image,
       },
-    }),
-  ]);
+    });
+  }
+
+  const tokenXSymbol = tokenXdata?.metadata.symbol;
+  const tokenYSymbol = tokenYdata?.metadata.symbol;
 
   await prisma.pool.upsert({
     where: {
@@ -66,7 +71,7 @@ const handleInitialized = async (event: Event) => {
       tokenXAddress: params.tokenXAddress,
       tokenYAddress: params.tokenYAddress,
       binStep: params.binStep,
-      name: `${tokenX.symbol}-${tokenY.symbol}`,
+      name: `${tokenXSymbol} - ${tokenYSymbol}`,
       activeBinId: params.activeId,
     },
   });

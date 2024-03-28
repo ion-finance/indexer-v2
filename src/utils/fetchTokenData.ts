@@ -39,35 +39,7 @@ const fetchTokenData = async (walletAddress: string) => {
       holders_count: number;
     };
   } catch {
-    return {
-      minter_address: data?.minter?.toString() || "",
-      mintable: false,
-      total_supply: "0",
-      metadata: {
-        address: "",
-        name: "UNKNOWN",
-        symbol: "UNKNOWN",
-        decimals: "9",
-        image: "",
-        description: "",
-      },
-      verification: "",
-      holders_count: 0,
-    } as {
-      minter_address: string;
-      mintable: boolean;
-      total_supply: string;
-      metadata: {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: string;
-        image: string;
-        description: string;
-      };
-      verification: string;
-      holders_count: number;
-    };
+    return null;
   }
 };
 

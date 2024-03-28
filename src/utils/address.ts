@@ -34,3 +34,18 @@ export const sortByAddress = (addresses: Address[]) =>
       "0x" + beginCell().storeAddress(address).endCell().hash().toString("hex")
     )
   ).reverse();
+
+export const changeNameOfProxyTon = (name: string) => {
+  if (name === "Proxy TON") {
+    return "TON";
+  }
+  return name;
+};
+
+export const changeSymbolOfProxyTon = (symbol: string) => {
+  if (symbol === "pTON" || symbol === "SCAM") {
+    console.warn(`Symbol is wrong. Change to ${symbol} to TON`);
+    return "TON";
+  }
+  return symbol;
+};
