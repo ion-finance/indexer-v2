@@ -9,8 +9,9 @@ import {
 } from "../mappings/cpmm";
 import { parseRaw } from "../utils/address";
 import dotenv from "dotenv";
+import { Address } from "@ton/core";
 dotenv.config();
-const ROUTER_ADDRESS = process.env.ROUTER_ADDRESS;
+const ROUTER_ADDRESS = process.env.ROUTER_ADDRESS || "";
 
 enum OP {
   TRANSFER = "0x0f8a7ea5",
@@ -177,9 +178,15 @@ function extractPaths(node: Trace): Ops[][] {
           transaction.in_msg?.destination?.address
         );
         // TODO: consider case of router jetton wallet deploy
-        if (destinationAddress === ROUTER_ADDRESS) {
+        if (
+          Address.parse(destinationAddress).equals(
+            Address.parse(ROUTER_ADDRESS)
+          )
+        ) {
           return "router_deployed";
-        } else if (sourceAddress === ROUTER_ADDRESS) {
+        } else if (
+          Address.parse(sourceAddress).equals(Address.parse(ROUTER_ADDRESS))
+        ) {
           return "pool_deployed";
         } else if (isParentJettonMaster) {
           // parent should be jettonMaster && pool
