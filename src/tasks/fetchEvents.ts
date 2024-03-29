@@ -1,12 +1,12 @@
 import axios from "axios";
-import { Event } from "../types/ton-api";
+import { AccountEvent, Event } from "../types/ton-api";
+import prisma from "../clients/prisma";
 // import * as Sentry from "@sentry/node";
 
 const fetchEvents = async () => {
-  const timestamp = 0;
-  // const timestamp = await prisma.indexerState.getLastTimestamp();
+  const timestamp = await prisma.indexerState.getLastTimestamp();
   let endDate = 0;
-  let events = [];
+  const events: AccountEvent[] = [];
 
   for (;;) {
     try {
@@ -23,25 +23,25 @@ const fetchEvents = async () => {
         }
       );
 
-      const parsedEvents = res.data.events as Event[];
+      const parsedEvents = res.data.events.filter(
+        (event: Event) => event.in_progress === false
+      ) as AccountEvent[];
+      events.push(...parsedEvents);
 
       if (parsedEvents.length >= 100) {
         // TON API limit is 100 events per request.
         // If 100 events are found, we need to fetch evetns more precisely.
         // It we don't this, we may miss some events.
         console.log("More than 100 events found.");
-        endDate = parsedEvents[Math.floor(parsedEvents.length / 2)].timestamp;
+        // endDate = parsedEvents[Math.floor(parsedEvents.length / 2)].timestamp;
+        endDate = parsedEvents[parsedEvents.length - 1].timestamp;
         console.log(
           "Try to fetch events endData ",
-          endDate,
-          new Date(endDate * 1000)
+          new Date(endDate * 1000).toLocaleString("ko-KR"),
+          endDate
         );
         continue;
       }
-
-      events = res.data.events.filter(
-        (event: Event) => event.in_progress === false
-      );
 
       break;
     } catch (e) {
@@ -51,7 +51,8 @@ const fetchEvents = async () => {
     }
   }
 
-  return events;
+  const orderedEvents = events.sort((a, b) => a.timestamp - b.timestamp);
+  return orderedEvents;
 };
 
 export default fetchEvents;
