@@ -6,10 +6,10 @@ import {
   findTracesByOpCode,
   parseRaw,
 } from "../../utils/address";
-import { OP } from "../../tasks/handleEvent";
 import { Cell } from "@ton/core";
 import fetchTokenData from "../../utils/fetchTokenData";
 import { upsertToken } from "./upsertToken";
+import { OP } from "../../tasks/handleEvent/opCode";
 
 const parseMint = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];

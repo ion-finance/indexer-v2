@@ -3,7 +3,6 @@ import fetchTokenData from "../../utils/fetchTokenData";
 import { PoolType } from "@prisma/client";
 import { AccountEvent, Trace } from "../../types/ton-api";
 import { Cell, address } from "@ton/core";
-import { OP } from "../../tasks/handleEvent";
 import {
   changeNameOfProxyTon,
   changeSymbolOfProxyTon,
@@ -11,6 +10,7 @@ import {
   parseRaw,
   sortByAddress,
 } from "../../utils/address";
+import { OP } from "../../tasks/handleEvent/opCode";
 const parseTransferNotification = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];
   const body = message.beginParse();
