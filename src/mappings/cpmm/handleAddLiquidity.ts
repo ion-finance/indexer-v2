@@ -1,5 +1,5 @@
 import prisma from "../../clients/prisma";
-import { AccountEvent } from "../../types/ton-api";
+import { AccountEvent, Trace } from "../../types/ton-api";
 import { findTracesByOpCode, parseRaw } from "../../utils/address";
 import { BiDirectionalOP } from "../../tasks/handleEvent";
 import { Cell } from "@ton/core";
@@ -48,29 +48,42 @@ export const handleAddLiquidity = async ({
   traces,
 }: {
   event: AccountEvent;
-  traces: any;
+  traces: Trace;
 }) => {
   const cbAddLiquidityTrace = findTracesByOpCode(
     traces,
     BiDirectionalOP.CB_ADD_LIQUIDITY
   )?.[0];
-  const poolAddress = parseRaw(
-    cbAddLiquidityTrace?.transaction.in_msg.destination.address
-  );
-  const { amount0, amount1, minLpOut, op, queryId, userAddress } =
-    parseCbAddLiquidity(cbAddLiquidityTrace?.transaction.in_msg.raw_body);
+  const { raw_body: cbAddLiquidityBody, destination } =
+    cbAddLiquidityTrace?.transaction.in_msg || {};
+  if (!cbAddLiquidityBody) {
+    console.warn("Empty raw_body cbAddLiquidityTrace");
+    return;
+  }
+  if (!destination) {
+    console.warn("Empty destination cbAddLiquidityTrace");
+    return;
+  }
+  const poolAddress = parseRaw(destination.address);
+  const { amount0, amount1, userAddress } =
+    parseCbAddLiquidity(cbAddLiquidityBody);
 
   const internalTransferTraces = findTracesByOpCode(
     traces,
     BiDirectionalOP.INTERNAL_TRANSFER
   );
   const mintTrace = internalTransferTraces?.find(
-    (trace: any) =>
-      parseRaw(trace.transaction.in_msg.source.address) === poolAddress
+    (trace: Trace) =>
+      parseRaw(trace.transaction.in_msg?.source?.address) === poolAddress
   );
-  const { amount: minted, to } = parseMint(
-    mintTrace?.transaction.in_msg.raw_body
-  );
+
+  const { raw_body: mintRawBody } = mintTrace?.transaction.in_msg || {};
+  if (!mintRawBody) {
+    console.warn("Empty raw_body mintTrace");
+    return;
+  }
+
+  const { amount: minted, to } = parseMint(mintRawBody);
   if (!to) {
     console.warn("Initial Liquidity found. Skip this event.");
     return;

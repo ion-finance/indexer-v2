@@ -1,5 +1,5 @@
 import prisma from "../../clients/prisma";
-import { AccountEvent } from "../../types/ton-api";
+import { AccountEvent, Trace } from "../../types/ton-api";
 import { Cell } from "@ton/core";
 import { BiDirectionalOP } from "../../tasks/handleEvent";
 import { findTracesByOpCode, parseRaw } from "../../utils/address";
@@ -58,7 +58,7 @@ export const handleExchange = async ({
   traces,
 }: {
   event: AccountEvent;
-  traces: any;
+  traces: Trace;
 }) => {
   const eventId = event.event_id;
   const { hash, utime } = traces.transaction;
@@ -80,8 +80,21 @@ export const handleExchange = async ({
 
   const swapTrace = findTracesByOpCode(traces, BiDirectionalOP.SWAP)?.[0];
   const payToTrace = findTracesByOpCode(traces, BiDirectionalOP.PAY_TO)?.[0];
-  const { senderAddress } = parseSwap(swapTrace?.transaction.in_msg.raw_body);
-  const { exitCode } = parsePayTo(payToTrace?.transaction.in_msg.raw_body);
+
+  const swapTraceRawBody = swapTrace?.transaction.in_msg?.raw_body || "";
+  const payToRawBody = payToTrace?.transaction.in_msg?.raw_body || "";
+  if (!swapTraceRawBody) {
+    console.warn("Empty raw_body swapTrace");
+    return null;
+  }
+
+  if (!payToRawBody) {
+    console.warn("Empty raw_body payTo");
+    return null;
+  }
+
+  const { senderAddress } = parseSwap(swapTraceRawBody);
+  const { exitCode } = parsePayTo(payToRawBody);
   const receiverAddress = senderAddress;
   const poolAddress = parseRaw(swapTrace?.transaction.account.address);
 

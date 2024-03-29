@@ -1,5 +1,5 @@
 import axios from "axios";
-import { TransactionResult } from "../types/ton-api";
+import { Trace } from "../types/ton-api";
 import { Address, Cell } from "@ton/core";
 import {
   handleDepositedToBins,
@@ -31,12 +31,12 @@ const handleEventCLMM = async (event_id: string) => {
     },
   });
 
-  const transactionRes = res.data as TransactionResult;
+  const transactionRes = res.data as Trace;
 
   let txs = [transactionRes];
-  const txsHasOutMsgs: TransactionResult[] = [];
+  const txsHasOutMsgs: Trace[] = [];
   while (txs.length != 0) {
-    let new_txs: TransactionResult[] = [];
+    let new_txs: Trace[] = [];
 
     txs.forEach((t) => {
       if (t.transaction.out_msgs.length > 0) {
@@ -58,7 +58,7 @@ const handleEventCLMM = async (event_id: string) => {
     const tx = txsHasOutMsgs[i];
     for (let j = 0; j < tx.transaction.out_msgs.length; j++) {
       const msg = tx.transaction.out_msgs[j];
-      const body = Cell.fromBoc(Buffer.from(msg.raw_body, "hex"))[0];
+      const body = Cell.fromBoc(Buffer.from(msg.raw_body || "", "hex"))[0];
       const transaction = {
         source: Address.parseRaw(tx.transaction.account.address).toString(),
         hash: tx.transaction.hash,

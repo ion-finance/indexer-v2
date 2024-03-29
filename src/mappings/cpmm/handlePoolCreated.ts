@@ -1,7 +1,7 @@
 import prisma from "../../clients/prisma";
 import fetchTokenData from "../../utils/fetchTokenData";
 import { PoolType } from "@prisma/client";
-import { AccountEvent } from "../../types/ton-api";
+import { AccountEvent, Trace } from "../../types/ton-api";
 import { Cell, address } from "@ton/core";
 import { BiDirectionalOP } from "../../tasks/handleEvent";
 import {
@@ -38,27 +38,35 @@ export const handlePoolCreated = async ({
   traces,
 }: {
   event: AccountEvent;
-  traces: any;
+  traces: Trace;
 }) => {
   const provideLpTrace = findTracesByOpCode(
     traces,
     BiDirectionalOP.PROVIDE_LP
   )?.[0];
   const poolAddress = parseRaw(
-    provideLpTrace.transaction.in_msg.destination.address
+    provideLpTrace.transaction?.in_msg?.destination?.address
   );
 
   const transferNotificationTrace = findTracesByOpCode(
     traces,
     BiDirectionalOP.TRANSFER_NOTIFICATION
   )?.[0];
+
+  const { raw_body, source } =
+    transferNotificationTrace.transaction.in_msg || {};
+  if (!raw_body) {
+    console.warn("Empty raw_body");
+    return null;
+  }
+  if (!source) {
+    console.warn("Empty source");
+    return null;
+  }
+
   // router jetton wallets
-  const { tokenWallet1 } = parseTransferNotification(
-    transferNotificationTrace.transaction.in_msg.raw_body
-  );
-  const sourceAddress = parseRaw(
-    transferNotificationTrace.transaction.in_msg.source.address
-  );
+  const { tokenWallet1 } = parseTransferNotification(raw_body);
+  const sourceAddress = parseRaw(source.address);
   const sorted = sortByAddress([address(tokenWallet1), address(sourceAddress)]);
   const tokenXAddress = sorted[0].toString();
   const tokenYAddress = sorted[1].toString();

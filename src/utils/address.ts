@@ -1,5 +1,6 @@
 import { sortBy } from "lodash";
 import { Address, beginCell } from "@ton/core";
+import { Trace } from "../types/ton-api";
 
 export const parseRaw = (raw?: string): string => {
   if (!raw) {
@@ -8,10 +9,10 @@ export const parseRaw = (raw?: string): string => {
   return Address.parseRaw(raw).toString();
 };
 
-export const findTracesByOpCode = (trace: any, opCode: any): any => {
-  const result: any[] = [];
+export const findTracesByOpCode = (trace: Trace, opCode: string) => {
+  const result: Trace[] = [];
   // Check if the current transaction's op_code matches the given opCode.
-  if (trace.transaction.in_msg.op_code === opCode) {
+  if (trace.transaction.in_msg?.op_code === opCode) {
     result.push(trace);
   }
 

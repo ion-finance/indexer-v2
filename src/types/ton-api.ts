@@ -21,32 +21,58 @@ export interface OutMessage {
 export interface Transaction {
   hash: string;
   lt: string;
-  account: Account;
+  account: AccountAddress;
   success: boolean;
   utime: number;
-  out_msgs: OutMessage[];
-  in_msg: InMsg;
-  orig_status: string;
-  end_status: string;
-  // others..
+  orig_status: AccountStatus;
+  end_status: AccountStatus;
+  total_fees: number;
+  transaction_type: TransactionType;
+  state_update_old: string;
+  state_update_new: string;
+  in_msg?: Message;
+  out_msgs: Message[];
+  block: string;
+  prev_trans_hash?: string;
+  prev_trans_lt?: number;
+  compute_phase?: any;
+  storage_phase?: any;
+  credit_phase?: any;
+  action_phase?: any;
+  bounce_phase?: any;
+  aborted: boolean;
+  destroyed: boolean;
 }
 
-interface InMsg {
+interface Message {
   msg_type: string;
+  created_lt: number;
+  ihr_disabled: boolean;
+  bounce: boolean;
+  bounced: boolean;
+  value: number;
+  fwd_fee: number;
+  ihr_fee: number;
+  destination?: AccountAddress;
+  source?: AccountAddress;
+  import_fee: number;
+  created_at: number;
   op_code?: string;
-  source: {
-    address: string;
-  };
-  destination: {
-    address: string;
-  };
-  // TODO: fill others..
+  init?: StateInit;
+  raw_body?: string;
+  decoded_op_name?: string;
+  decoded_body?: string;
 }
-export interface TransactionResult {
+export interface Trace {
   transaction: Transaction;
-  interfaces?: string[];
-  children?: TransactionResult[];
+  interfaces: string[];
+  children?: Trace[];
+  emulated?: boolean;
 }
+
+type StateInit = {
+  boc: string;
+};
 
 export interface Event {
   event_id: string;
@@ -74,6 +100,16 @@ export interface AccountEvent {
   in_progress: boolean;
   extra: number;
 }
+
+type AccountStatus = "nonexist" | "uninit" | "active" | "frozen";
+type TransactionType =
+  | "TransOrd"
+  | "TransTickTock"
+  | "TransSplitPrepare"
+  | "TransSplitInstall"
+  | "TransMergePrepare"
+  | "TransMergeInstall"
+  | "TransStorage";
 
 export interface AccountAddress {
   address: string;
