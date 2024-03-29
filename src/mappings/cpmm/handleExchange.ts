@@ -1,7 +1,7 @@
 import prisma from "../../clients/prisma";
 import { AccountEvent, Trace } from "../../types/ton-api";
 import { Cell } from "@ton/core";
-import { BiDirectionalOP } from "../../tasks/handleEvent";
+import { OP } from "../../tasks/handleEvent";
 import { findTracesByOpCode, parseRaw } from "../../utils/address";
 
 const parseSwap = (raw_body: string) => {
@@ -78,8 +78,8 @@ export const handleExchange = async ({
   const amountIn = String(amount_in || ton_in);
   const amountOut = String(amount_out || ton_out);
 
-  const swapTrace = findTracesByOpCode(traces, BiDirectionalOP.SWAP)?.[0];
-  const payToTrace = findTracesByOpCode(traces, BiDirectionalOP.PAY_TO)?.[0];
+  const swapTrace = findTracesByOpCode(traces, OP.SWAP)?.[0];
+  const payToTrace = findTracesByOpCode(traces, OP.PAY_TO)?.[0];
 
   const swapTraceRawBody = swapTrace?.transaction.in_msg?.raw_body || "";
   const payToRawBody = payToTrace?.transaction.in_msg?.raw_body || "";

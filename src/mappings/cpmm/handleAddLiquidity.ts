@@ -6,7 +6,7 @@ import {
   findTracesByOpCode,
   parseRaw,
 } from "../../utils/address";
-import { BiDirectionalOP } from "../../tasks/handleEvent";
+import { OP } from "../../tasks/handleEvent";
 import { Cell } from "@ton/core";
 import fetchTokenData from "../../utils/fetchTokenData";
 import { upsertToken } from "./upsertToken";
@@ -59,7 +59,7 @@ export const handleAddLiquidity = async ({
 }) => {
   const cbAddLiquidityTrace = findTracesByOpCode(
     traces,
-    BiDirectionalOP.CB_ADD_LIQUIDITY
+    OP.CB_ADD_LIQUIDITY
   )?.[0];
   const { raw_body: cbAddLiquidityBody, destination } =
     cbAddLiquidityTrace?.transaction.in_msg || {};
@@ -77,7 +77,7 @@ export const handleAddLiquidity = async ({
 
   const internalTransferTraces = findTracesByOpCode(
     traces,
-    BiDirectionalOP.INTERNAL_TRANSFER
+    OP.INTERNAL_TRANSFER
   );
   const mintTrace = internalTransferTraces?.find(
     (trace: Trace) =>

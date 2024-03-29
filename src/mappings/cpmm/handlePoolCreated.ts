@@ -3,7 +3,7 @@ import fetchTokenData from "../../utils/fetchTokenData";
 import { PoolType } from "@prisma/client";
 import { AccountEvent, Trace } from "../../types/ton-api";
 import { Cell, address } from "@ton/core";
-import { BiDirectionalOP } from "../../tasks/handleEvent";
+import { OP } from "../../tasks/handleEvent";
 import {
   changeNameOfProxyTon,
   changeSymbolOfProxyTon,
@@ -42,17 +42,14 @@ export const handlePoolCreated = async ({
   event: AccountEvent;
   traces: Trace;
 }) => {
-  const provideLpTrace = findTracesByOpCode(
-    traces,
-    BiDirectionalOP.PROVIDE_LP
-  )?.[0];
+  const provideLpTrace = findTracesByOpCode(traces, OP.PROVIDE_LP)?.[0];
   const poolAddress = parseRaw(
     provideLpTrace.transaction?.in_msg?.destination?.address
   );
 
   const transferNotificationTrace = findTracesByOpCode(
     traces,
-    BiDirectionalOP.TRANSFER_NOTIFICATION
+    OP.TRANSFER_NOTIFICATION
   )?.[0];
 
   const { raw_body, source } =

@@ -13,7 +13,7 @@ import { Address } from "@ton/core";
 dotenv.config();
 const ROUTER_ADDRESS = process.env.ROUTER_ADDRESS || "";
 
-enum OP {
+enum RAW_OP {
   TRANSFER = "0x0f8a7ea5",
   TRANSFER_NOTIFICATION = "0x7362d09c",
   PROVIDE_LP = "0xfcf9e58f",
@@ -25,7 +25,7 @@ enum OP {
   SWAP = "0x25938561",
 }
 
-enum CUSTOM_OP {
+enum RAW_CUSTOM_OP {
   // custom ops
   EXT_IN_MSG = "ext_in_msg",
   ROUTER_DEPLOYED = "router_deployed",
@@ -34,6 +34,8 @@ enum CUSTOM_OP {
   LP_WALLET_DEPLOYED = "lp_wallet_deployed",
   LP_ACCOUNT_DEPLOYED = "lp_account_deployed",
 }
+// It makes bi-directional enum
+// ex) OP[key] = value, OP[value] = key
 function createBiDirectionalEnum<E extends { [index: string]: string }>(
   e: E
 ): E & { [key: string]: string } {
@@ -43,8 +45,8 @@ function createBiDirectionalEnum<E extends { [index: string]: string }>(
   };
 }
 
-export const BiDirectionalOP = createBiDirectionalEnum(OP);
-export const BiDirectionalCustomOP = createBiDirectionalEnum(CUSTOM_OP);
+export const OP = createBiDirectionalEnum(RAW_OP);
+export const CustomOP = createBiDirectionalEnum(RAW_CUSTOM_OP);
 
 // Info
 // * This method can throw an error if the event is processing
@@ -66,45 +68,34 @@ const handleEvent = async (event: AccountEvent) => {
   const paths: Ops[][] = extractPaths(traces);
   // console.log("paths", paths);
   const isRouterDeployed = paths.some((path) =>
-    path.some(
-      ({ customOp }) => customOp === BiDirectionalCustomOP.ROUTER_DEPLOYED
-    )
+    path.some(({ customOp }) => customOp === CustomOP.ROUTER_DEPLOYED)
   );
 
   const isPoolDeployed = paths.some((path) =>
-    path.some(
-      ({ customOp }) => customOp === BiDirectionalCustomOP.POOL_DEPLOYED
-    )
+    path.some(({ customOp }) => customOp === CustomOP.POOL_DEPLOYED)
   );
 
   const isLpWalletDeployed = paths.some((path) =>
-    path.some(
-      ({ customOp }) => customOp === BiDirectionalCustomOP.LP_WALLET_DEPLOYED
-    )
+    path.some(({ customOp }) => customOp === CustomOP.LP_WALLET_DEPLOYED)
   );
 
   const isLpAccountDeployed = paths.some((path) =>
-    path.some(
-      ({ customOp }) => customOp === BiDirectionalCustomOP.LP_ACCOUNT_DEPLOYED
-    )
+    path.some(({ customOp }) => customOp === CustomOP.LP_ACCOUNT_DEPLOYED)
   );
 
   const isRouterJettonWalletDeployed = paths.some((path) =>
     path.some(
-      ({ customOp }) =>
-        customOp === BiDirectionalCustomOP.ROUTER_JETTON_WALLET_DEPLOYED
+      ({ customOp }) => customOp === CustomOP.ROUTER_JETTON_WALLET_DEPLOYED
     )
   );
 
   const isProvideLpConfirmed = paths.some((path) =>
-    path.some(({ op }) => op === BiDirectionalOP.CB_ADD_LIQUIDITY)
+    path.some(({ op }) => op === OP.CB_ADD_LIQUIDITY)
   );
 
   const isProvideLp =
     !isProvideLpConfirmed &&
-    paths.some((path) =>
-      path.some(({ op }) => op === BiDirectionalOP.ADD_LIQUIDITY)
-    );
+    paths.some((path) => path.some(({ op }) => op === OP.ADD_LIQUIDITY));
 
   // deploy cases can be overlapped
   if (isRouterDeployed) {
@@ -190,12 +181,12 @@ function extractPaths(node: Trace): Ops[][] {
           return "pool_deployed";
         } else if (isParentJettonMaster) {
           // parent should be jettonMaster && pool
-          if (opCode === BiDirectionalOP.ADD_LIQUIDITY) {
+          if (opCode === OP.ADD_LIQUIDITY) {
             return "lp_account_deployed";
           } else {
             return "lp_wallet_deployed";
           }
-        } else if (opCode === BiDirectionalOP.INTERNAL_TRANSFER) {
+        } else if (opCode === OP.INTERNAL_TRANSFER) {
           return "router_jetton_wallet_deployed";
         } else {
           return "contract_deployed";
@@ -204,7 +195,7 @@ function extractPaths(node: Trace): Ops[][] {
       return "";
     })();
 
-    const opKey = BiDirectionalOP[opCode];
+    const opKey = OP[opCode];
     if (!opKey && !customOp) {
       console.warn(
         `Unknown opCode: ${opCode}, txHash: ${currentNode.transaction.hash}`
