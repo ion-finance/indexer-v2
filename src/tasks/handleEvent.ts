@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AccountEvent, Trace } from "../types/ton-api";
+import { AccountEvent, ActionType, Trace } from "../types/ton-api";
 
 import {
   handleAddLiquidity,
@@ -57,7 +57,7 @@ const handleEvent = async (event: AccountEvent) => {
   });
 
   const firstActionType = actions[0].type;
-  const isSwap = firstActionType === "JettonSwap";
+  const isSwap = firstActionType === ActionType.JETTON_SWAP;
 
   const traces = res.data as Trace;
 

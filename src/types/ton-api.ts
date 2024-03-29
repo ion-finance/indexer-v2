@@ -101,16 +101,22 @@ export interface AccountEvent {
   extra: number;
 }
 
-type AccountStatus = "nonexist" | "uninit" | "active" | "frozen";
-type TransactionType =
-  | "TransOrd"
-  | "TransTickTock"
-  | "TransSplitPrepare"
-  | "TransSplitInstall"
-  | "TransMergePrepare"
-  | "TransMergeInstall"
-  | "TransStorage";
+enum AccountStatus {
+  Nonexist = "nonexist",
+  Uninit = "uninit",
+  Active = "active",
+  Frozen = "frozen",
+}
 
+enum TransactionType {
+  TransOrd = "TransOrd",
+  TransTickTock = "TransTickTock",
+  TransSplitPrepare = "TransSplitPrepare",
+  TransSplitInstall = "TransSplitInstall",
+  TransMergePrepare = "TransMergePrepare",
+  TransMergeInstall = "TransMergeInstall",
+  TransStorage = "TransStorage",
+}
 export interface AccountAddress {
   address: string;
   name?: string;
@@ -160,16 +166,28 @@ export interface JettonSwapAction {
   jetton_master_in?: JettonPreview;
   jetton_master_out?: JettonPreview;
 }
-type DEX = "stonfi" | "tonswap" | "tonbridge";
+
+enum DEX {
+  STONFI = "stonfi",
+  TONSWAP = "tonswap",
+  TONBRIDGE = "tonbridge",
+}
+
 export interface JettonPreview {
   address: string;
   name: string;
   symbol: string;
   decimals: number;
   image: string;
-  verification: JettonVerificationTypestringEnum;
+  verification: JettonVerificationType;
 }
-type JettonVerificationTypestringEnum = "whitelist" | "blacklist" | "none";
+
+enum JettonVerificationType {
+  WHITELIST = "whitelist",
+  BLACKLIST = "blacklist",
+  NONE = "none",
+}
+// type JettonVerificationTypestringEnum = "whitelist" | "blacklist" | "none";
 
 export interface EncryptedComment {
   encryption_type: string;
@@ -189,25 +207,26 @@ interface ActionSimplePreview {
   accounts: AccountAddress[];
 }
 
-type ActionType =
-  | "TonTransfer"
-  | "JettonTransfer"
-  | "JettonBurn"
-  | "JettonMint"
-  | "NftItemTransfer"
-  | "ContractDeploy"
-  | "Subscribe"
-  | "UnSubscribe"
-  | "AuctionBid"
-  | "NftPurchase"
-  | "DepositStake"
-  | "WithdrawStake"
-  | "WithdrawStakeRequest"
-  | "JettonSwap"
-  | "SmartContractExec"
-  | "ElectionsRecoverStake"
-  | "ElectionsDepositStake"
-  | "DomainRenew"
-  | "InscriptionTransfer"
-  | "InscriptionMint"
-  | "Unknown";
+export enum ActionType {
+  TON_TRANSFER = "TonTransfer",
+  JETTON_TRANSFER = "JettonTransfer",
+  JETTON_BURN = "JettonBurn",
+  JETTON_MINT = "JettonMint",
+  NFTITEM_TRANSFER = "NftItemTransfer",
+  CONTRACT_DEPLOY = "CONTRACTDEPLOY",
+  SUBSCRIBE = "Subscribe",
+  UNSUBSCRIBE = "UnSubscribe",
+  AUCTION_BID = "AuctionBid",
+  NFT_PURCHASE = "NftPurchase",
+  DEPOSIT_STAKE = "DepositStake",
+  WITHDRAW_STAKE = "WithdrawStake",
+  WITHDRAW_STAKE_REQUEST = "WithdrawStakeRequest",
+  JETTON_SWAP = "JettonSwap",
+  SMARTCONTRACT_EXEC = "SmartContractExec",
+  ELECTIONS_RECOVER_STAKE = "ElectionsRecoverStake",
+  ELECTIONS_DEPOSIT_STAKE = "ElectionsDepositStake",
+  DOMAIN_RENEW = "DomainRenew",
+  INSCRIPTION_TRANSFER = "InscriptionTransfer",
+  INSCRIPTION_MINT = "InscriptionMint",
+  UNKNOWN = "Unknown",
+}
