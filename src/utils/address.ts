@@ -9,8 +9,11 @@ export const parseRaw = (raw?: string): string => {
   return Address.parseRaw(raw).toString();
 };
 
-export const findTracesByOpCode = (trace: Trace, opCode: string) => {
-  const result: Trace[] = [];
+export const findTracesByOpCode = (
+  trace: Trace,
+  opCode: string
+): Trace[] | null => {
+  const result = [];
   // Check if the current transaction's op_code matches the given opCode.
   if (trace.transaction.in_msg?.op_code === opCode) {
     result.push(trace);
@@ -20,10 +23,13 @@ export const findTracesByOpCode = (trace: Trace, opCode: string) => {
   if (trace.children) {
     for (const child of trace.children) {
       const childResults = findTracesByOpCode(child, opCode); // Collect results from children
-      if (childResults.length) {
+      if (childResults) {
         result.push(...childResults); // Merge child results into the current result set
       }
     }
+  }
+  if (result.length === 0) {
+    return null;
   }
   return result;
 };

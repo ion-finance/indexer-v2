@@ -1,7 +1,6 @@
 import axios from "axios";
-import prisma from "../clients/prisma";
 import { Event } from "../types/ton-api";
-import * as Sentry from "@sentry/node";
+// import * as Sentry from "@sentry/node";
 
 const fetchEvents = async () => {
   const timestamp = 0;

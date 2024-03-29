@@ -43,14 +43,22 @@ export const handlePoolCreated = async ({
   traces: Trace;
 }) => {
   const provideLpTrace = findTracesByOpCode(traces, OP.PROVIDE_LP)?.[0];
-  const poolAddress = parseRaw(
-    provideLpTrace.transaction?.in_msg?.destination?.address
-  );
-
   const transferNotificationTrace = findTracesByOpCode(
     traces,
     OP.TRANSFER_NOTIFICATION
   )?.[0];
+  if (!provideLpTrace) {
+    console.warn("Empty provideLpTrace");
+    return;
+  }
+  if (!transferNotificationTrace) {
+    console.warn("Empty transferNotificationTrace");
+    return;
+  }
+
+  const poolAddress = parseRaw(
+    provideLpTrace.transaction?.in_msg?.destination?.address
+  );
 
   const { raw_body, source } =
     transferNotificationTrace.transaction.in_msg || {};
@@ -74,8 +82,6 @@ export const handlePoolCreated = async ({
     fetchTokenData(tokenXAddress),
     fetchTokenData(tokenYAddress),
   ]);
-  console.log("tokenXdata", tokenXdata);
-  console.log("tokenYdata", tokenYdata);
 
   if (tokenXdata) {
     await prisma.token.upsert({

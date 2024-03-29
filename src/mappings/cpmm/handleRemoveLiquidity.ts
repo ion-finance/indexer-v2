@@ -2,6 +2,7 @@ import { Event } from "../../types/events";
 import prisma from "../../clients/prisma";
 import parseRemoveLiquidity from "../../parsers/cpmm/parseRemoveLiquidity";
 
+// TODO: impl
 export const handleRemoveLiquidity = async (event: Event) => {
   const params = parseRemoveLiquidity(event.body);
   console.log("Remove liquidity event is indexed.");
@@ -19,11 +20,13 @@ export const handleRemoveLiquidity = async (event: Event) => {
     return;
   }
 
-  const withdraw = await prisma.withdraw.findFirst({where: {id: event.transaction.hash, eventId: event.transaction.eventId}});
+  const withdraw = await prisma.withdraw.findFirst({
+    where: { id: event.transaction.hash, eventId: event.transaction.eventId },
+  });
 
-  if(withdraw) {
-    console.log("withdraw already exists.")
-    return
+  if (withdraw) {
+    console.log("withdraw already exists.");
+    return;
   }
 
   await prisma.withdraw.upsert({

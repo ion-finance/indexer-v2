@@ -5,10 +5,8 @@ import {
   handleAddLiquidity,
   handleExchange,
   handlePoolCreated,
-  handleRemoveLiquidity,
+  // handleRemoveLiquidity,
 } from "../../mappings/cpmm";
-import { parseRaw } from "../../utils/address";
-import { Address } from "@ton/core";
 import extractPaths from "./extractPaths";
 import { CustomOP, OP } from "./opCode";
 import type { Ops } from "./opCode";

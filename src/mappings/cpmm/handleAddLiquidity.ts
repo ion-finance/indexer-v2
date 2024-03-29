@@ -1,13 +1,7 @@
 import prisma from "../../clients/prisma";
 import { AccountEvent, Trace } from "../../types/ton-api";
-import {
-  changeNameOfProxyTon,
-  changeSymbolOfProxyTon,
-  findTracesByOpCode,
-  parseRaw,
-} from "../../utils/address";
+import { findTracesByOpCode, parseRaw } from "../../utils/address";
 import { Cell } from "@ton/core";
-import fetchTokenData from "../../utils/fetchTokenData";
 import { upsertToken } from "./upsertToken";
 import { OP } from "../../tasks/handleEvent/opCode";
 
@@ -61,6 +55,11 @@ export const handleAddLiquidity = async ({
     traces,
     OP.CB_ADD_LIQUIDITY
   )?.[0];
+  if (!cbAddLiquidityTrace) {
+    console.warn("Empty cbAddLiquidityTrace");
+    return;
+  }
+
   const { raw_body: cbAddLiquidityBody, destination } =
     cbAddLiquidityTrace?.transaction.in_msg || {};
   if (!cbAddLiquidityBody) {
@@ -79,6 +78,11 @@ export const handleAddLiquidity = async ({
     traces,
     OP.INTERNAL_TRANSFER
   );
+  if (!internalTransferTraces) {
+    console.warn("Empty internalTransferTraces");
+    return;
+  }
+
   const mintTrace = internalTransferTraces?.find(
     (trace: Trace) =>
       parseRaw(trace.transaction.in_msg?.source?.address) === poolAddress
@@ -90,7 +94,7 @@ export const handleAddLiquidity = async ({
     return;
   }
 
-  const { amount: minted, to } = parseMint(mintRawBody);
+  const { amount: minted } = parseMint(mintRawBody);
   // if (!to) {
   //   console.warn("Initial Liquidity found. Skip this event.");
   //   return;

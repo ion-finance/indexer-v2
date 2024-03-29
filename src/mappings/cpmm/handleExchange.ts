@@ -80,9 +80,17 @@ export const handleExchange = async ({
 
   const swapTrace = findTracesByOpCode(traces, OP.SWAP)?.[0];
   const payToTrace = findTracesByOpCode(traces, OP.PAY_TO)?.[0];
+  if (!swapTrace) {
+    console.warn("Empty swapTrace");
+    return;
+  }
+  if (!payToTrace) {
+    console.warn("Empty payToTrace");
+    return;
+  }
 
-  const swapTraceRawBody = swapTrace?.transaction.in_msg?.raw_body || "";
-  const payToRawBody = payToTrace?.transaction.in_msg?.raw_body || "";
+  const swapTraceRawBody = swapTrace.transaction.in_msg?.raw_body || "";
+  const payToRawBody = payToTrace.transaction.in_msg?.raw_body || "";
   if (!swapTraceRawBody) {
     console.warn("Empty raw_body swapTrace");
     return null;
@@ -115,12 +123,13 @@ export const handleExchange = async ({
     console.log("Pool not found.");
     return;
   }
-  const { tokenXAddress, tokenYAddress } = pool;
+  const { tokenXAddress } = pool;
   const swapForY = senderAddress === tokenXAddress;
 
   // swap_ok_ref = 0x45078540 = 1158120768
   // swap_ok = 0xc64370e5 = 3326308581
   const validExitCodes = [1158120768, 3326308581];
+  // pay_to can occur in refund scenario
   if (!validExitCodes.includes(exitCode)) {
     console.warn("Swap failed. Skip current indexing.");
     return;
