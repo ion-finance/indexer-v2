@@ -1,10 +1,13 @@
 import axios from "axios";
 import { AccountEvent, Event } from "../types/ton-api";
 import prisma from "../clients/prisma";
+import { uniqBy } from "lodash";
 // import * as Sentry from "@sentry/node";
 
+let lastEvent: AccountEvent;
 const fetchEvents = async () => {
   const timestamp = await prisma.indexerState.getLastTimestamp();
+  // do not fetch the last event
   let endDate = 0;
   const events: AccountEvent[] = [];
 
@@ -50,9 +53,19 @@ const fetchEvents = async () => {
       break;
     }
   }
+  // event
+  if (events.length === 1 && events[0].event_id === lastEvent?.event_id) {
+    return [];
+  }
 
   const orderedEvents = events.sort((a, b) => a.timestamp - b.timestamp);
-  return orderedEvents;
+  // !NOTE: events can be duplicated, remove duplicated events
+  // when fetch with start_date 1711630630, 1711630633 can be
+  const uniqEvents = uniqBy(orderedEvents, (e) => e.event_id);
+
+  lastEvent = uniqEvents[uniqEvents.length - 1];
+
+  return uniqEvents;
 };
 
 export default fetchEvents;

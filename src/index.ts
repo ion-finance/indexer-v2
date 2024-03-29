@@ -60,7 +60,9 @@ const eventPooling = async () => {
   console.log(`${events.length} events are indexed.`);
 
   if (events.length > 0) {
-    await prisma.indexerState.setLastTimestamp(events[0].timestamp);
+    await prisma.indexerState.setLastTimestamp(
+      events[events.length - 1].timestamp
+    );
   }
 };
 
