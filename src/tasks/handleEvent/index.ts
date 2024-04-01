@@ -5,6 +5,7 @@ import {
   handleAddLiquidity,
   handleExchange,
   handlePoolCreated,
+  handleRemoveLiquidity,
   // handleRemoveLiquidity,
 } from "../../mappings/cpmm";
 import extractPaths from "./extractPaths";
@@ -54,6 +55,8 @@ const handleEvent = async (event: AccountEvent) => {
   const isProvideLp =
     !isProvideLpConfirmed && checkPathHasOp(paths, OP.ADD_LIQUIDITY);
 
+  const isRemoveLiquidity = checkPathHasOp(paths, OP.BURN_NOTIFICATION);
+
   // deploy cases can be overlapped
   if (isRouterDeployed) {
     console.log(`Router deploy event: ${event_id}`);
@@ -80,6 +83,8 @@ const handleEvent = async (event: AccountEvent) => {
   } else if (isProvideLpConfirmed) {
     console.log(`Provide Lp Confirmed: ${event_id}`);
     await handleAddLiquidity({ event, traces });
+  } else if (isRemoveLiquidity) {
+    await handleRemoveLiquidity({ event, traces });
   }
 
   if (
@@ -90,7 +95,8 @@ const handleEvent = async (event: AccountEvent) => {
     !isRouterJettonWalletDeployed &&
     !isSwap &&
     !isProvideLp &&
-    !isProvideLpConfirmed
+    !isProvideLpConfirmed &&
+    !isRemoveLiquidity
   ) {
     console.log(`Unknown event: ${event_id}`);
     console.log("paths", paths);

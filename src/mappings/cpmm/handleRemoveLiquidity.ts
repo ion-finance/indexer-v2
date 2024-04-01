@@ -1,17 +1,102 @@
 import { Event } from "../../types/events";
 import prisma from "../../clients/prisma";
 import parseRemoveLiquidity from "../../parsers/cpmm/parseRemoveLiquidity";
+import { AccountEvent, Trace } from "@/src/types/ton-api";
+import { findTracesByOpCode, parseRaw } from "../../utils/address";
+import { EXIT_CODE, OP } from "../../tasks/handleEvent/opCode";
+import { Cell } from "@ton/core";
 
-// TODO: impl
-export const handleRemoveLiquidity = async (event: Event) => {
-  const params = parseRemoveLiquidity(event.body);
-  console.log("Remove liquidity event is indexed.");
-  console.log(params);
-  const { senderAddress, amountX, amountY, burned } = params;
-  const { hash, source, timestamp } = event.transaction;
+const parseBurnNotification = (raw_body: string) => {
+  const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];
+  const body = message.beginParse();
+  const op = body.loadUint(32);
+  const queryId = body.loadUint(64);
+
+  const jettonAmount = body.loadCoins();
+  const fromAddress = body.loadAddress().toString();
+  const responseAddress = body.loadAddress().toString();
+
+  return {
+    op,
+    queryId,
+    jettonAmount,
+    fromAddress,
+    responseAddress,
+  };
+};
+
+const parsePayTo = (raw_body: string) => {
+  const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];
+  const body = message.beginParse();
+  const op = body.loadUint(32);
+  const queryId = body.loadUint(64);
+  const toAddress = body.loadAddress().toString();
+  const exitCode = body.loadUint(32);
+  const hasMore = body.loadUint(0);
+  const ref = body.loadRef().beginParse();
+  const amount0Out = ref.loadCoins();
+  const token0Address = ref.loadAddress().toString();
+  const amount1Out = ref.loadCoins();
+  const token1Address = ref.loadAddress().toString();
+
+  return {
+    op,
+    queryId,
+    toAddress,
+    exitCode,
+    hasMore,
+    amount0Out,
+    token0Address,
+    amount1Out,
+    token1Address,
+  };
+};
+
+export const handleRemoveLiquidity = async ({
+  event,
+  traces,
+}: {
+  event: AccountEvent;
+  traces: Trace;
+}) => {
+  const eventId = event.event_id;
+  const { hash, utime } = traces.transaction;
+  const payToTrace = findTracesByOpCode(traces, OP.PAY_TO)?.[0];
+  const burnNotificationTrace = findTracesByOpCode(
+    traces,
+    OP.BURN_NOTIFICATION
+  )?.[0];
+  if (!payToTrace) {
+    console.warn("Empty payToTrace");
+    return;
+  }
+  if (!burnNotificationTrace) {
+    console.warn("Empty burnNotificationTrace");
+    return;
+  }
+  const payToRawBody = payToTrace.transaction.in_msg?.raw_body || "";
+  const burnNotificationRawBody =
+    burnNotificationTrace.transaction.in_msg?.raw_body || "";
+  if (!payToRawBody) {
+    console.warn("Empty raw_body payTo");
+    return null;
+  }
+  if (!burnNotificationRawBody) {
+    console.warn("Empty raw_body burnNotificationRawBody");
+    return null;
+  }
+  const { toAddress, amount0Out, amount1Out } = parsePayTo(payToRawBody);
+
+  const { jettonAmount: burned } = parseBurnNotification(
+    burnNotificationRawBody
+  );
+  const poolAddress = parseRaw(
+    payToTrace.transaction.in_msg?.source?.address.toString()
+  );
+
   const pool = await prisma.pool.findFirst({
     where: {
-      id: source,
+      id: poolAddress,
     },
   });
 
@@ -21,7 +106,7 @@ export const handleRemoveLiquidity = async (event: Event) => {
   }
 
   const withdraw = await prisma.withdraw.findFirst({
-    where: { id: event.transaction.hash, eventId: event.transaction.eventId },
+    where: { id: hash, eventId },
   });
 
   if (withdraw) {
@@ -29,21 +114,23 @@ export const handleRemoveLiquidity = async (event: Event) => {
     return;
   }
 
+  const senderAddress = parseRaw(event.account.address.toString());
+
   await prisma.withdraw.upsert({
     where: {
       id: hash,
-      eventId: event.transaction.eventId,
+      eventId,
     },
     update: {},
     create: {
       id: hash,
-      eventId: event.transaction.eventId,
+      eventId,
       senderAddress,
-      receiverAddress: senderAddress,
-      poolAddress: source,
-      amountX,
-      amountY,
-      timestamp,
+      receiverAddress: toAddress,
+      poolAddress,
+      amountX: String(amount0Out),
+      amountY: String(amount1Out),
+      timestamp: utime,
     },
   });
 
@@ -52,15 +139,15 @@ export const handleRemoveLiquidity = async (event: Event) => {
       id: pool.id,
     },
     data: {
-      reserveX: (BigInt(pool.reserveX) - BigInt(amountX)).toString(),
-      reserveY: (BigInt(pool.reserveY) - BigInt(amountY)).toString(),
+      reserveX: (BigInt(pool.reserveX) - amount0Out).toString(),
+      reserveY: (BigInt(pool.reserveY) - amount1Out).toString(),
       lpSupply: (BigInt(pool.lpSupply) - BigInt(burned)).toString(),
     },
   });
 
   const lpTokenWallet = await prisma.lpTokenWallet.findFirst({
     where: {
-      poolAddress: event.transaction.source,
+      poolAddress,
       ownerAddress: senderAddress,
     },
   });
@@ -77,7 +164,7 @@ export const handleRemoveLiquidity = async (event: Event) => {
   } else {
     await prisma.lpTokenWallet.create({
       data: {
-        poolAddress: event.transaction.source,
+        poolAddress,
         ownerAddress: senderAddress,
         amount: "0",
       },
