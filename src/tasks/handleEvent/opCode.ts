@@ -1,10 +1,16 @@
+// swap_refund_no_liq = 0x5ffe1295 = 1610486421
+// swap_refund_reserve_err = 0x38976e9b = 949448347
 // swap_ok_ref = 0x45078540 = 1158120768
 // swap_ok = 0xc64370e5 = 3326308581
-// burn_ok = 0xdda48b6a
+// burn_ok = 0xdda48b6a = 3718548330
+// refund_ok = 0xde7dbbc2 = 3732782018
 export enum EXIT_CODE {
+  SWAP_REFUND_NO_LIQ = 1610486421,
+  SWAP_REFUND_RESERVE_ERR = 949448347,
   SWAP_OK_REF = 1158120768,
   SWAP_OK = 3326308581,
   BURN_OK = 3718548330,
+  REFUND_OK = 3732782018,
 }
 
 export enum RAW_OP {
