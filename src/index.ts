@@ -28,11 +28,9 @@ const eventPooling = async () => {
 
   console.log(`${events.length} events found.`);
   let error = false;
-  let lastIndex = events.length;
+  let lastIndex = 0;
   for (let i = 0; i < events.length; i++) {
-    const index = events.length - 1 - i;
-
-    const event = events[index];
+    const event = events[i];
     try {
       if (isCLMM) {
         await handleEventCLMM(event.event_id);
@@ -42,8 +40,8 @@ const eventPooling = async () => {
     } catch (e) {
       error = true;
       console.error(e);
-      console.error(`Error when handling event ${events[index].event_id}`);
-      lastIndex = index + 1;
+      console.error(`Error when handling event ${events[i].event_id}`);
+      lastIndex = i;
       // Sentry.captureException(e);
       break;
     }
