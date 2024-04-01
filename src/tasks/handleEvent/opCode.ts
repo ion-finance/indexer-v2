@@ -1,3 +1,12 @@
+// swap_ok_ref = 0x45078540 = 1158120768
+// swap_ok = 0xc64370e5 = 3326308581
+// burn_ok = 0xdda48b6a
+export enum EXIT_CODE {
+  SWAP_OK_REF = 1158120768,
+  SWAP_OK = 3326308581,
+  BURN_OK = 3718548330,
+}
+
 export enum RAW_OP {
   TRANSFER = "0x0f8a7ea5",
   TRANSFER_NOTIFICATION = "0x7362d09c",
@@ -8,6 +17,8 @@ export enum RAW_OP {
   INTERNAL_TRANSFER = "0x178d4519",
   EXCESS = "0xd53276db",
   SWAP = "0x25938561",
+  BURN = "0x595f07bc",
+  BURN_NOTIFICATION = "0x7bdd97de",
 }
 
 export enum RAW_CUSTOM_OP {

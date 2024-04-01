@@ -2,7 +2,7 @@ import prisma from "../../clients/prisma";
 import { AccountEvent, Trace } from "../../types/ton-api";
 import { Cell } from "@ton/core";
 import { findTracesByOpCode, parseRaw } from "../../utils/address";
-import { OP } from "../../tasks/handleEvent/opCode";
+import { EXIT_CODE, OP } from "../../tasks/handleEvent/opCode";
 
 const parseSwap = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];
@@ -126,9 +126,7 @@ export const handleExchange = async ({
   const { tokenXAddress } = pool;
   const swapForY = senderAddress === tokenXAddress;
 
-  // swap_ok_ref = 0x45078540 = 1158120768
-  // swap_ok = 0xc64370e5 = 3326308581
-  const validExitCodes = [1158120768, 3326308581];
+  const validExitCodes = [EXIT_CODE.SWAP_OK_REF, EXIT_CODE.SWAP_OK];
   // pay_to can occur in refund scenario
   if (!validExitCodes.includes(exitCode)) {
     console.warn("Swap failed. Skip current indexing.");
