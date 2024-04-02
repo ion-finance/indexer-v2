@@ -87,7 +87,7 @@ export const handleRemoveLiquidity = async ({
   }
   const { toAddress, amount0Out, amount1Out } = parsePayTo(payToRawBody);
 
-  const { jettonAmount: burned } = parseBurnNotification(
+  const { jettonAmount: burned, fromAddress } = parseBurnNotification(
     burnNotificationRawBody
   );
   const poolAddress = parseRaw(
@@ -114,7 +114,7 @@ export const handleRemoveLiquidity = async ({
     return;
   }
 
-  const senderAddress = parseRaw(event.account.address.toString());
+  const senderAddress = fromAddress;
 
   await prisma.withdraw.upsert({
     where: {
