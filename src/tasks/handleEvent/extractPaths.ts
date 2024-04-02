@@ -3,9 +3,8 @@ import { Trace } from "../../types/ton-api";
 import { parseRaw } from "../../utils/address";
 import dotenv from "dotenv";
 import { CustomOP, OP, Ops } from "./opCode";
+import { routerAddress } from "../../address";
 dotenv.config();
-
-const ROUTER_ADDRESS = process.env.ROUTER_ADDRESS || "";
 
 function extractPaths(node: Trace): Ops[][] {
   // This function recursively extracts the paths using the spread operator.
@@ -35,13 +34,11 @@ function extractPaths(node: Trace): Ops[][] {
         );
         // TODO: consider case of router jetton wallet deploy
         if (
-          Address.parse(destinationAddress).equals(
-            Address.parse(ROUTER_ADDRESS)
-          )
+          Address.parse(destinationAddress).equals(Address.parse(routerAddress))
         ) {
           return CustomOP.ROUTER_DEPLOYED;
         } else if (
-          Address.parse(sourceAddress).equals(Address.parse(ROUTER_ADDRESS))
+          Address.parse(sourceAddress).equals(Address.parse(routerAddress))
         ) {
           return CustomOP.POOL_DEPLOYED;
         } else if (isParentJettonMaster) {

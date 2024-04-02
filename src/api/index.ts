@@ -6,6 +6,7 @@ import transactionRouter from "./routers/transactions";
 import binRouter from "./routers/bins";
 import orderRouter from "./routers/orders";
 import taskRouter from "./routers/tasks";
+import routerAddressRouter from "./routers/routerAddress";
 import cors from "cors";
 
 const api = express();
@@ -18,5 +19,6 @@ api.use(transactionRouter);
 api.use(binRouter);
 api.use(orderRouter);
 api.use(taskRouter);
+api.use(routerAddressRouter);
 
 export default api;

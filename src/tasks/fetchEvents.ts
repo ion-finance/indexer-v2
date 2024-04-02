@@ -2,6 +2,8 @@ import axios from "axios";
 import { AccountEvent, Event } from "../types/ton-api";
 import prisma from "../clients/prisma";
 import { uniqBy } from "lodash";
+import { routerAddress } from "../address";
+
 // import * as Sentry from "@sentry/node";
 
 let lastEvent: AccountEvent;
@@ -18,7 +20,7 @@ const fetchEvents = async () => {
         (endDate ? `&end_date=${endDate}` : "");
 
       const res = await axios(
-        `${process.env.TON_API_URL}/accounts/${process.env.ROUTER_ADDRESS}/events?${args}`,
+        `${process.env.TON_API_URL}/accounts/${routerAddress}/events?${args}`,
         {
           headers: {
             Authorization: `Bearer ${process.env.TON_API_KEY}`,
