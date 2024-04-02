@@ -7,6 +7,7 @@ import binRouter from "./routers/bins";
 import orderRouter from "./routers/orders";
 import taskRouter from "./routers/tasks";
 import routerAddressRouter from "./routers/routerAddress";
+import coinPricesRouter from "./routers/coinPrices";
 import cors from "cors";
 
 const api = express();
@@ -20,5 +21,6 @@ api.use(binRouter);
 api.use(orderRouter);
 api.use(taskRouter);
 api.use(routerAddressRouter);
+api.use(coinPricesRouter);
 
 export default api;
