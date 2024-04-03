@@ -83,6 +83,15 @@ export const handlePoolCreated = async ({
     fetchTokenData(tokenYAddress),
   ]);
 
+  const tokenXSymbol = changeSymbolOfProxyTon(
+    tokenXdata?.metadata?.symbol || ""
+  );
+  const tokenYSymbol = changeSymbolOfProxyTon(
+    tokenYdata?.metadata?.symbol || ""
+  );
+  const tokenXName = changeNameOfProxyTon(tokenXdata?.metadata?.name || "");
+  const tokenYName = changeNameOfProxyTon(tokenYdata?.metadata?.name || "");
+
   if (tokenXdata) {
     await prisma.token.upsert({
       where: {
@@ -90,16 +99,16 @@ export const handlePoolCreated = async ({
       },
       update: {
         jettonMinterAddress: tokenXdata.minter_address,
-        name: changeNameOfProxyTon(tokenXdata.metadata.name),
-        symbol: changeSymbolOfProxyTon(tokenXdata.metadata.symbol),
+        name: tokenXName,
+        symbol: tokenXSymbol,
         decimals: parseInt(tokenXdata.metadata.decimals),
         image: tokenXdata.metadata.image,
       },
       create: {
         id: tokenXAddress,
         jettonMinterAddress: tokenXdata.minter_address,
-        name: changeNameOfProxyTon(tokenXdata.metadata.name),
-        symbol: changeSymbolOfProxyTon(tokenXdata.metadata.symbol),
+        name: tokenXName,
+        symbol: tokenXSymbol,
         decimals: parseInt(tokenXdata.metadata.decimals),
         image: tokenXdata.metadata.image,
       },
@@ -113,27 +122,21 @@ export const handlePoolCreated = async ({
       },
       update: {
         jettonMinterAddress: tokenYdata.minter_address,
-        name: changeNameOfProxyTon(tokenYdata.metadata.name),
-        symbol: changeSymbolOfProxyTon(tokenYdata.metadata.symbol),
+        name: tokenYName,
+        symbol: tokenYSymbol,
         decimals: parseInt(tokenYdata.metadata.decimals),
         image: tokenYdata.metadata.image,
       },
       create: {
         id: tokenYAddress,
         jettonMinterAddress: tokenYdata.minter_address,
-        name: changeNameOfProxyTon(tokenYdata.metadata.name),
-        symbol: changeSymbolOfProxyTon(tokenYdata.metadata.symbol),
+        name: tokenYName,
+        symbol: tokenYSymbol,
         decimals: parseInt(tokenYdata.metadata.decimals),
         image: tokenYdata.metadata.image,
       },
     });
   }
-  const tokenXSymbol = changeSymbolOfProxyTon(
-    tokenXdata?.metadata?.symbol || ""
-  );
-  const tokenYSymbol = changeSymbolOfProxyTon(
-    tokenYdata?.metadata?.symbol || ""
-  );
 
   await prisma.pool.upsert({
     where: {

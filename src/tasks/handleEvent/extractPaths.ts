@@ -24,8 +24,10 @@ function extractPaths(node: Trace): Ops[][] {
       if (isFirst) {
         return "ext_in_msg";
       }
+      const interfaces = parentNode?.interfaces || [];
       const isParentJettonMaster =
-        parentNode?.interfaces?.includes("jetton_master");
+        interfaces.includes("jettonMaster") ||
+        interfaces.includes("stonfi_pool");
       const { orig_status, end_status } = transaction;
       if (orig_status === "nonexist" && end_status === "active") {
         const sourceAddress = parseRaw(transaction.in_msg.source?.address);
@@ -37,22 +39,22 @@ function extractPaths(node: Trace): Ops[][] {
           Address.parse(destinationAddress).equals(Address.parse(routerAddress))
         ) {
           return CustomOP.ROUTER_DEPLOYED;
-        } else if (
-          Address.parse(sourceAddress).equals(Address.parse(routerAddress))
-        ) {
+        }
+        if (Address.parse(sourceAddress).equals(Address.parse(routerAddress))) {
           return CustomOP.POOL_DEPLOYED;
-        } else if (isParentJettonMaster) {
+        }
+        if (isParentJettonMaster) {
           // parent should be jettonMaster && pool
           if (opCode === OP.ADD_LIQUIDITY) {
             return CustomOP.LP_ACCOUNT_DEPLOYED;
           } else {
             return CustomOP.LP_WALLET_DEPLOYED;
           }
-        } else if (opCode === OP.INTERNAL_TRANSFER) {
-          return CustomOP.ROUTER_JETTON_WALLET_DEPLOYED;
-        } else {
-          console.warn("Unknown deploy case", transaction.hash);
         }
+        if (opCode === OP.INTERNAL_TRANSFER) {
+          return CustomOP.ROUTER_JETTON_WALLET_DEPLOYED;
+        }
+        console.warn("Unknown deploy case", transaction.hash);
       }
       return "";
     })();
