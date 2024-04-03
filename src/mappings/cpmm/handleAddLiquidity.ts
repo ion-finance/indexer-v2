@@ -1,7 +1,7 @@
 import prisma from "../../clients/prisma";
 import { AccountEvent, Trace } from "../../types/ton-api";
 import { findTracesByOpCode, parseRaw } from "../../utils/address";
-import { Cell } from "@ton/core";
+import { Address, Cell } from "@ton/core";
 import { upsertToken } from "./upsertToken";
 import { OP } from "../../tasks/handleEvent/opCode";
 
@@ -94,7 +94,7 @@ export const handleAddLiquidity = async ({
     return;
   }
 
-  const { amount: minted } = parseMint(mintRawBody);
+  const { amount: minted, to } = parseMint(mintRawBody);
   // if (!to) {
   //   console.warn("Initial Liquidity found. Skip this event.");
   //   return;
@@ -195,7 +195,7 @@ export const handleAddLiquidity = async ({
     await prisma.lpTokenWallet.create({
       data: {
         poolAddress,
-        ownerAddress: userAddress,
+        ownerAddress: to ? to.toString() : "",
         amount: BigInt(minted).toString(),
       },
     });
