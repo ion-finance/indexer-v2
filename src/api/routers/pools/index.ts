@@ -14,9 +14,11 @@ router.get("/pools", async function handler(req, res) {
     const tokenX = tokens.find((token) => token.id === pool.tokenXAddress);
     const tokenY = tokens.find((token) => token.id === pool.tokenYAddress);
     const { reserveX, reserveY } = pool;
-    if (!Number(reserveX) || !Number(reserveY)) {
-      console.warn("Reserve not found", pool.id);
-      return;
+    if (pool.type === "CPMM") {
+      if (!Number(reserveX) || !Number(reserveY)) {
+        console.warn("Reserve not found", pool.id);
+        return;
+      }
     }
     if (!tokenX) {
       console.warn("TokenX not found", pool.tokenXAddress);
