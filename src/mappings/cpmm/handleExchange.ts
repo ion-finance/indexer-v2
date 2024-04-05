@@ -62,21 +62,6 @@ export const handleExchange = async ({
 }) => {
   const eventId = event.event_id;
   const { hash, utime } = traces.transaction;
-  const jettonSwapAction = event.actions[0].JettonSwap;
-  if (!jettonSwapAction) {
-    return;
-  }
-  const {
-    amount_in,
-    amount_out,
-    ton_in,
-    ton_out,
-    jetton_master_in,
-    jetton_master_out,
-  } = jettonSwapAction;
-
-  const amountIn = String(amount_in || ton_in);
-  const amountOut = String(amount_out || ton_out);
 
   const swapTrace = findTracesByOpCode(traces, OP.SWAP)?.[0];
   const payToTrace = findTracesByOpCode(traces, OP.PAY_TO)?.[0];
@@ -101,8 +86,8 @@ export const handleExchange = async ({
     return null;
   }
 
-  const { senderAddress } = parseSwap(swapTraceRawBody);
-  const { exitCode } = parsePayTo(payToRawBody);
+  const { senderAddress, jettonAmount } = parseSwap(swapTraceRawBody);
+  const { exitCode, amount0Out, amount1Out } = parsePayTo(payToRawBody);
   const receiverAddress = senderAddress;
   const poolAddress = parseRaw(swapTrace?.transaction.account.address);
 
@@ -112,6 +97,8 @@ export const handleExchange = async ({
   //   return `${amountIn} ${inToken} -> ${amountOut} ${outToken}`;
   // })();
   // console.log("summary", summary);
+  const amountIn = String(jettonAmount);
+  const amountOut = String(amount0Out || amount1Out);
 
   const pool = await prisma.pool.findFirst({
     where: {
@@ -125,11 +112,11 @@ export const handleExchange = async ({
   }
   const { tokenXAddress } = pool;
   const swapForY = senderAddress === tokenXAddress;
-
-  const validExitCodes = [EXIT_CODE.SWAP_OK_REF, EXIT_CODE.SWAP_OK];
+  const validExitCodes = [EXIT_CODE.SWAP_OK_REF, EXIT_CODE.SWAP_OK] as string[];
   // pay_to can occur in refund scenario
-  if (!validExitCodes.includes(exitCode)) {
+  if (!validExitCodes.includes(String(exitCode))) {
     console.warn("Swap failed. Skip current indexing.");
+    console.log("exitCode", EXIT_CODE[exitCode]);
     return;
   }
 

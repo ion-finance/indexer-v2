@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AccountEvent, ActionType, Trace } from "../../types/ton-api";
+import { AccountEvent, Trace } from "../../types/ton-api";
 
 import {
   handleAddLiquidity,
@@ -15,15 +15,12 @@ import type { Ops } from "./opCode";
 // Info
 // * This method can throw an error if the event is processing
 const handleEvent = async (event: AccountEvent) => {
-  const { event_id, actions } = event;
+  const { event_id } = event;
   const res = await axios(`${process.env.TON_API_URL}/traces/${event_id}`, {
     headers: {
       Authorization: `Bearer ${process.env.TON_API_KEY}`,
     },
   });
-
-  const firstActionType = actions[0].type;
-  const isSwap = firstActionType === ActionType.JETTON_SWAP;
 
   const traces = res.data as Trace;
 
@@ -50,6 +47,7 @@ const handleEvent = async (event: AccountEvent) => {
     CustomOP.ROUTER_JETTON_WALLET_DEPLOYED
   );
 
+  const isSwap = checkPathHasOp(paths, OP.SWAP);
   const isProvideLpConfirmed = checkPathHasOp(paths, OP.CB_ADD_LIQUIDITY);
 
   const isProvideLp =
