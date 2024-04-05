@@ -8,6 +8,7 @@ import orderRouter from "./routers/orders";
 import taskRouter from "./routers/tasks";
 import routerAddressRouter from "./routers/routerAddress";
 import coinPricesRouter from "./routers/coinPrices";
+import traceRouter from "./routers/trace";
 import cors from "cors";
 
 const api = express();
@@ -22,5 +23,6 @@ api.use(orderRouter);
 api.use(taskRouter);
 api.use(routerAddressRouter);
 api.use(coinPricesRouter);
+api.use(traceRouter);
 
 export default api;
