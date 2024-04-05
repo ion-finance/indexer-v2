@@ -1,10 +1,10 @@
-import type { Config } from "jest";
+import type { Config } from 'jest'
 
 const config: Config = {
-  preset: "ts-jest",
-  testEnvironment: "node",
-  testPathIgnorePatterns: ["/node_modules/", "/dist/"],
-  setupFiles: ["dotenv/config"],
-};
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  setupFiles: ['dotenv/config'],
+}
 
-export default config;
+export default config

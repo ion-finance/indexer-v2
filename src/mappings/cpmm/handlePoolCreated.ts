@@ -1,28 +1,28 @@
-import prisma from "../../clients/prisma";
-import fetchTokenData from "../../utils/fetchTokenData";
-import { PoolType } from "@prisma/client";
-import { AccountEvent, Trace } from "../../types/ton-api";
-import { Cell, address } from "@ton/core";
+import prisma from '../../clients/prisma'
+import fetchTokenData from '../../utils/fetchTokenData'
+import { PoolType } from '@prisma/client'
+import { AccountEvent, Trace } from '../../types/ton-api'
+import { Cell, address } from '@ton/core'
 import {
   changeNameOfProxyTon,
   changeSymbolOfProxyTon,
   findTracesByOpCode,
   parseRaw,
   sortByAddress,
-} from "../../utils/address";
-import { OP } from "../../tasks/handleEvent/opCode";
+} from '../../utils/address'
+import { OP } from '../../tasks/handleEvent/opCode'
 const parseTransferNotification = (raw_body: string) => {
-  const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];
-  const body = message.beginParse();
-  const op = body.loadUint(32);
-  const queryId = body.loadUint(64);
-  const jettonAmount = body.loadCoins();
-  const fromUser = body.loadAddress().toString();
-  const c = body.loadRef();
-  const cs = c.beginParse();
-  const transferredOp = cs.loadUint(32);
-  const tokenWallet1 = cs.loadAddress().toString(); // router jetton wallet
-  const minLpOut = cs.loadCoins();
+  const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
+  const body = message.beginParse()
+  const op = body.loadUint(32)
+  const queryId = body.loadUint(64)
+  const jettonAmount = body.loadCoins()
+  const fromUser = body.loadAddress().toString()
+  const c = body.loadRef()
+  const cs = c.beginParse()
+  const transferredOp = cs.loadUint(32)
+  const tokenWallet1 = cs.loadAddress().toString() // router jetton wallet
+  const minLpOut = cs.loadCoins()
 
   return {
     op,
@@ -32,65 +32,65 @@ const parseTransferNotification = (raw_body: string) => {
     transferredOp,
     tokenWallet1,
     minLpOut,
-  };
-};
+  }
+}
 
 export const handlePoolCreated = async ({
   event,
   traces,
 }: {
-  event: AccountEvent;
-  traces: Trace;
+  event: AccountEvent
+  traces: Trace
 }) => {
-  const provideLpTrace = findTracesByOpCode(traces, OP.PROVIDE_LP)?.[0];
+  const provideLpTrace = findTracesByOpCode(traces, OP.PROVIDE_LP)?.[0]
   const transferNotificationTrace = findTracesByOpCode(
     traces,
-    OP.TRANSFER_NOTIFICATION
-  )?.[0];
+    OP.TRANSFER_NOTIFICATION,
+  )?.[0]
   if (!provideLpTrace) {
-    console.warn("Empty provideLpTrace");
-    return;
+    console.warn('Empty provideLpTrace')
+    return
   }
   if (!transferNotificationTrace) {
-    console.warn("Empty transferNotificationTrace");
-    return;
+    console.warn('Empty transferNotificationTrace')
+    return
   }
 
   const poolAddress = parseRaw(
-    provideLpTrace.transaction?.in_msg?.destination?.address
-  );
+    provideLpTrace.transaction?.in_msg?.destination?.address,
+  )
 
   const { raw_body, source } =
-    transferNotificationTrace.transaction.in_msg || {};
+    transferNotificationTrace.transaction.in_msg || {}
   if (!raw_body) {
-    console.warn("Empty raw_body");
-    return null;
+    console.warn('Empty raw_body')
+    return null
   }
   if (!source) {
-    console.warn("Empty source");
-    return null;
+    console.warn('Empty source')
+    return null
   }
 
   // router jetton wallets
-  const { tokenWallet1 } = parseTransferNotification(raw_body);
-  const sourceAddress = parseRaw(source.address);
-  const sorted = sortByAddress([address(tokenWallet1), address(sourceAddress)]);
-  const tokenXAddress = sorted[0].toString();
-  const tokenYAddress = sorted[1].toString();
+  const { tokenWallet1 } = parseTransferNotification(raw_body)
+  const sourceAddress = parseRaw(source.address)
+  const sorted = sortByAddress([address(tokenWallet1), address(sourceAddress)])
+  const tokenXAddress = sorted[0].toString()
+  const tokenYAddress = sorted[1].toString()
 
   const [tokenXdata, tokenYdata] = await Promise.all([
     fetchTokenData(tokenXAddress),
     fetchTokenData(tokenYAddress),
-  ]);
+  ])
 
   const tokenXSymbol = changeSymbolOfProxyTon(
-    tokenXdata?.metadata?.symbol || ""
-  );
+    tokenXdata?.metadata?.symbol || '',
+  )
   const tokenYSymbol = changeSymbolOfProxyTon(
-    tokenYdata?.metadata?.symbol || ""
-  );
-  const tokenXName = changeNameOfProxyTon(tokenXdata?.metadata?.name || "");
-  const tokenYName = changeNameOfProxyTon(tokenYdata?.metadata?.name || "");
+    tokenYdata?.metadata?.symbol || '',
+  )
+  const tokenXName = changeNameOfProxyTon(tokenXdata?.metadata?.name || '')
+  const tokenYName = changeNameOfProxyTon(tokenYdata?.metadata?.name || '')
 
   if (tokenXdata) {
     await prisma.token.upsert({
@@ -112,7 +112,7 @@ export const handlePoolCreated = async ({
         decimals: parseInt(tokenXdata.metadata.decimals),
         image: tokenXdata.metadata.image,
       },
-    });
+    })
   }
 
   if (tokenYdata) {
@@ -135,7 +135,7 @@ export const handlePoolCreated = async ({
         decimals: parseInt(tokenYdata.metadata.decimals),
         image: tokenYdata.metadata.image,
       },
-    });
+    })
   }
 
   await prisma.pool.upsert({
@@ -150,7 +150,7 @@ export const handlePoolCreated = async ({
       tokenYAddress: tokenYAddress,
     },
     update: {},
-  });
-};
+  })
+}
 
-export default handlePoolCreated;
+export default handlePoolCreated

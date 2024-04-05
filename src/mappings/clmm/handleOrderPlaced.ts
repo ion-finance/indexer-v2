@@ -1,12 +1,12 @@
-import { Event } from "../../types/events";
-import prisma from "../../clients/prisma";
-import { OrderType } from "@prisma/client";
-import parseOrder from "../../parsers/clmm/parseOrder";
+import { Event } from '../../types/events'
+import prisma from '../../clients/prisma'
+import { OrderType } from '@prisma/client'
+import parseOrder from '../../parsers/clmm/parseOrder'
 
 const handleOrderPlaced = async (event: Event) => {
-  const params = parseOrder(event.body);
-  console.log("OrderPlaced event is indexed.");
-  console.log(event);
+  const params = parseOrder(event.body)
+  console.log('OrderPlaced event is indexed.')
+  console.log(event)
 
   const order = await prisma.order.findFirst({
     where: {
@@ -17,7 +17,7 @@ const handleOrderPlaced = async (event: Event) => {
       binId: params.binId,
       status: OrderType.PLACED,
     },
-  });
+  })
 
   if (order) {
     await prisma.order.update({
@@ -28,7 +28,7 @@ const handleOrderPlaced = async (event: Event) => {
         amountX: (BigInt(order.amountX) + params.amountX).toString(),
         amountY: (BigInt(order.amountY) + params.amountY).toString(),
       },
-    });
+    })
   } else {
     await prisma.order.create({
       data: {
@@ -43,7 +43,7 @@ const handleOrderPlaced = async (event: Event) => {
         status: OrderType.PLACED,
         orderForY: params.orderForY,
       },
-    });
+    })
   }
 
   await prisma.orderHistory.create({
@@ -61,7 +61,7 @@ const handleOrderPlaced = async (event: Event) => {
       timestamp: event.transaction.timestamp,
       orderType: OrderType.PLACED,
     },
-  });
-};
+  })
+}
 
-export default handleOrderPlaced;
+export default handleOrderPlaced

@@ -1,18 +1,18 @@
-import prisma from "../../clients/prisma";
-import { AccountEvent, Trace } from "../../types/ton-api";
-import { findTracesByOpCode, parseRaw } from "../../utils/address";
-import { Address, Cell } from "@ton/core";
-import { upsertToken } from "./upsertToken";
-import { OP } from "../../tasks/handleEvent/opCode";
+import prisma from '../../clients/prisma'
+import { AccountEvent, Trace } from '../../types/ton-api'
+import { findTracesByOpCode, parseRaw } from '../../utils/address'
+import { Address, Cell } from '@ton/core'
+import { upsertToken } from './upsertToken'
+import { OP } from '../../tasks/handleEvent/opCode'
 
 const parseMint = (raw_body: string) => {
-  const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];
-  const body = message.beginParse();
-  const op = body.loadUint(32);
-  const queryId = body.loadUint(64);
-  const amount = body.loadCoins();
-  const poolAddress = body.loadAddress().toString();
-  const to = body.loadMaybeAddress();
+  const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
+  const body = message.beginParse()
+  const op = body.loadUint(32)
+  const queryId = body.loadUint(64)
+  const amount = body.loadCoins()
+  const poolAddress = body.loadAddress().toString()
+  const to = body.loadMaybeAddress()
 
   return {
     op,
@@ -20,19 +20,19 @@ const parseMint = (raw_body: string) => {
     amount,
     poolAddress,
     to,
-  };
-};
+  }
+}
 
 const parseCbAddLiquidity = (raw_body: string) => {
-  const message = Cell.fromBoc(Buffer.from(raw_body, "hex"))[0];
-  const body = message.beginParse();
-  const op = body.loadUint(32);
-  const queryId = body.loadUint(64);
+  const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
+  const body = message.beginParse()
+  const op = body.loadUint(32)
+  const queryId = body.loadUint(64)
 
-  const amount0 = body.loadCoins();
-  const amount1 = body.loadCoins();
-  const userAddress = body.loadAddress().toString();
-  const minLpOut = body.loadCoins();
+  const amount0 = body.loadCoins()
+  const amount1 = body.loadCoins()
+  const userAddress = body.loadAddress().toString()
+  const minLpOut = body.loadCoins()
 
   return {
     op,
@@ -41,60 +41,60 @@ const parseCbAddLiquidity = (raw_body: string) => {
     amount1,
     userAddress,
     minLpOut,
-  };
-};
+  }
+}
 
 export const handleAddLiquidity = async ({
   event,
   traces,
 }: {
-  event: AccountEvent;
-  traces: Trace;
+  event: AccountEvent
+  traces: Trace
 }) => {
   const cbAddLiquidityTrace = findTracesByOpCode(
     traces,
-    OP.CB_ADD_LIQUIDITY
-  )?.[0];
+    OP.CB_ADD_LIQUIDITY,
+  )?.[0]
   if (!cbAddLiquidityTrace) {
-    console.warn("Empty cbAddLiquidityTrace");
-    return;
+    console.warn('Empty cbAddLiquidityTrace')
+    return
   }
 
   const { raw_body: cbAddLiquidityBody, destination } =
-    cbAddLiquidityTrace?.transaction.in_msg || {};
+    cbAddLiquidityTrace?.transaction.in_msg || {}
   if (!cbAddLiquidityBody) {
-    console.warn("Empty raw_body cbAddLiquidityTrace");
-    return;
+    console.warn('Empty raw_body cbAddLiquidityTrace')
+    return
   }
   if (!destination) {
-    console.warn("Empty destination cbAddLiquidityTrace");
-    return;
+    console.warn('Empty destination cbAddLiquidityTrace')
+    return
   }
-  const poolAddress = parseRaw(destination.address);
+  const poolAddress = parseRaw(destination.address)
   const { amount0, amount1, userAddress } =
-    parseCbAddLiquidity(cbAddLiquidityBody);
+    parseCbAddLiquidity(cbAddLiquidityBody)
 
   const internalTransferTraces = findTracesByOpCode(
     traces,
-    OP.INTERNAL_TRANSFER
-  );
+    OP.INTERNAL_TRANSFER,
+  )
   if (!internalTransferTraces) {
-    console.warn("Empty internalTransferTraces");
-    return;
+    console.warn('Empty internalTransferTraces')
+    return
   }
 
   const mintTrace = internalTransferTraces?.find(
     (trace: Trace) =>
-      parseRaw(trace.transaction.in_msg?.source?.address) === poolAddress
-  );
+      parseRaw(trace.transaction.in_msg?.source?.address) === poolAddress,
+  )
 
-  const { raw_body: mintRawBody } = mintTrace?.transaction.in_msg || {};
+  const { raw_body: mintRawBody } = mintTrace?.transaction.in_msg || {}
   if (!mintRawBody) {
-    console.warn("Empty raw_body mintTrace");
-    return;
+    console.warn('Empty raw_body mintTrace')
+    return
   }
 
-  const { amount: minted, to } = parseMint(mintRawBody);
+  const { amount: minted, to } = parseMint(mintRawBody)
   // if (!to) {
   //   console.warn("Initial Liquidity found. Skip this event.");
   //   return;
@@ -104,28 +104,28 @@ export const handleAddLiquidity = async ({
     where: {
       id: poolAddress,
     },
-  });
+  })
 
   if (!pool) {
-    console.log("Pool not found.");
-    return;
+    console.log('Pool not found.')
+    return
   }
 
-  const hash = traces.transaction.hash;
-  const eventId = event.event_id;
-  const timestamp = traces.transaction.utime;
+  const hash = traces.transaction.hash
+  const eventId = event.event_id
+  const timestamp = traces.transaction.utime
 
   const deposit = await prisma.deposit.findFirst({
     where: { id: hash, eventId },
-  });
+  })
 
   if (deposit) {
-    console.log("deposit already exists.");
-    return;
+    console.log('deposit already exists.')
+    return
   }
 
-  const amountX = String(amount0);
-  const amountY = String(amount1);
+  const amountX = String(amount0)
+  const amountY = String(amount1)
 
   await prisma.deposit.upsert({
     where: {
@@ -151,17 +151,17 @@ export const handleAddLiquidity = async ({
       amountY,
       timestamp,
     },
-  });
+  })
 
-  const tokens = await prisma.token.findMany();
-  const { tokenXAddress, tokenYAddress } = pool;
-  const tokenX = tokens.find((token) => token.id === tokenXAddress);
-  const tokenY = tokens.find((token) => token.id === tokenYAddress);
+  const tokens = await prisma.token.findMany()
+  const { tokenXAddress, tokenYAddress } = pool
+  const tokenX = tokens.find((token) => token.id === tokenXAddress)
+  const tokenY = tokens.find((token) => token.id === tokenYAddress)
 
   // if tokenX is empty, it means router_token_x is not initilized yet.
-  const updatedTokenX = tokenX ? tokenX : await upsertToken(tokenXAddress);
-  const updatedTokenY = tokenY ? tokenY : await upsertToken(tokenYAddress);
-  const name = `${updatedTokenX?.symbol}-${updatedTokenY?.symbol}`;
+  const updatedTokenX = tokenX ? tokenX : await upsertToken(tokenXAddress)
+  const updatedTokenY = tokenY ? tokenY : await upsertToken(tokenYAddress)
+  const name = `${updatedTokenX?.symbol}-${updatedTokenY?.symbol}`
 
   await prisma.pool.update({
     where: {
@@ -173,14 +173,14 @@ export const handleAddLiquidity = async ({
       reserveY: (BigInt(pool.reserveY) + BigInt(amountY)).toString(),
       lpSupply: (BigInt(pool.lpSupply) + BigInt(minted)).toString(),
     },
-  });
+  })
 
   const lpTokenWallet = await prisma.lpTokenWallet.findFirst({
     where: {
       poolAddress,
       ownerAddress: userAddress,
     },
-  });
+  })
 
   if (lpTokenWallet) {
     await prisma.lpTokenWallet.update({
@@ -190,16 +190,16 @@ export const handleAddLiquidity = async ({
       data: {
         amount: (BigInt(lpTokenWallet.amount) + BigInt(minted)).toString(),
       },
-    });
+    })
   } else {
     await prisma.lpTokenWallet.create({
       data: {
         poolAddress,
-        ownerAddress: to ? to.toString() : "",
+        ownerAddress: to ? to.toString() : '',
         amount: BigInt(minted).toString(),
       },
-    });
+    })
   }
-};
+}
 
-export default handleAddLiquidity;
+export default handleAddLiquidity

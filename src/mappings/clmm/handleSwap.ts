@@ -1,11 +1,11 @@
-import { Event } from "../../types/events";
-import prisma from "../../clients/prisma";
-import parseSwap from "../../parsers/clmm/parseSwap";
+import { Event } from '../../types/events'
+import prisma from '../../clients/prisma'
+import parseSwap from '../../parsers/clmm/parseSwap'
 
 const handleSwap = async (event: Event) => {
-  const params = parseSwap(event.body);
-  console.log("Swap event is indexed.");
-  console.log(event);
+  const params = parseSwap(event.body)
+  console.log('Swap event is indexed.')
+  console.log(event)
 
   await prisma.swap.upsert({
     where: {
@@ -33,13 +33,13 @@ const handleSwap = async (event: Event) => {
       swapForY: params.swapForY,
       activeBinId: params.activeBinId,
     },
-  });
+  })
 
   const pool = await prisma.pool.findFirst({
     where: {
       id: event.transaction.source,
     },
-  });
+  })
 
   if (pool) {
     await prisma.pool.update({
@@ -49,8 +49,8 @@ const handleSwap = async (event: Event) => {
       data: {
         activeBinId: params.activeBinId,
       },
-    });
+    })
   }
-};
+}
 
-export default handleSwap;
+export default handleSwap

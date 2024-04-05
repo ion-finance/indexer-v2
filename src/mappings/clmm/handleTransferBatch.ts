@@ -1,19 +1,19 @@
-import { Event } from "../../types/events";
-import prisma from "../../clients/prisma";
-import { Prisma } from "@prisma/client";
-import parseTransferBatch from "../../parsers/clmm/parseTransferBatch";
-import _ from "lodash";
+import { Event } from '../../types/events'
+import prisma from '../../clients/prisma'
+import { Prisma } from '@prisma/client'
+import parseTransferBatch from '../../parsers/clmm/parseTransferBatch'
+import _ from 'lodash'
 
 const handleTransferBatch = async (event: Event) => {
-  console.log("TransferBatch event is indexed.");
-  const params = parseTransferBatch(event.body);
+  console.log('TransferBatch event is indexed.')
+  const params = parseTransferBatch(event.body)
 
   const amountArray = params.amounts.keys().map((key) => {
     return {
       binId: key,
-      amount: params.amounts.get(key)?.amount.toString() || "0",
-    };
-  });
+      amount: params.amounts.get(key)?.amount.toString() || '0',
+    }
+  })
 
   await prisma.transferBatch.create({
     data: {
@@ -26,14 +26,14 @@ const handleTransferBatch = async (event: Event) => {
       toAddress: params.toAddress,
       amounts: amountArray as Prisma.JsonArray,
     },
-  });
+  })
 
   const lpTokenWalletFrom = await prisma.lpTokenWallet.findFirst({
     where: {
       poolAddress: event.transaction.source,
       ownerAddress: params.fromAddress,
     },
-  });
+  })
 
   if (lpTokenWalletFrom) {
     await prisma.lpTokenWallet.update({
@@ -42,11 +42,11 @@ const handleTransferBatch = async (event: Event) => {
       },
       data: {
         shares: (lpTokenWalletFrom.shares as Prisma.JsonArray).map((share) => {
-          const typedShare = share as { binId: number; amount: string };
+          const typedShare = share as { binId: number; amount: string }
 
           const updated = amountArray.find(
-            (item) => item.binId === typedShare.binId
-          );
+            (item) => item.binId === typedShare.binId,
+          )
 
           if (updated) {
             return {
@@ -54,17 +54,17 @@ const handleTransferBatch = async (event: Event) => {
               amount: (
                 BigInt(typedShare.amount) - BigInt(updated.amount)
               ).toString(),
-            };
+            }
           }
 
-          return typedShare;
+          return typedShare
         }) as Prisma.JsonArray,
       },
-    });
+    })
   }
 
   if (params.toAddress === event.transaction.source) {
-    return;
+    return
   }
 
   const lpTokenWalletTo = await prisma.lpTokenWallet.findFirst({
@@ -72,28 +72,28 @@ const handleTransferBatch = async (event: Event) => {
       poolAddress: event.transaction.source,
       ownerAddress: params.toAddress,
     },
-  });
+  })
 
   if (lpTokenWalletTo) {
     const sharesGroupByBinId = _.groupBy(
       [...(lpTokenWalletTo.shares as Prisma.JsonArray), ...amountArray],
-      "binId"
-    );
+      'binId',
+    )
 
     const shares = Object.keys(sharesGroupByBinId).map((key) => {
-      const items = sharesGroupByBinId[key];
+      const items = sharesGroupByBinId[key]
 
       return {
         binId: Number(key),
         amount: items
           .reduce((acc, item) => {
-            const typedItem = item as { binId: number; amount: string };
+            const typedItem = item as { binId: number; amount: string }
 
-            return acc + BigInt(typedItem.amount || "0");
+            return acc + BigInt(typedItem.amount || '0')
           }, BigInt(0))
           .toString(),
-      };
-    });
+      }
+    })
 
     await prisma.lpTokenWallet.update({
       where: {
@@ -102,7 +102,7 @@ const handleTransferBatch = async (event: Event) => {
       data: {
         shares: shares as Prisma.JsonArray,
       },
-    });
+    })
   } else {
     await prisma.lpTokenWallet.create({
       data: {
@@ -110,8 +110,8 @@ const handleTransferBatch = async (event: Event) => {
         ownerAddress: params.toAddress,
         shares: amountArray as Prisma.JsonArray,
       },
-    });
+    })
   }
-};
+}
 
-export default handleTransferBatch;
+export default handleTransferBatch

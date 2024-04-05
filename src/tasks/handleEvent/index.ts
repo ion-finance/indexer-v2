@@ -1,5 +1,5 @@
-import axios from "axios";
-import { AccountEvent, Trace } from "../../types/ton-api";
+import axios from 'axios'
+import { AccountEvent, Trace } from '../../types/ton-api'
 
 import {
   handleAddLiquidity,
@@ -7,82 +7,82 @@ import {
   handlePoolCreated,
   handleRemoveLiquidity,
   // handleRemoveLiquidity,
-} from "../../mappings/cpmm";
-import extractPaths from "./extractPaths";
-import { CustomOP, OP } from "./opCode";
-import type { Ops } from "./opCode";
+} from '../../mappings/cpmm'
+import extractPaths from './extractPaths'
+import { CustomOP, OP } from './opCode'
+import type { Ops } from './opCode'
 
 // Info
 // * This method can throw an error if the event is processing
 const handleEvent = async (event: AccountEvent) => {
-  const { event_id } = event;
+  const { event_id } = event
   const res = await axios(`${process.env.TON_API_URL}/traces/${event_id}`, {
     headers: {
       Authorization: `Bearer ${process.env.TON_API_KEY}`,
     },
-  });
+  })
 
-  const traces = res.data as Trace;
+  const traces = res.data as Trace
 
   // Extract paths
   // TODO: implement test code
-  const paths: Ops[][] = extractPaths(traces);
+  const paths: Ops[][] = extractPaths(traces)
   // console.log("paths", paths);
   const checkPathHasOp = (paths: Ops[][], op: string) =>
     paths.some((path) =>
       path.some(
-        ({ op: _op, customOp: _customOp }) => _op === op || _customOp === op
-      )
-    );
+        ({ op: _op, customOp: _customOp }) => _op === op || _customOp === op,
+      ),
+    )
 
-  const isRouterDeployed = checkPathHasOp(paths, CustomOP.ROUTER_DEPLOYED);
-  const isPoolDeployed = checkPathHasOp(paths, CustomOP.POOL_DEPLOYED);
-  const isLpWalletDeployed = checkPathHasOp(paths, CustomOP.LP_WALLET_DEPLOYED);
+  const isRouterDeployed = checkPathHasOp(paths, CustomOP.ROUTER_DEPLOYED)
+  const isPoolDeployed = checkPathHasOp(paths, CustomOP.POOL_DEPLOYED)
+  const isLpWalletDeployed = checkPathHasOp(paths, CustomOP.LP_WALLET_DEPLOYED)
   const isLpAccountDeployed = checkPathHasOp(
     paths,
-    CustomOP.LP_ACCOUNT_DEPLOYED
-  );
+    CustomOP.LP_ACCOUNT_DEPLOYED,
+  )
   const isRouterJettonWalletDeployed = checkPathHasOp(
     paths,
-    CustomOP.ROUTER_JETTON_WALLET_DEPLOYED
-  );
+    CustomOP.ROUTER_JETTON_WALLET_DEPLOYED,
+  )
 
-  const isSwap = checkPathHasOp(paths, OP.SWAP);
-  const isProvideLpConfirmed = checkPathHasOp(paths, OP.CB_ADD_LIQUIDITY);
+  const isSwap = checkPathHasOp(paths, OP.SWAP)
+  const isProvideLpConfirmed = checkPathHasOp(paths, OP.CB_ADD_LIQUIDITY)
 
   const isProvideLp =
-    !isProvideLpConfirmed && checkPathHasOp(paths, OP.ADD_LIQUIDITY);
+    !isProvideLpConfirmed && checkPathHasOp(paths, OP.ADD_LIQUIDITY)
 
-  const isRemoveLiquidity = checkPathHasOp(paths, OP.BURN_NOTIFICATION);
+  const isRemoveLiquidity = checkPathHasOp(paths, OP.BURN_NOTIFICATION)
 
   // deploy cases can be overlapped
   if (isRouterDeployed) {
-    console.log(`Router deploy event: ${event_id}`);
+    console.log(`Router deploy event: ${event_id}`)
   }
   if (isPoolDeployed) {
-    console.log(`Pool deploy event: ${event_id}`);
-    await handlePoolCreated({ event, traces });
+    console.log(`Pool deploy event: ${event_id}`)
+    await handlePoolCreated({ event, traces })
   }
   if (isLpWalletDeployed) {
-    console.log(`LpWallet deploy event: ${event_id}`);
+    console.log(`LpWallet deploy event: ${event_id}`)
   }
   if (isLpAccountDeployed) {
-    console.log(`LpAccount deploy event: ${event_id}`);
+    console.log(`LpAccount deploy event: ${event_id}`)
   }
   if (isRouterJettonWalletDeployed) {
-    console.log(`Router Jetton Wallet deploy event: ${event_id}`);
+    console.log(`Router Jetton Wallet deploy event: ${event_id}`)
   }
 
   if (isSwap) {
-    console.log(`Exchange event: ${event_id}`);
-    await handleExchange({ event, traces });
+    console.log(`Exchange event: ${event_id}`)
+    await handleExchange({ event, traces })
   } else if (isProvideLp) {
-    console.log(`Provide Lp event: ${event_id}`);
+    console.log(`Provide Lp event: ${event_id}`)
   } else if (isProvideLpConfirmed) {
-    console.log(`Provide Lp Confirmed: ${event_id}`);
-    await handleAddLiquidity({ event, traces });
+    console.log(`Provide Lp Confirmed: ${event_id}`)
+    await handleAddLiquidity({ event, traces })
   } else if (isRemoveLiquidity) {
-    await handleRemoveLiquidity({ event, traces });
+    await handleRemoveLiquidity({ event, traces })
   }
 
   if (
@@ -96,9 +96,9 @@ const handleEvent = async (event: AccountEvent) => {
     !isProvideLpConfirmed &&
     !isRemoveLiquidity
   ) {
-    console.log(`Unknown event: ${event_id}`);
-    console.log("paths", paths);
+    console.log(`Unknown event: ${event_id}`)
+    console.log('paths', paths)
   }
-};
+}
 
-export default handleEvent;
+export default handleEvent

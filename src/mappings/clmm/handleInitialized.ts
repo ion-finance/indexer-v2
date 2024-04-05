@@ -1,17 +1,17 @@
-import prisma from "../../clients/prisma";
-import { Event } from "../../types/events";
-import parseInitialized from "../../parsers/clmm/parseInitialized";
-import fetchTokenData from "../../utils/fetchTokenData";
+import prisma from '../../clients/prisma'
+import { Event } from '../../types/events'
+import parseInitialized from '../../parsers/clmm/parseInitialized'
+import fetchTokenData from '../../utils/fetchTokenData'
 
 const handleInitialized = async (event: Event) => {
-  const params = parseInitialized(event.body);
-  console.log("Initialized event is indexed.");
-  console.log(event);
+  const params = parseInitialized(event.body)
+  console.log('Initialized event is indexed.')
+  console.log(event)
 
   const [tokenXdata, tokenYdata] = await Promise.all([
     fetchTokenData(params.tokenXAddress),
     fetchTokenData(params.tokenYAddress),
-  ]);
+  ])
 
   if (tokenXdata) {
     await prisma.token.upsert({
@@ -33,7 +33,7 @@ const handleInitialized = async (event: Event) => {
         decimals: parseInt(tokenXdata.metadata.decimals),
         image: tokenXdata.metadata.image,
       },
-    });
+    })
   }
   if (tokenYdata) {
     await prisma.token.upsert({
@@ -55,11 +55,11 @@ const handleInitialized = async (event: Event) => {
         decimals: parseInt(tokenYdata.metadata.decimals),
         image: tokenYdata.metadata.image,
       },
-    });
+    })
   }
 
-  const tokenXSymbol = tokenXdata?.metadata.symbol;
-  const tokenYSymbol = tokenYdata?.metadata.symbol;
+  const tokenXSymbol = tokenXdata?.metadata.symbol
+  const tokenYSymbol = tokenYdata?.metadata.symbol
 
   await prisma.pool.upsert({
     where: {
@@ -74,7 +74,7 @@ const handleInitialized = async (event: Event) => {
       name: `${tokenXSymbol} - ${tokenYSymbol}`,
       activeBinId: params.activeId,
     },
-  });
-};
+  })
+}
 
-export default handleInitialized;
+export default handleInitialized
