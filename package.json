@@ -8,6 +8,7 @@
     "start": "node build/src",
     "local": "ts-node src",
     "local:watch": "nodemon src -e ts,json --exec 'npm run local'",
+    "local:watch-all": "nodemon -e yaml --exec 'ts-node' src/index.ts",
     "lint": "eslint src",
     "format": "npx prettier --write src",
     "format:check": "npx prettier --check src",
