@@ -1,0 +1,34 @@
+openapi: 3.0.0
+info:
+  title: Trace API
+  description: This API returns the trace data
+  version: '0.1.0'
+paths:
+  /traces/{trace_hash}:
+    get:
+      summary: Get trace data by trace_id
+      parameters:
+        - in: path
+          name: trace_hash
+          required: true
+          schema:
+            type: string
+          description: The trace_id
+      responses:
+        '200':
+          description: Successfully retrieved trace data
+          content:
+            application/json:
+              schema:
+                type: object
+                # Define a more specific schema for your trace data here
+                properties:
+                  exists:
+                    type: boolean
+                    description: Indicates if the trace data exists
+        '404':
+          description: Trace data not found
+        '400':
+          description: Invalid hash format
+        '500':
+          description: Internal Server Error

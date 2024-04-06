@@ -6,6 +6,8 @@ import prisma from './clients/prisma'
 import sleep from './utils/sleep'
 import api from './api'
 import * as Sentry from '@sentry/node'
+import swaggerJSdoc from 'swagger-jsdoc'
+import * as swaggerUI from 'swagger-ui-express'
 
 dotenv.config()
 

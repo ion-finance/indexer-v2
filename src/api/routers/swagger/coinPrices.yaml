@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  title: Coin Prices API
+  description: This API returns the latest coin prices
+  version: '0.1.0'
+paths:
+  /coin-prices:
+    get:
+      summary: Get the latest coin prices
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  TON:
+                    type: number
+                  JUSDT:
+                    type: number
+                  JUSDC:
+                    type: number

@@ -1,0 +1,148 @@
+openapi: 3.0.0
+
+components:
+  schemas:
+    Pool:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Pool address
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation time of the pool
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update time of the pool
+        name:
+          type: string
+          description: Name of the pool
+        tokenXAddress:
+          type: string
+          description: Address of token X
+        tokenYAddress:
+          type: string
+          description: Address of token Y
+        binStep:
+          type: integer
+          description: 0 <= binStep <= 255
+        # activeBinId:
+        #   type: integer
+        #   description: 0 <= activeBinId <= 16777215
+        type:
+          $ref: '#/components/schemas/PoolType'
+        reserveX:
+          type: string
+          description: Reserve amount of token X
+        reserveY:
+          type: string
+          description: Reserve amount of token Y
+        lpSupply:
+          type: string
+          description: LP token supply
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - name
+        - tokenXAddress
+        - tokenYAddress
+        - type
+
+    Token:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Token ID
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        jettonMinterAddress:
+          type: string
+          description: Address of the jetton minter
+        name:
+          type: string
+          description: Name of the token
+        symbol:
+          type: string
+          description: Symbol of the token
+        image:
+          type: string
+          description: Image URL of the token
+        decimals:
+          type: integer
+          description: Number of decimals the token uses
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - name
+        - symbol
+        - decimals
+
+    Deposit:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Transaction hash
+        eventId:
+          type: string
+          description: Event ID
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        timestamp:
+          type: integer
+          description: Unix timestamp of the deposit
+        poolAddress:
+          type: string
+          description: Address of the pool
+        senderAddress:
+          type: string
+          description: Address of the sender
+        receiverAddress:
+          type: string
+          description: Address of the receiver
+        tokenAddress:
+          type: string
+          description: Address of the token
+        amountX:
+          type: string
+          description: Amount of token X
+        amountY:
+          type: string
+          description: Amount of token Y
+      required:
+        - id
+        - eventId
+        - createdAt
+        - updatedAt
+        - timestamp
+        - poolAddress
+        - senderAddress
+        - receiverAddress
+        - tokenAddress
+        - amountX
+        - amountY
+
+    PoolType:
+      type: string
+      enum:
+        - CLMM
+        - OtherType # Replace or extend with actual pool types
+
+info:
+  title: Example API
+  version: 1.0.0
+  description: API modeled from Prisma schema
+paths: {}

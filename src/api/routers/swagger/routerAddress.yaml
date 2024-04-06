@@ -1,0 +1,32 @@
+openapi: 3.0.0
+info:
+  title: Router Address API
+  description: This API returns the latest router address
+  version: '0.1.0'
+paths:
+  /router-address:
+    get:
+      summary: Get the latest router address
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ROUTER_ADDRESS:
+                    type: string
+  /router-address_clmm:
+    get:
+      summary: Get the latest router address clmm
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ROUTER_ADDRESS_CLMM:
+                    type: string

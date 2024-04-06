@@ -1,0 +1,18 @@
+openapi: 3.0.0
+info:
+  title: Pools API
+  description: This API returns the latest pools data
+  version: '0.1.0'
+paths:
+  /pools:
+    get:
+      summary: Get the latest pools data
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'common.yaml#/components/schemas/Pool'

@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  title: Positions API
+  description: This API returns the latest positions data
+  version: '0.1.0'
+paths:
+  /positions/{address}:
+    get:
+      summary: Get the latest positions data
+      parameters:
+        - in: path
+          name: address
+          schema:
+            type: string
+          required: true
+          description: The address of the wallet
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: object
+                    properties:
+                      balanceUsd:
+                        type: number
+                      apy:
+                        type: number
+                      earnedUsd:
+                        type: number
+                  positions:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: string
+                        poolAddress:
+                          type: string
+                        ownerAddress:
+                          type: string
+                        amount:
+                          type: string
+                        shares:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              amount:
+                                type: string
+                              token:
+                                $ref: 'common.yaml#/components/schemas/Token'
+                        feeUsd:
+                          type: number
+                        balanceUsd:
+                          type: number
+                        tokenX:
+                          allOf:
+                            - $ref: 'common.yaml#/components/schemas/Token'
+                            - type: object
+                              properties:
+                                balanceUsd: # TODO: show balanceUSD in swagger
+                                  type: number
+                                  description: The balance in USD
+                        tokenY:
+                          allOf:
+                            - $ref: 'common.yaml#/components/schemas/Token'
+                            - type: object
+                              properties:
+                                balanceUsd: # TODO: show balanceUSD in swagger
+                                  type: number
+                                  description: The balance in USD
