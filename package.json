@@ -60,6 +60,8 @@
     "@ton/sandbox": "^0.13.1",
     "@ton/test-utils": "^0.3.1",
     "@ton/ton": "^13.8.0",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.6",
     "axios": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -70,6 +72,8 @@
     "lint-staged": "^15.2.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
-    "prisma": "^5.0.0"
+    "prisma": "^5.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   }
 }
