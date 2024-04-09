@@ -1,33 +1,55 @@
-// !NOTE: copy for referencing stonfi
-// swap_refund_no_liq = 0x5ffe1295 = 1610486421
-// swap_refund_reserve_err = 0x38976e9b = 949448347
-// swap_ok_ref = 0x45078540 = 1158120768
-// swap_ok = 0xc64370e5 = 3326308581
-// burn_ok = 0xdda48b6a = 3718548330
-// refund_ok = 0xde7dbbc2 = 3732782018
-// export enum EXIT_CODE {
-//   SWAP_REFUND_NO_LIQ = 1610486421,
-//   SWAP_REFUND_RESERVE_ERR = 949448347,
-//   SWAP_OK_REF = 1158120768,
-//   SWAP_OK = 3326308581,
-//   BURN_OK = 3718548330,
-//   REFUND_OK = 3732782018,
-// }
+import dotenv from 'dotenv'
+dotenv.config()
 
-// swap_refund_no_liq = 0x5ffe1295 = 1610486421
-// swap_refund_reserve_err = 0x38976e9b = 949448347
-// swap_ok_ref = 0x45078540 = 1158120768
-// swap_ok = 0xc64370e5 = 3326308581
-// burn_ok = 0xdda48b6a = 3718548330
-// refund_ok = 0xde7d
+enum RAW_EXIT_CODE_STONFI {
+  SWAP_REFUND_NO_LIQ = '1610486421', // 0x5ffe1295
+  SWAP_REFUND_RESERVE_ERR = '949448347', // 0x38976e9b
+  SWAP_OK_REF = '1158120768', // 0x45078540
+  SWAP_OK = '3326308581', // 0xc64370e5
+  BURN_OK = '3718548330', // 0xdda48b6a
+  REFUND_OK = '3732782018', // 0xde7dbbc2
+}
 
-// SWAP = "0x25938561", // swap
-// PROVIDE_LP = "0xfcf9e58f", //provide_lp
-// ADD_LIQUIDITY = "0x3ebe5431", // add_liquidity
-// CB_ADD_LIQUIDITY = "0x56dfeb8a", // cb_add_liquidity
-// PAY_TO = "0xf93bb43f", // pay_tobbc2 = 3732782018
+enum RAW_OP_STONFI {
+  TRANSFER = '0x0f8a7ea5',
+  TRANSFER_NOTIFICATION = '0x7362d09c',
+  INTERNAL_TRANSFER = '0x178d4519',
+  EXCESS = '0xd53276db',
+  BURN = '0x595f07bc',
+  BURN_NOTIFICATION = '0x7bdd97de',
 
+  REFUND_ME = '0x0bf3f447',
+  CB_REFUND_ME = '0x89446a42',
+
+  BOUNCE = '0xffffffff',
+  TEXT_COMMENT = '0x00000000',
+  EXCEPTION = 'exception',
+
+  SWAP = '0x25938561', // swap
+  PROVIDE_LP = '0xfcf9e58f', //provide_lp
+  ADD_LIQUIDITY = '0x3ebe5431', // add_liquidity
+  CB_ADD_LIQUIDITY = '0x56dfeb8a', // cb_add_liquidity
+  PAY_TO = '0xf93bb43f', // pay_to = 3732782018
+
+  COLLECT_FEES = '0x1fcb7d3d',
+  SET_FEES = '0x355423e5',
+  RESET_GAS = '0x42a0fb43',
+  RESET_POOL_GAS = '0xf6aa9737',
+  LOCK = '0x878f9b0e',
+  UNLOCK = '0x6ae4b0ef',
+
+  INIT_CODE_UPGRADE = '0xdf1e233d',
+  INIT_ADMIN_UPGRADE = '0x2fb94384',
+  CANCEL_CODE_UPGRADE = '0x357ccc67',
+  CANCEL_ADMIN_UPGRADE = '0xa4ed9981',
+  FINALIZE_UPGRADES = '0x6378509f',
+
+  GETTER_POOL_ADDRESS = '0xd1db969b',
+  TRANSFER_BOUNCE_LOCKED = '0xa0dbdcb',
+  TRANSFER_BOUNCE_INVALID_REQUEST = '0x19727ea7',
+}
 enum RAW_EXIT_CODE {
+  // prefix 'ion_'
   SWAP_REFUND_NO_LIQ = '2019787373', // 0x7863826d
   SWAP_REFUND_RESERVE_ERR = '3533507941', // 0xd29d0d65
   SWAP_OK_REF = '2913750411', // 0xadac4d8b
@@ -36,13 +58,20 @@ enum RAW_EXIT_CODE {
   REFUND_OK = '2921179866', // 0xae1daada
 }
 
-export enum RAW_OP {
+enum RAW_OP {
   TRANSFER = '0x0f8a7ea5',
   TRANSFER_NOTIFICATION = '0x7362d09c',
   INTERNAL_TRANSFER = '0x178d4519',
   EXCESS = '0xd53276db',
   BURN = '0x595f07bc',
   BURN_NOTIFICATION = '0x7bdd97de',
+
+  REFUND_ME = '0x0bf3f447',
+  CB_REFUND_ME = '0x89446a42',
+
+  BOUNCE = '0xffffffff',
+  TEXT_COMMENT = '0x00000000',
+  EXCEPTION = 'exception',
 
   SWAP = '0x5b1234b8', // ion_swap
   PROVIDE_LP = '0xefe51dc8', // ion_provide_lp
@@ -78,6 +107,10 @@ function createBiDirectionalEnum<E extends { [index: string]: string }>(
   }
 }
 
-export const OP = createBiDirectionalEnum(RAW_OP)
+const isStonfi = process.env.IS_STONFI === 'true'
+const op = isStonfi ? RAW_OP_STONFI : RAW_OP
+const exitCode = isStonfi ? RAW_EXIT_CODE_STONFI : RAW_EXIT_CODE
+
+export const OP = createBiDirectionalEnum(op)
 export const CustomOP = createBiDirectionalEnum(RAW_CUSTOM_OP)
-export const EXIT_CODE = createBiDirectionalEnum(RAW_EXIT_CODE)
+export const EXIT_CODE = createBiDirectionalEnum(exitCode)
