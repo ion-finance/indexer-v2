@@ -6,6 +6,7 @@ import prisma from './clients/prisma'
 import sleep from './utils/sleep'
 import api from './api'
 import * as Sentry from '@sentry/node'
+import { toLocaleString } from './utils/date'
 
 dotenv.config()
 
@@ -17,8 +18,10 @@ Sentry.init({
 })
 
 const isCLMM = process.env.IS_CLMM === 'true'
+let totalEvents = 0
 const eventPooling = async () => {
   const events = await fetchEvents()
+  totalEvents += events.length
 
   if (events.length === 0) {
     // console.debug(`No events found. Sleep for ${MIN_POOL / 1000}s.`);
@@ -57,6 +60,10 @@ const eventPooling = async () => {
   }
 
   console.log(`${events.length} events are indexed.`)
+  console.log('totalEvents length: ', totalEvents)
+  console.log(
+    `from ${toLocaleString(events[0].timestamp)} to ${toLocaleString(events[events.length - 1].timestamp)}`,
+  )
 
   if (events.length > 0) {
     await prisma.indexerState.setLastTimestamp(

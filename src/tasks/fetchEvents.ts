@@ -3,6 +3,7 @@ import { AccountEvent, Event } from '../types/ton-api'
 import prisma from '../clients/prisma'
 import { uniqBy } from 'lodash'
 import { routerAddress } from '../address'
+import { toLocaleString } from '../utils/date'
 
 // import * as Sentry from "@sentry/node";
 
@@ -19,14 +20,12 @@ const fetchEvents = async () => {
         `start_date=${timestamp}&limit=100` +
         (endDate ? `&end_date=${endDate}` : '')
 
-      const res = await axios(
-        `${process.env.TON_API_URL}/accounts/${routerAddress}/events?${args}`,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.TON_API_KEY}`,
-          },
+      const url = `${process.env.TON_API_URL}/accounts/${routerAddress}/events?${args}`
+      const res = await axios(url, {
+        headers: {
+          Authorization: `Bearer ${process.env.TON_API_KEY}`,
         },
-      )
+      })
 
       const parsedEvents = res.data.events.filter(
         (event: Event) => event.in_progress === false,
@@ -43,7 +42,7 @@ const fetchEvents = async () => {
         endDate = parsedEvents[parsedEvents.length - 1].timestamp
         console.log(
           'Try to fetch events endData ',
-          new Date(endDate * 1000).toLocaleString('ko-KR'),
+          toLocaleString(endDate),
           endDate,
         )
         continue

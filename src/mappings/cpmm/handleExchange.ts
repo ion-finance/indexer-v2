@@ -115,7 +115,7 @@ export const handleExchange = async ({
   // pay_to can occur in refund scenario
   if (!validExitCodes.includes(String(exitCode))) {
     console.warn('Swap failed. Skip current indexing.')
-    console.log('exitCode', EXIT_CODE[exitCode])
+    console.log('exitCode', EXIT_CODE[exitCode], exitCode)
     return
   }
 
