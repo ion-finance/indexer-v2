@@ -12,7 +12,9 @@ import updateTokenPrices from './routers/updateTokenPrices'
 import traceRouter from './routers/trace'
 import cors from 'cors'
 import swaggerJSDoc from 'swagger-jsdoc'
+import cron from 'node-cron'
 import * as swaggerUI from 'swagger-ui-express'
+import updateTokenPricesLogic from './routers/updateTokenPrices/updateTokenPricesLogic'
 
 const swaggerOptions = {
   definition: {
@@ -43,5 +45,10 @@ api.use(tokenPricesRouter)
 api.use(updateTokenPrices)
 api.use(traceRouter)
 api.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec))
+
+// every 1 min
+cron.schedule('*/1 * * * *', async () => {
+  await updateTokenPricesLogic()
+})
 
 export default api

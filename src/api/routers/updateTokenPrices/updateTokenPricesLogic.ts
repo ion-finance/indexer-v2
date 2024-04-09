@@ -1,8 +1,7 @@
 import axios from 'axios'
-import router from './pools'
-import prisma from '../../clients/prisma'
+import prisma from '../../../clients/prisma'
 import { compact, filter, find, forEach, map, reduce } from 'lodash'
-import { TON_WALLET_ADDRESS } from '../../constant'
+import { TON_WALLET_ADDRESS } from '../../../constant'
 import { Pool, Token } from '@prisma/client'
 
 const getUSDPrice = (data: any) => data?.quote?.USD?.price || 0
@@ -24,8 +23,7 @@ const getPrice = async () => {
   return { TON, JUSDT, JUSDC }
 }
 
-// TODO: use cache, add cron job
-router.get('/update-token-prices', async function handler(req, res) {
+const updateTokenPricesLogic = async () => {
   const pools = (await prisma.pool.findMany()) as Pool[]
   const tokens = (await prisma.token.findMany()) as Token[]
   const prices = await getPrice()
@@ -102,10 +100,7 @@ router.get('/update-token-prices', async function handler(req, res) {
   })
 
   bulkUpsertTokenPrices(prisma, tokenPrices)
-  return res.status(200).json(true)
-})
-
-export default router
+}
 
 async function bulkUpsertTokenPrices(
   prisma: any,
@@ -129,3 +124,5 @@ async function bulkUpsertTokenPrices(
 
   await prisma.$executeRawUnsafe(query)
 }
+
+export default updateTokenPricesLogic
