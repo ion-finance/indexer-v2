@@ -7,7 +7,8 @@ import binRouter from './routers/bins'
 import orderRouter from './routers/orders'
 import taskRouter from './routers/tasks'
 import routerAddressRouter from './routers/routerAddress'
-import coinPricesRouter from './routers/coinPrices'
+import tokenPricesRouter from './routers/tokenPrices'
+import updateTokenPrices from './routers/updateTokenPrices'
 import traceRouter from './routers/trace'
 import cors from 'cors'
 import swaggerJSDoc from 'swagger-jsdoc'
@@ -38,7 +39,8 @@ api.use(binRouter)
 api.use(orderRouter)
 api.use(taskRouter)
 api.use(routerAddressRouter)
-api.use(coinPricesRouter)
+api.use(tokenPricesRouter)
+api.use(updateTokenPrices)
 api.use(traceRouter)
 api.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec))
 
