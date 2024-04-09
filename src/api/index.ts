@@ -15,6 +15,7 @@ import swaggerJSDoc from 'swagger-jsdoc'
 import cron from 'node-cron'
 import * as swaggerUI from 'swagger-ui-express'
 import updateTokenPricesLogic from './routers/updateTokenPrices/updateTokenPricesLogic'
+import manualCPMMTraceRouter from './routers/manualCPMMTrace'
 
 const swaggerOptions = {
   definition: {
@@ -44,6 +45,7 @@ api.use(routerAddressRouter)
 api.use(tokenPricesRouter)
 api.use(updateTokenPrices)
 api.use(traceRouter)
+api.use(manualCPMMTraceRouter)
 api.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec))
 
 // every 1 min
