@@ -53,13 +53,12 @@ const parsePayTo = (raw_body: string) => {
 }
 
 export const handleRemoveLiquidity = async ({
-  event,
+  eventId,
   traces,
 }: {
-  event: AccountEvent
+  eventId: string
   traces: Trace
 }) => {
-  const eventId = event.event_id
   const { hash, utime } = traces.transaction
   const payToTrace = findTracesByOpCode(traces, OP.PAY_TO)?.[0]
   const burnNotificationTrace = findTracesByOpCode(

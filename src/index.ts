@@ -6,8 +6,6 @@ import prisma from './clients/prisma'
 import sleep from './utils/sleep'
 import api from './api'
 import * as Sentry from '@sentry/node'
-import swaggerJSdoc from 'swagger-jsdoc'
-import * as swaggerUI from 'swagger-ui-express'
 
 dotenv.config()
 
@@ -33,16 +31,17 @@ const eventPooling = async () => {
   let lastIndex = 0
   for (let i = 0; i < events.length; i++) {
     const event = events[i]
+    const eventId = event.event_id
     try {
       if (isCLMM) {
-        await handleEventCLMM(event.event_id)
+        await handleEventCLMM(eventId)
       } else {
-        await handleEvent(event)
+        await handleEvent(eventId)
       }
     } catch (e) {
       error = true
       console.error(e)
-      console.error(`Error when handling event ${events[i].event_id}`)
+      console.error(`Error when handling event ${eventId}`)
       lastIndex = i
       // Sentry.captureException(e);
       break

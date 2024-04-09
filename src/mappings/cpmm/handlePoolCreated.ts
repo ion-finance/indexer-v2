@@ -1,7 +1,7 @@
 import prisma from '../../clients/prisma'
 import fetchTokenData from '../../utils/fetchTokenData'
 import { PoolType } from '@prisma/client'
-import { AccountEvent, Trace } from '../../types/ton-api'
+import { Trace } from '../../types/ton-api'
 import { Cell, address } from '@ton/core'
 import {
   changeNameOfProxyTon,
@@ -36,10 +36,10 @@ const parseTransferNotification = (raw_body: string) => {
 }
 
 export const handlePoolCreated = async ({
-  event,
+  eventId,
   traces,
 }: {
-  event: AccountEvent
+  eventId: string
   traces: Trace
 }) => {
   const provideLpTrace = findTracesByOpCode(traces, OP.PROVIDE_LP)?.[0]

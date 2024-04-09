@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { AccountEvent, Trace } from '../../types/ton-api'
+import { Trace } from '../../types/ton-api'
 
 import {
   handleAddLiquidity,
@@ -14,9 +14,8 @@ import type { Ops } from './opCode'
 
 // Info
 // * This method can throw an error if the event is processing
-const handleEvent = async (event: AccountEvent) => {
-  const { event_id } = event
-  const res = await axios(`${process.env.TON_API_URL}/traces/${event_id}`, {
+const handleEvent = async (eventId: string) => {
+  const res = await axios(`${process.env.TON_API_URL}/traces/${eventId}`, {
     headers: {
       Authorization: `Bearer ${process.env.TON_API_KEY}`,
     },
@@ -57,32 +56,32 @@ const handleEvent = async (event: AccountEvent) => {
 
   // deploy cases can be overlapped
   if (isRouterDeployed) {
-    console.log(`Router deploy event: ${event_id}`)
+    console.log(`Router deploy event: ${eventId}`)
   }
   if (isPoolDeployed) {
-    console.log(`Pool deploy event: ${event_id}`)
-    await handlePoolCreated({ event, traces })
+    console.log(`Pool deploy event: ${eventId}`)
+    await handlePoolCreated({ eventId, traces })
   }
   if (isLpWalletDeployed) {
-    console.log(`LpWallet deploy event: ${event_id}`)
+    console.log(`LpWallet deploy event: ${eventId}`)
   }
   if (isLpAccountDeployed) {
-    console.log(`LpAccount deploy event: ${event_id}`)
+    console.log(`LpAccount deploy event: ${eventId}`)
   }
   if (isRouterJettonWalletDeployed) {
-    console.log(`Router Jetton Wallet deploy event: ${event_id}`)
+    console.log(`Router Jetton Wallet deploy event: ${eventId}`)
   }
 
   if (isSwap) {
-    console.log(`Exchange event: ${event_id}`)
-    await handleExchange({ event, traces })
+    console.log(`Exchange event: ${eventId}`)
+    await handleExchange({ eventId, traces })
   } else if (isProvideLp) {
-    console.log(`Provide Lp event: ${event_id}`)
+    console.log(`Provide Lp event: ${eventId}`)
   } else if (isProvideLpConfirmed) {
-    console.log(`Provide Lp Confirmed: ${event_id}`)
-    await handleAddLiquidity({ event, traces })
+    console.log(`Provide Lp Confirmed: ${eventId}`)
+    await handleAddLiquidity({ eventId, traces })
   } else if (isRemoveLiquidity) {
-    await handleRemoveLiquidity({ event, traces })
+    await handleRemoveLiquidity({ eventId, traces })
   }
 
   if (
@@ -96,7 +95,7 @@ const handleEvent = async (event: AccountEvent) => {
     !isProvideLpConfirmed &&
     !isRemoveLiquidity
   ) {
-    console.log(`Unknown event: ${event_id}`)
+    console.log(`Unknown event: ${eventId}`)
     console.log('paths', paths)
   }
 }

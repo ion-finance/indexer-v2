@@ -45,10 +45,10 @@ const parseCbAddLiquidity = (raw_body: string) => {
 }
 
 export const handleAddLiquidity = async ({
-  event,
+  eventId,
   traces,
 }: {
-  event: AccountEvent
+  eventId: string
   traces: Trace
 }) => {
   const cbAddLiquidityTrace = findTracesByOpCode(
@@ -112,7 +112,6 @@ export const handleAddLiquidity = async ({
   }
 
   const hash = traces.transaction.hash
-  const eventId = event.event_id
   const timestamp = traces.transaction.utime
 
   const deposit = await prisma.deposit.findFirst({
@@ -130,7 +129,7 @@ export const handleAddLiquidity = async ({
   await prisma.deposit.upsert({
     where: {
       id: hash,
-      eventId: event.event_id,
+      eventId,
     },
     update: {
       senderAddress: userAddress,
@@ -142,7 +141,7 @@ export const handleAddLiquidity = async ({
     },
     create: {
       id: hash,
-      eventId: event.event_id,
+      eventId,
       senderAddress: userAddress,
       receiverAddress: userAddress,
       poolAddress,

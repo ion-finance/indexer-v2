@@ -1,5 +1,5 @@
 import prisma from '../../clients/prisma'
-import { AccountEvent, Trace } from '../../types/ton-api'
+import { Trace } from '../../types/ton-api'
 import { Cell } from '@ton/core'
 import { findTracesByOpCode, parseRaw } from '../../utils/address'
 import { EXIT_CODE, OP } from '../../tasks/handleEvent/opCode'
@@ -54,13 +54,12 @@ const parsePayTo = (raw_body: string) => {
 }
 
 export const handleExchange = async ({
-  event,
+  eventId,
   traces,
 }: {
-  event: AccountEvent
+  eventId: string
   traces: Trace
 }) => {
-  const eventId = event.event_id
   const { hash, utime } = traces.transaction
 
   const swapTrace = findTracesByOpCode(traces, OP.SWAP)?.[0]
@@ -121,7 +120,7 @@ export const handleExchange = async ({
   }
 
   const swap = await prisma.swap.findFirst({
-    where: { id: hash, eventId: event.event_id },
+    where: { id: hash, eventId },
   })
 
   if (swap) {
