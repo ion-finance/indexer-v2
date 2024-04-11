@@ -1,7 +1,8 @@
-import { TonClient4 } from '@ton/ton'
+import { TonClient } from '@ton/ton'
 
-const ton = new TonClient4({
-  endpoint: process.env.TON_HUB_API_URL || '',
+const ton = new TonClient({
+  endpoint: process.env.TON_CENTER_API_URL || '',
+  apiKey: process.env.TON_CENTER_API_KEY || '',
 })
 
 export default ton
