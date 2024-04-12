@@ -3,6 +3,7 @@ import { Trace } from '../../types/ton-api'
 import { Cell } from '@ton/core'
 import { findTracesByOpCode, parseRaw } from '../../utils/address'
 import { EXIT_CODE, OP } from '../../tasks/handleEvent/opCode'
+import { find, map } from 'lodash'
 
 const parseSwap = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
@@ -60,42 +61,69 @@ export const handleExchange = async ({
   eventId: string
   traces: Trace
 }) => {
+  const routerAddress = process.env.ROUTER_ADDRESS || ''
   const { hash, utime } = traces.transaction
 
   const swapTrace = findTracesByOpCode(traces, OP.SWAP)?.[0]
+  const payToTraces = findTracesByOpCode(traces, OP.PAY_TO)
   const payToTrace = findTracesByOpCode(traces, OP.PAY_TO)?.[0]
   if (!swapTrace) {
     console.warn('Empty swapTrace')
     return
   }
-  if (!payToTrace) {
-    console.warn('Empty payToTrace')
+  if (!payToTraces) {
+    console.warn('Empty payToTraces')
     return
   }
 
   const swapTraceRawBody = swapTrace.transaction.in_msg?.raw_body || ''
-  const payToRawBody = payToTrace.transaction.in_msg?.raw_body || ''
   if (!swapTraceRawBody) {
     console.warn('Empty raw_body swapTrace')
     return null
   }
 
-  if (!payToRawBody) {
-    console.warn('Empty raw_body payTo')
-    return null
+  const { senderAddress, jettonAmount, hasRef, toAddress } =
+    parseSwap(swapTraceRawBody)
+
+  const payToNormalTrace = find(payToTraces, (payToTrace) => {
+    const rawBody = payToTrace.transaction.in_msg?.raw_body || ''
+    if (!rawBody) {
+      return false
+    }
+    const { exitCode } = parsePayTo(rawBody)
+    return exitCode === Number(EXIT_CODE.SWAP_OK)
+  })
+
+  const payToRefTrace = find(payToTraces, (payToTrace) => {
+    const rawBody = payToTrace.transaction.in_msg?.raw_body || ''
+    if (!rawBody) {
+      return false
+    }
+    const { exitCode } = parsePayTo(rawBody)
+    return exitCode === Number(EXIT_CODE.SWAP_OK_REF)
+  })
+
+  if (!payToNormalTrace) {
+    console.warn('Empty payToNormalTrace')
+    return
   }
 
-  const { senderAddress, jettonAmount } = parseSwap(swapTraceRawBody)
-  const { exitCode, amount0Out, amount1Out } = parsePayTo(payToRawBody)
+  if (hasRef && !payToRefTrace) {
+    console.warn("Empty payToRefTrace given 'hasRef'")
+    return
+  }
+
+  const payToNormal = parsePayTo(
+    payToNormalTrace?.transaction.in_msg?.raw_body || '',
+  )
+  const payToRef =
+    payToRefTrace &&
+    parsePayTo(payToRefTrace?.transaction.in_msg?.raw_body || '')
+
+  const { amount0Out, amount1Out } = payToNormal
   const receiverAddress = senderAddress
   const poolAddress = parseRaw(swapTrace?.transaction.account.address)
 
-  // const summary = (function () {
-  //   const inToken = jetton_master_in?.name || "TON";
-  //   const outToken = jetton_master_out?.name || "TON";
-  //   return `${amountIn} ${inToken} -> ${amountOut} ${outToken}`;
-  // })();
-  // console.log("summary", summary);
   const amountIn = String(jettonAmount)
   const amountOut = String(amount0Out || amount1Out)
 
@@ -109,15 +137,9 @@ export const handleExchange = async ({
     console.log('Pool not found.')
     return
   }
-  const { tokenXAddress } = pool
+
+  const { tokenXAddress, tokenYAddress } = pool
   const swapForY = senderAddress === tokenXAddress
-  const validExitCodes = [EXIT_CODE.SWAP_OK_REF, EXIT_CODE.SWAP_OK] as string[]
-  // pay_to can occur in refund scenario
-  if (!validExitCodes.includes(String(exitCode))) {
-    console.warn('Swap failed. Skip current indexing.')
-    console.log('exitCode', EXIT_CODE[exitCode], exitCode)
-    return
-  }
 
   const swap = await prisma.swap.findFirst({
     where: { id: hash, eventId },
@@ -152,6 +174,78 @@ export const handleExchange = async ({
       amountIn,
       amountOut,
       swapForY,
+    },
+  })
+
+  const walletTrace = traces
+  const {
+    hash: poolTxHash,
+    lt,
+    utime: poolUtime,
+  } = payToNormalTrace.transaction
+  // TODO: fix
+  const lpFeeAmount = Number(amountIn) * 0.002
+  // TODO: use get_amount_out
+  const protocolFeeAmount = lpFeeAmount
+  const referralFeeAmount = Number(
+    payToRef ? payToRef.amount0Out || payToRef.amount1Out : 0,
+  )
+
+  const res = (function () {
+    const assetOutDelta = Number(amountOut)
+    const assetOutAmount =
+      assetOutDelta - (protocolFeeAmount + referralFeeAmount)
+    if (swapForY) {
+      return {
+        asset0Delta: -Number(amountIn),
+        asset0Amount: -Number(amountIn),
+        asset1Delta: assetOutDelta,
+        asset1Amount: assetOutAmount,
+      }
+    } else {
+      return {
+        asset0Delta: assetOutDelta,
+        asset0Amount: assetOutAmount,
+        asset1Delta: -Number(amountIn),
+        asset1Amount: -Number(amountIn),
+      }
+    }
+  })()
+  const { asset0Delta, asset0Amount, asset1Delta, asset1Amount } = res
+
+  await prisma.operation.create({
+    data: {
+      poolTxHash: poolTxHash,
+      poolAddress: pool.id,
+      routerAddress,
+      poolTxLt: Number(lt),
+      poolTxTimestamp: new Date(poolUtime * 1000),
+      destinationWalletAddress: toAddress,
+      operationType: 'swap',
+      exitCode: 'swap_ok',
+
+      // if swap is for Y, then asset0 is tokenX and asset1 is tokenY
+      asset0Address: tokenXAddress,
+      asset0Amount: String(asset0Amount),
+      asset0Delta: String(asset0Delta),
+      asset0Reserve: pool.reserveX,
+
+      asset1Address: tokenYAddress,
+      asset1Amount: String(asset1Amount),
+      asset1Delta: String(asset1Delta),
+      asset1Reserve: pool.reserveY,
+
+      lpTokenDelta: '0', // always 0 for swap
+      lpTokenSupply: pool.lpSupply, // TODO: check lpTSupply before or after
+
+      lpFeeAmount: String(lpFeeAmount),
+      protocolFeeAmount: String(protocolFeeAmount),
+      referralFeeAmount: String(referralFeeAmount),
+
+      walletAddress: walletTrace.transaction.in_msg?.source?.address,
+      walletTxLt: Number(walletTrace.transaction.lt),
+      walletTxHash: walletTrace.transaction.hash,
+      walletTxTimestamp: new Date(walletTrace.transaction.utime * 1000),
     },
   })
 
