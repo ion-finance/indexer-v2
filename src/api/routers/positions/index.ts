@@ -3,6 +3,7 @@ import prisma from '../../../clients/prisma'
 import { formatUnits } from 'ethers'
 import { PoolType } from '@prisma/client'
 import { USD_PRICE_OF_TON } from '../../../mocks/price'
+import { isSameAddress } from '../../../utils/address'
 const router = Router()
 
 router.get('/positions/:address', async function handler(req, res) {
@@ -63,8 +64,8 @@ router.get('/positions/:address', async function handler(req, res) {
     // Improve this to utilize blockchain data.
 
     const tonAddress = 'EQA86VCMKZu1HeSg04UqpY5rRIAG3UvgcptW8xC5VhB8btGn'
-    const isXisTon = tokenX?.id === tonAddress
-    const isYisTon = tokenY?.id === tonAddress
+    const isXisTon = isSameAddress(tokenX?.id, tonAddress)
+    const isYisTon = isSameAddress(tokenY?.id, tonAddress)
     const tonAmount = isXisTon ? xSum : isYisTon ? ySum : 0
     const totalPriceOfPool = (2 * tonAmount * USD_PRICE_OF_TON) / 10 ** 9
     const balanceUsd = (lpBalance * totalPriceOfPool) / totalLpAmount

@@ -55,3 +55,8 @@ export const changeSymbolOfProxyTon = (symbol: string) => {
   }
   return symbol
 }
+
+export const isSameAddress = (a?: string, b?: string) => {
+  if (!a || !b) return false
+  return Address.parse(a).equals(Address.parse(b))
+}

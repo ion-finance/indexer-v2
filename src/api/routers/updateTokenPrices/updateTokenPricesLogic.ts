@@ -2,6 +2,7 @@ import axios from 'axios'
 import prisma from '../../../clients/prisma'
 import { compact, filter, find, forEach, map, reduce } from 'lodash'
 import { Pool, Token } from '@prisma/client'
+import { isSameAddress } from '../../../utils/address'
 
 const getUSDPrice = (data: any) => data?.quote?.USD?.price || 0
 const getPrice = async () => {
@@ -41,22 +42,22 @@ const updateTokenPricesLogic = async () => {
   const poolHasTON = filter(
     pools,
     (pool) =>
-      pool.tokenXAddress === TON_WALLET_ADDRESS ||
-      pool.tokenYAddress === TON_WALLET_ADDRESS,
+      isSameAddress(pool.tokenXAddress, TON_WALLET_ADDRESS) ||
+      isSameAddress(pool.tokenYAddress, TON_WALLET_ADDRESS),
   )
   const poolNotHaveTON = filter(
     pools,
     (pool) =>
-      pool.tokenXAddress !== TON_WALLET_ADDRESS &&
-      pool.tokenYAddress !== TON_WALLET_ADDRESS,
+      !isSameAddress(pool.tokenXAddress, TON_WALLET_ADDRESS) &&
+      !isSameAddress(pool.tokenYAddress, TON_WALLET_ADDRESS),
   )
 
   const rawTokenPrices = map(poolHasTON, (pool) => {
     const tokenX = tokensMap[pool.tokenXAddress]
     const tokenY = tokensMap[pool.tokenYAddress]
     if (!tokenX || !tokenY) return
-    const xIsTON = tokenX.id === TON_WALLET_ADDRESS
-    const yIsTON = tokenX.id === TON_WALLET_ADDRESS
+    const xIsTON = isSameAddress(tokenX.id, TON_WALLET_ADDRESS)
+    const yIsTON = isSameAddress(tokenY.id, TON_WALLET_ADDRESS)
     if (!xIsTON && !yIsTON) return
 
     const quote = xIsTON ? tokenY : tokenX
