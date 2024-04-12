@@ -1,12 +1,12 @@
 openapi: 3.0.0
 info:
-  title: Coin Prices API
-  description: This API returns the latest coin prices
+  title: Token Prices API
+  description: This API returns the latest token prices
   version: '0.1.0'
 paths:
-  /coin-prices:
+  /token-prices:
     get:
-      summary: Get the latest coin prices
+      summary: Get the latest token prices
       responses:
         '200':
           description: OK
