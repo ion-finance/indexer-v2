@@ -165,6 +165,36 @@ model TokenPrice {
   price        String
 }
 
+model Operation {
+  id                        Int      @id @default(autoincrement())
+  poolTxHash                String   @unique
+  poolAddress               String?
+  routerAddress             String?
+  poolTxLt                  BigInt?
+  poolTxTimestamp           DateTime?
+  destinationWalletAddress  String?
+  operationType             String?
+  // success                   Boolean
+  exitCode                  String
+  asset0Address             String?
+  asset0Amount              String?
+  asset0Delta               String?
+  asset0Reserve             String?
+  asset1Address             String?
+  asset1Amount              String?
+  asset1Delta               String?
+  asset1Reserve             String?
+  lpTokenDelta              String?
+  lpTokenSupply             String?
+  lpFeeAmount               String?
+  protocolFeeAmount         String?
+  referralFeeAmount         String?
+  walletAddress             String?
+  walletTxLt                BigInt?
+  walletTxHash              String?   
+  walletTxTimestamp         DateTime?
+}
+
 // last block or tx data
 // heath check
 model IndexerState {
