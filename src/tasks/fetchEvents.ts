@@ -31,6 +31,7 @@ const fetchEvents = async () => {
       const parsedEvents = res.data.events.filter(
         (event: Event) => event.in_progress === false,
       ) as AccountEvent[]
+      // TODO: sort by timestamp
       events.push(...parsedEvents)
 
       if (parsedEvents.length >= 100) {

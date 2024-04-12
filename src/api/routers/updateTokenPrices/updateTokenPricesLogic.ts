@@ -1,7 +1,6 @@
 import axios from 'axios'
 import prisma from '../../../clients/prisma'
 import { compact, filter, find, forEach, map, reduce } from 'lodash'
-import { TON_WALLET_ADDRESS } from '../../../constant'
 import { Pool, Token } from '@prisma/client'
 
 const getUSDPrice = (data: any) => data?.quote?.USD?.price || 0
@@ -24,6 +23,7 @@ const getPrice = async () => {
 }
 
 const updateTokenPricesLogic = async () => {
+  const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS as string
   const pools = (await prisma.pool.findMany()) as Pool[]
   const tokens = (await prisma.token.findMany()) as Token[]
   const prices = await getPrice()
