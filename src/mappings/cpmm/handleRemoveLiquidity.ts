@@ -2,7 +2,11 @@ import { Event } from '../../types/events'
 import prisma from '../../clients/prisma'
 import parseRemoveLiquidity from '../../parsers/cpmm/parseRemoveLiquidity'
 import { AccountEvent, Trace } from '@/src/types/ton-api'
-import { findTracesByOpCode, parseRaw } from '../../utils/address'
+import {
+  findTracesByOpCode,
+  findTracesOfPool,
+  parseRaw,
+} from '../../utils/address'
 import { EXIT_CODE, OP } from '../../tasks/handleEvent/opCode'
 import { Cell } from '@ton/core'
 
@@ -59,6 +63,7 @@ export const handleRemoveLiquidity = async ({
   eventId: string
   traces: Trace
 }) => {
+  const routerAddress = process.env.ROUTER_ADDRESS || ''
   const { hash, utime } = traces.transaction
   const payToTrace = findTracesByOpCode(traces, OP.PAY_TO)?.[0]
   const burnNotificationTrace = findTracesByOpCode(
@@ -130,6 +135,47 @@ export const handleRemoveLiquidity = async ({
       amountX: String(amount0Out),
       amountY: String(amount1Out),
       timestamp: utime,
+    },
+  })
+
+  const walletTrace = traces
+  const poolTraces = findTracesOfPool(traces, poolAddress)
+  const poolTrace = burnNotificationTrace
+  const { tokenXAddress, tokenYAddress } = pool
+  const { hash: poolTxHash, lt, utime: poolUtime } = poolTrace.transaction
+
+  await prisma.operation.create({
+    data: {
+      poolTxHash: poolTxHash,
+      poolAddress: pool.id,
+      routerAddress,
+      poolTxLt: Number(lt),
+      poolTxTimestamp: new Date(poolUtime * 1000),
+      destinationWalletAddress: toAddress,
+      operationType: 'withdraw_liquidity',
+      exitCode: 'burn_ok',
+
+      asset0Address: tokenXAddress,
+      asset0Amount: String(-amount0Out),
+      asset0Delta: '0', // always 0 for withdraw
+      asset0Reserve: pool.reserveX,
+
+      asset1Address: tokenYAddress,
+      asset1Amount: String(-amount1Out),
+      asset1Delta: '0',
+      asset1Reserve: pool.reserveY,
+
+      lpTokenDelta: String(-burned),
+      lpTokenSupply: pool.lpSupply,
+
+      lpFeeAmount: '0', // always 0 for withdraw
+      protocolFeeAmount: '0',
+      referralFeeAmount: '0',
+
+      walletAddress: walletTrace.transaction.in_msg?.source?.address,
+      walletTxLt: Number(walletTrace.transaction.lt),
+      walletTxHash: walletTrace.transaction.hash,
+      walletTxTimestamp: new Date(walletTrace.transaction.utime * 1000),
     },
   })
 
