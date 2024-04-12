@@ -1,9 +1,15 @@
 import prisma from '../../clients/prisma'
-import { AccountEvent, Trace } from '../../types/ton-api'
-import { findTracesByOpCode, parseRaw } from '../../utils/address'
-import { Address, Cell } from '@ton/core'
+import { Trace } from '../../types/ton-api'
+import {
+  findTracesByOpCode,
+  findTracesOfPool,
+  isSameAddress,
+  parseRaw,
+} from '../../utils/address'
+import { Cell } from '@ton/core'
 import { upsertToken } from './upsertToken'
 import { OP } from '../../tasks/handleEvent/opCode'
+import { map } from 'lodash'
 
 const parseMint = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
@@ -51,6 +57,7 @@ export const handleAddLiquidity = async ({
   eventId: string
   traces: Trace
 }) => {
+  const routerAddress = process.env.ROUTER_ADDRESS || ''
   const cbAddLiquidityTrace = findTracesByOpCode(
     traces,
     OP.CB_ADD_LIQUIDITY,
@@ -199,6 +206,48 @@ export const handleAddLiquidity = async ({
       },
     })
   }
+
+  const poolTraces = findTracesOfPool(traces, poolAddress)
+  const walletTrace = traces
+
+  await Promise.all(
+    map(poolTraces, async (trace) => {
+      const { hash, lt, utime, in_msg } = trace.transaction
+      const isFromRouter = isSameAddress(in_msg?.source?.address, routerAddress)
+      const operationType = isFromRouter ? 'send_liquidity' : 'add_liquidity'
+      const exitCode = isFromRouter ? 'provide_liquidity_ok' : 'mint_ok'
+      const lpTokenDelta = exitCode === 'mint_ok' ? String(minted) : '0'
+      await prisma.operation.create({
+        data: {
+          poolTxHash: hash,
+          poolAddress: pool.id,
+          routerAddress,
+          poolTxLt: Number(lt),
+          poolTxTimestamp: new Date(utime * 1000),
+          destinationWalletAddress: userAddress, // TODO: check.
+          operationType,
+          exitCode,
+          asset0Address: tokenXAddress,
+          asset0Amount: amountX,
+          asset0Delta: '0',
+          asset0Reserve: pool.reserveX,
+          asset1Address: tokenYAddress,
+          asset1Amount: amountY,
+          asset1Delta: '0',
+          asset1Reserve: pool.reserveY,
+          lpTokenDelta,
+          lpTokenSupply: pool.lpSupply, // TODO: check lpTSupply before or after
+          lpFeeAmount: '0',
+          protocolFeeAmount: '0',
+          referralFeeAmount: '0',
+          walletAddress: walletTrace.transaction.in_msg?.source?.address,
+          walletTxLt: Number(walletTrace.transaction.lt),
+          walletTxHash: walletTrace.transaction.hash,
+          walletTxTimestamp: new Date(walletTrace.transaction.utime * 1000),
+        },
+      })
+    }),
+  )
 }
 
 export default handleAddLiquidity

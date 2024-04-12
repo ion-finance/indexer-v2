@@ -34,6 +34,33 @@ export const findTracesByOpCode = (
   return result
 }
 
+// traces which receiver is pool
+export const findTracesOfPool = (
+  trace: Trace,
+  poolAddress: string,
+): Trace[] | null => {
+  const result = []
+  // Check if the current transaction's op_code matches the given opCode.
+  const destinationAddress = trace.transaction.in_msg?.destination?.address
+  if (isSameAddress(destinationAddress, poolAddress)) {
+    result.push(trace)
+  }
+
+  // If the current trace has children, iterate over them and recursively search for the opCode.
+  if (trace.children) {
+    for (const child of trace.children) {
+      const childResults = findTracesOfPool(child, poolAddress) // Collect results from children
+      if (childResults) {
+        result.push(...childResults) // Merge child results into the current result set
+      }
+    }
+  }
+  if (result.length === 0) {
+    return null
+  }
+  return result
+}
+
 export const sortByAddress = (addresses: Address[]) =>
   sortBy(addresses, (address) =>
     BigInt(
