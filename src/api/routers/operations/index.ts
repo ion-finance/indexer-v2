@@ -10,7 +10,14 @@ router.get('/operations', async function handler(req, res) {
     until,
     poolAddress,
     destinationWalletAddress,
+    operationType,
   } = req.query
+  const validOperationTypes = [
+    'add_liquidity',
+    'send_liquidity',
+    'swap',
+    'withdraw_liquidity',
+  ]
 
   const numberRegex = /^[0-9]+$/
 
@@ -37,6 +44,11 @@ router.get('/operations', async function handler(req, res) {
     return res.status(400).end()
   }
 
+  if (operationType && !validOperationTypes.includes(String(operationType))) {
+    console.warn('Invalid operation type:', operationType)
+    return res.status(400).end()
+  }
+
   const gte = since ? new Date(String(since)) : undefined
   const lte = until ? new Date(String(until)) : undefined
   const skip = parseInt(String(page)) || 0
@@ -52,6 +64,7 @@ router.get('/operations', async function handler(req, res) {
       destinationWalletAddress: destinationWalletAddress
         ? String(destinationWalletAddress)
         : undefined,
+      operationType: operationType ? String(operationType) : undefined,
     },
     orderBy: {
       poolTxTimestamp: 'asc',
