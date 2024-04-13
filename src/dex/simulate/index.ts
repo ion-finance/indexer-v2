@@ -7,7 +7,7 @@ import {
 } from './utils'
 import { LP_FEE, PROTOCOL_FEE, REF_FEE } from './contant'
 
-interface SwapSimulateRequest {
+export type SwapSimulateRequest = {
   offerAddress: string
   askAddress: string
   units: number
@@ -15,7 +15,7 @@ interface SwapSimulateRequest {
   referralAddress?: string
 }
 
-interface SwapSimulateResponse {
+type SwapSimulateResponse = {
   askAddress: string
   askUnits: number
   feeAddress: string
@@ -32,7 +32,7 @@ interface SwapSimulateResponse {
   tonFeeUnits: number
 }
 
-async function simulateSwap(
+export async function simulateSwap(
   swapData: SwapSimulateRequest,
 ): Promise<SwapSimulateResponse | null> {
   const routerAddress = process.env.ROUTER_ADDRESS || ''
@@ -43,20 +43,18 @@ async function simulateSwap(
     units,
     referralAddress,
   } = swapData
-  const pool = await Promise.race([
-    prisma.pool.findFirst({
-      where: {
-        tokenXAddress: askAddress,
-        tokenYAddress: offerAddress,
-      },
-    }),
-    prisma.pool.findFirst({
-      where: {
-        tokenXAddress: offerAddress,
-        tokenYAddress: askAddress,
-      },
-    }),
-  ])
+  const pool = await prisma.pool.findFirst({
+    where: {
+      OR: [
+        {
+          AND: [{ tokenXAddress: askAddress }, { tokenYAddress: offerAddress }],
+        },
+        {
+          AND: [{ tokenXAddress: offerAddress }, { tokenYAddress: askAddress }],
+        },
+      ],
+    },
+  })
   if (!pool) {
     console.warn('Pool not found.')
     return null

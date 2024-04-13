@@ -1,5 +1,5 @@
-import prisma from '@/src/clients/prisma'
-import { isSameAddress } from '@/src/utils/address'
+import prisma from '../../../src/clients/prisma'
+import { isSameAddress } from '../../../src/utils/address'
 import { Token } from '@prisma/client'
 import { FEE_DIVIDER } from './contant'
 
