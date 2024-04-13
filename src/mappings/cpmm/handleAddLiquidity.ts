@@ -217,13 +217,14 @@ export const handleAddLiquidity = async ({
       const operationType = isFromRouter ? 'send_liquidity' : 'add_liquidity'
       const exitCode = isFromRouter ? 'provide_liquidity_ok' : 'mint_ok'
       const lpTokenDelta = exitCode === 'mint_ok' ? String(minted) : '0'
+
       await prisma.operation.create({
         data: {
           poolTxHash: hash,
           poolAddress: pool.id,
           routerAddress,
-          poolTxLt: Number(lt),
-          poolTxTimestamp: new Date(utime * 1000),
+          poolTxLt: String(lt),
+          poolTxTimestamp: new Date(utime * 1000).toISOString(),
           destinationWalletAddress: userAddress, // TODO: check.
           operationType,
           exitCode,
@@ -241,9 +242,11 @@ export const handleAddLiquidity = async ({
           protocolFeeAmount: '0',
           referralFeeAmount: '0',
           walletAddress: walletTrace.transaction.in_msg?.source?.address,
-          walletTxLt: Number(walletTrace.transaction.lt),
+          walletTxLt: String(walletTrace.transaction.lt),
           walletTxHash: walletTrace.transaction.hash,
-          walletTxTimestamp: new Date(walletTrace.transaction.utime * 1000),
+          walletTxTimestamp: new Date(
+            walletTrace.transaction.utime * 1000,
+          ).toISOString(),
         },
       })
     }),

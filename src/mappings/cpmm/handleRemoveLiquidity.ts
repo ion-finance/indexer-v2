@@ -149,8 +149,8 @@ export const handleRemoveLiquidity = async ({
       poolTxHash: poolTxHash,
       poolAddress: pool.id,
       routerAddress,
-      poolTxLt: Number(lt),
-      poolTxTimestamp: new Date(poolUtime * 1000),
+      poolTxLt: String(lt),
+      poolTxTimestamp: new Date(poolUtime * 1000).toISOString(),
       destinationWalletAddress: toAddress,
       operationType: 'withdraw_liquidity',
       exitCode: 'burn_ok',
@@ -173,9 +173,11 @@ export const handleRemoveLiquidity = async ({
       referralFeeAmount: '0',
 
       walletAddress: walletTrace.transaction.in_msg?.source?.address,
-      walletTxLt: Number(walletTrace.transaction.lt),
+      walletTxLt: String(walletTrace.transaction.lt),
       walletTxHash: walletTrace.transaction.hash,
-      walletTxTimestamp: new Date(walletTrace.transaction.utime * 1000),
+      walletTxTimestamp: new Date(
+        walletTrace.transaction.utime * 1000,
+      ).toISOString(),
     },
   })
 

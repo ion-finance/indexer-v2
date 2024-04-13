@@ -218,8 +218,8 @@ export const handleExchange = async ({
       poolTxHash: poolTxHash,
       poolAddress: pool.id,
       routerAddress,
-      poolTxLt: Number(lt),
-      poolTxTimestamp: new Date(poolUtime * 1000),
+      poolTxLt: String(lt),
+      poolTxTimestamp: new Date(poolUtime * 1000).toISOString(), // save timestamp in UTC+0
       destinationWalletAddress: toAddress,
       operationType: 'swap',
       exitCode: 'swap_ok',
@@ -243,9 +243,11 @@ export const handleExchange = async ({
       referralFeeAmount: String(referralFeeAmount),
 
       walletAddress: walletTrace.transaction.in_msg?.source?.address,
-      walletTxLt: Number(walletTrace.transaction.lt),
+      walletTxLt: String(walletTrace.transaction.lt),
       walletTxHash: walletTrace.transaction.hash,
-      walletTxTimestamp: new Date(walletTrace.transaction.utime * 1000),
+      walletTxTimestamp: new Date(
+        walletTrace.transaction.utime * 1000,
+      ).toISOString(),
     },
   })
 
