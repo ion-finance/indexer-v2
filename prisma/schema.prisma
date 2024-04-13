@@ -170,7 +170,7 @@ model Operation {
   poolTxHash                String   @unique
   poolAddress               String?
   routerAddress             String?
-  poolTxLt                  BigInt?
+  poolTxLt                  String?
   poolTxTimestamp           DateTime?
   destinationWalletAddress  String?
   operationType             String?
@@ -190,7 +190,7 @@ model Operation {
   protocolFeeAmount         String?
   referralFeeAmount         String?
   walletAddress             String?
-  walletTxLt                BigInt?
+  walletTxLt                String?
   walletTxHash              String?   
   walletTxTimestamp         DateTime?
 }

@@ -20,7 +20,7 @@ export interface OutMessage {
 
 export interface Transaction {
   hash: string
-  lt: string
+  lt: number
   account: AccountAddress
   success: boolean
   utime: number
