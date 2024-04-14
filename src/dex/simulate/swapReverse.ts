@@ -2,13 +2,13 @@ import prisma from 'src/clients/prisma'
 import { Token } from '@prisma/client'
 import {
   calculateFeeInNanotons,
-  calculateOutAmount,
+  calculateInAmount,
   calculatePriceImpact,
 } from './utils'
-import { LP_FEE, PROTOCOL_FEE, REF_FEE } from './contant'
+import { FEE_DIVIDER, LP_FEE, PROTOCOL_FEE, REF_FEE } from './contant'
 import { SwapSimulateRequest, SwapSimulateResponse } from './type'
 
-export async function simulateSwap(
+export async function simulateSwapReverse(
   swapData: SwapSimulateRequest,
 ): Promise<SwapSimulateResponse | null> {
   const routerAddress = process.env.ROUTER_ADDRESS || ''
@@ -46,53 +46,57 @@ export async function simulateSwap(
 
   const reserveX = Number(pool.reserveX)
   const reserveY = Number(pool.reserveY)
-  const amountIn = units
+  const amountOut = units
   const hasRef = !!referralAddress
   const swapForY = pool.tokenXAddress === offerAddress
   const [reserveIn, reserveOut] = swapForY
     ? [reserveX, reserveY]
     : [reserveY, reserveX]
 
-  const {
-    out: askUnits,
-    protocolFeeOut,
-    refFeeOut,
-  } = calculateOutAmount({
-    amountIn,
+  const offerUnits = calculateInAmount({
     hasRef,
+    amountOut,
+    reserveIn,
+    reserveOut,
     lpFee: LP_FEE,
     protocolFee: PROTOCOL_FEE,
     refFee: REF_FEE,
-    reserveIn,
-    reserveOut,
+    slippageTolerance,
   })
 
   const priceImpact = calculatePriceImpact({
-    amountIn,
+    amountIn: offerUnits,
     reserveIn,
   })
 
-  const minAskUnits =
-    askUnits > 0 ? Math.floor(askUnits * (1 - slippageTolerance)) : 0
-  const swapRate = amountIn > 0 ? askUnits / amountIn : 0
-  const feePercent = askUnits > 0 ? (protocolFeeOut + refFeeOut) / askUnits : 0
+  const minAskUnits = units
+
+  const swapRate = offerUnits > 0 ? units / offerUnits : 0
+
+  // TODO: check
+  const protocolFeeOut =
+    amountOut * (FEE_DIVIDER / (FEE_DIVIDER - PROTOCOL_FEE)) * PROTOCOL_FEE
+  const refFeeOut =
+    amountOut * (FEE_DIVIDER / (FEE_DIVIDER - REF_FEE)) * REF_FEE
+  const feePercent =
+    minAskUnits > 0 ? (protocolFeeOut + refFeeOut) / minAskUnits : 0
 
   const offerToken = swapForY ? tokenX : tokenY
   const feeNanotons = await calculateFeeInNanotons({
-    offerAmount: amountIn,
+    offerAmount: offerUnits,
     offerToken,
     feePercent,
   })
 
   return {
     askAddress: askAddress,
-    askUnits: askUnits,
+    askUnits: minAskUnits,
     feeAddress: askAddress,
     feePercent: feePercent,
     feeUnits: protocolFeeOut + refFeeOut,
     minAskUnits: minAskUnits,
     offerAddress: offerAddress,
-    offerUnits: amountIn,
+    offerUnits: offerUnits,
     poolAddress: pool.id,
     priceImpact: priceImpact,
     routerAddress,

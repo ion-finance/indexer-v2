@@ -1,7 +1,8 @@
 import prisma from 'src/clients/prisma'
 import { isSameAddress } from 'src/utils/address'
 import { Token } from '@prisma/client'
-import { FEE_DIVIDER } from './contant'
+import { FEE_DIVIDER, LP_FEE } from './contant'
+import { has } from 'lodash'
 
 export const calculatePriceImpact = ({
   amountIn,
@@ -57,6 +58,47 @@ export const calculateOutAmount = ({
     protocolFeeOut: Math.floor(protocolFeeOut),
     refFeeOut: Math.floor(refFeeOut),
   }
+}
+
+export const calculateInAmount = ({
+  hasRef,
+  amountOut,
+  reserveIn,
+  reserveOut,
+  lpFee,
+  protocolFee,
+  refFee,
+  slippageTolerance,
+}: {
+  hasRef: boolean
+  amountOut: number
+  reserveIn: number
+  reserveOut: number
+  lpFee: number
+  protocolFee: number
+  refFee: number
+  slippageTolerance: number
+}): number => {
+  if (amountOut <= 0) {
+    return Number(Infinity)
+  }
+  // amountOut should be large for protocolFee, refFee
+  const fee = hasRef ? protocolFee + refFee : protocolFee
+  const amountOutBeforeFee = (amountOut * FEE_DIVIDER) / (FEE_DIVIDER - fee)
+
+  if (reserveOut <= amountOutBeforeFee) {
+    console.warn('Not enough reserve')
+    return Number(Infinity)
+  }
+
+  const numerator = reserveIn * amountOutBeforeFee
+  const denominator =
+    ((reserveOut - amountOutBeforeFee) * (FEE_DIVIDER - lpFee)) / FEE_DIVIDER
+
+  const amountAfterFee = numerator / denominator + 1
+  const amountIn = (amountAfterFee * FEE_DIVIDER) / (FEE_DIVIDER - lpFee)
+  const amountInWithSlippage = amountIn * (1 + slippageTolerance) // slippage applied to amountIn
+  return Math.floor(amountInWithSlippage)
 }
 
 export async function calculateFeeInNanotons({
