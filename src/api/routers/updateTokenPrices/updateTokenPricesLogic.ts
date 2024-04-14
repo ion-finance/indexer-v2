@@ -1,8 +1,8 @@
 import axios from 'axios'
-import prisma from '../../../clients/prisma'
+import prisma from 'src/clients/prisma'
 import { compact, filter, find, forEach, map, reduce } from 'lodash'
 import { Pool, Token } from '@prisma/client'
-import { isSameAddress } from '../../../utils/address'
+import { isSameAddress } from 'src/utils/address'
 
 const getUSDPrice = (data: any) => data?.quote?.USD?.price || 0
 const getPrice = async () => {

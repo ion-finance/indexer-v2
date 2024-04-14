@@ -1,5 +1,5 @@
 import { Event } from '../../types/events'
-import prisma from '../../clients/prisma'
+import prisma from 'src/clients/prisma'
 import parseSwap from '../../parsers/clmm/parseSwap'
 
 const handleSwap = async (event: Event) => {

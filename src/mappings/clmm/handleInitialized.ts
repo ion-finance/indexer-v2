@@ -1,7 +1,7 @@
-import prisma from '../../clients/prisma'
+import prisma from 'src/clients/prisma'
 import { Event } from '../../types/events'
 import parseInitialized from '../../parsers/clmm/parseInitialized'
-import fetchTokenData from '../../utils/fetchTokenData'
+import fetchTokenData from 'src/utils/fetchTokenData'
 
 const handleInitialized = async (event: Event) => {
   const params = parseInitialized(event.body)

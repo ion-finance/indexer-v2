@@ -1,5 +1,5 @@
 import router from '../pools'
-import prisma from '../../../clients/prisma'
+import prisma from 'src/clients/prisma'
 
 router.get('/traces/:trace_hash', async function handler(req, res) {
   const { trace_hash } = req.params

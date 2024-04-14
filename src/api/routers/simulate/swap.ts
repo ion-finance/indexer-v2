@@ -1,4 +1,4 @@
-import { SwapSimulateRequest, simulateSwap } from '../../../../src/dex/simulate'
+import { SwapSimulateRequest, simulateSwap } from 'src/dex/simulate'
 import { Request, Response, NextFunction, Router } from 'express'
 import { query, validationResult } from 'express-validator'
 

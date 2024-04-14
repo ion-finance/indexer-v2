@@ -2,13 +2,13 @@ import dotenv from 'dotenv'
 import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'
 import handleEventCLMM from './tasks/handleEventCLMM'
-import prisma from './clients/prisma'
-import sleep from './utils/sleep'
-import api from './api'
+import prisma from 'src/clients/prisma'
+import api from 'src/api'
 import * as Sentry from '@sentry/node'
 import { toLocaleString } from './utils/date'
 import axios from 'axios'
 import { Trace } from './types/ton-api'
+import sleep from './utils/sleep'
 
 dotenv.config()
 

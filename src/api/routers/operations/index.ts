@@ -1,5 +1,5 @@
+import prisma from 'src/clients/prisma'
 import { NextFunction, Request, Response, Router } from 'express'
-import prisma from '../../../clients/prisma'
 import { query, validationResult } from 'express-validator'
 
 const router = Router()

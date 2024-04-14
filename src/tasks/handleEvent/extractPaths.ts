@@ -1,6 +1,6 @@
 import { Address } from '@ton/core'
 import { Trace } from '../../types/ton-api'
-import { parseRaw } from '../../utils/address'
+import { parseRaw } from 'src/utils/address'
 import dotenv from 'dotenv'
 import { CustomOP, OP, Ops } from './opCode'
 import { routerAddress } from '../../address'

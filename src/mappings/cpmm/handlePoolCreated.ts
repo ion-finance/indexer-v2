@@ -1,5 +1,5 @@
-import prisma from '../../clients/prisma'
-import fetchTokenData from '../../utils/fetchTokenData'
+import prisma from 'src/clients/prisma'
+import fetchTokenData from 'src/utils/fetchTokenData'
 import { PoolType } from '@prisma/client'
 import { Trace } from '../../types/ton-api'
 import { Cell, address } from '@ton/core'
@@ -9,8 +9,8 @@ import {
   findTracesByOpCode,
   parseRaw,
   sortByAddress,
-} from '../../utils/address'
-import { OP } from '../../tasks/handleEvent/opCode'
+} from 'src/utils/address'
+import { OP } from 'src/tasks/handleEvent/opCode'
 const parseTransferNotification = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
   const body = message.beginParse()

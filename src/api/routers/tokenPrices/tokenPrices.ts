@@ -1,5 +1,5 @@
 import router from '../pools'
-import prisma from '../../../clients/prisma'
+import prisma from 'src/clients/prisma'
 import { TokenPrice } from '@prisma/client'
 
 router.get('/token-prices', async function handler(req, res) {

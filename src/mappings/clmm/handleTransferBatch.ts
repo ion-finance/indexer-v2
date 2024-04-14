@@ -1,5 +1,5 @@
 import { Event } from '../../types/events'
-import prisma from '../../clients/prisma'
+import prisma from 'src/clients/prisma'
 import { Prisma } from '@prisma/client'
 import parseTransferBatch from '../../parsers/clmm/parseTransferBatch'
 import _ from 'lodash'

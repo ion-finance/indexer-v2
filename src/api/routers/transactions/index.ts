@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import prisma from '../../../clients/prisma'
+import prisma from 'src/clients/prisma'
 import { Prisma } from '@prisma/client'
 import _ from 'lodash'
 

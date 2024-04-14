@@ -1,5 +1,5 @@
 import { Event } from '../../types/events'
-import prisma from '../../clients/prisma'
+import prisma from 'src/clients/prisma'
 import parseDepositedToBins from '../../parsers/clmm/parseDepositedToBins'
 
 const handleDepositedToBins = async (event: Event) => {

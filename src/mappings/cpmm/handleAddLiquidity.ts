@@ -1,15 +1,15 @@
-import prisma from '../../clients/prisma'
-import { Trace } from '../../types/ton-api'
+import prisma from 'src/clients/prisma'
+import { Trace } from 'src/types/ton-api'
 import {
   findTracesByOpCode,
   findTracesOfPool,
   isSameAddress,
   parseRaw,
-} from '../../utils/address'
+} from 'src/utils/address'
 import { Cell } from '@ton/core'
 import { upsertToken } from './upsertToken'
-import { OP } from '../../tasks/handleEvent/opCode'
 import { map } from 'lodash'
+import { OP } from 'src/tasks/handleEvent/opCode'
 
 const parseMint = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]

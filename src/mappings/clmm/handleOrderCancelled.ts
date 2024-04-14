@@ -1,5 +1,5 @@
 import { Event } from '../../types/events'
-import prisma from '../../clients/prisma'
+import prisma from 'src/clients/prisma'
 import { OrderType } from '@prisma/client'
 import parseOrder from '../../parsers/clmm/parseOrder'
 

@@ -1,13 +1,11 @@
-import { Event } from '../../types/events'
-import prisma from '../../clients/prisma'
-import parseRemoveLiquidity from '../../parsers/cpmm/parseRemoveLiquidity'
-import { AccountEvent, Trace } from '@/src/types/ton-api'
+import prisma from 'src/clients/prisma'
+import { OP } from 'src/tasks/handleEvent/opCode'
+import { Trace } from 'src/types/ton-api'
 import {
   findTracesByOpCode,
   findTracesOfPool,
   parseRaw,
-} from '../../utils/address'
-import { EXIT_CODE, OP } from '../../tasks/handleEvent/opCode'
+} from 'src/utils/address'
 import { Cell } from '@ton/core'
 
 const parseBurnNotification = (raw_body: string) => {

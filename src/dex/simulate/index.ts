@@ -1,4 +1,4 @@
-import prisma from '../../clients/prisma'
+import prisma from 'src/clients/prisma'
 import { Token } from '@prisma/client'
 import {
   calculateFeeInNanotons,
