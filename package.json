@@ -6,8 +6,9 @@
     "clean": "rimraf ./build",
     "build": "npm-run-all format lint clean && tsc",
     "start": "node build/src",
-    "local": "ts-node src",
-    "local:watch": "nodemon src -e ts,json --exec 'npm run local'",
+    "ts-node": "ts-node -r tsconfig-paths/register ./src/index.ts",
+    "local": "ts-node -r tsconfig-paths/register src",
+    "local:watch": "nodmon src -e ts,json --exec 'npm run local'",
     "local:watch-all": "nodemon -e yaml --exec 'ts-node' src/index.ts",
     "lint": "eslint src",
     "format": "npx prettier --write src",
@@ -54,6 +55,7 @@
     "tonweb": "^0.0.66",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^4.9.5"
   },
   "dependencies": {
