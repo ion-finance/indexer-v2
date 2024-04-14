@@ -1,6 +1,7 @@
-import { SwapSimulateRequest, simulateSwap } from 'src/dex/simulate'
+import { simulateSwap } from 'src/dex/simulate/swap'
 import { Request, Response, NextFunction, Router } from 'express'
 import { query, validationResult } from 'express-validator'
+import { SwapSimulateRequest } from 'src/dex/simulate/type'
 
 const router = Router()
 
