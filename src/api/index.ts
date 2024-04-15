@@ -18,6 +18,7 @@ import updateTokenPricesLogic from './routers/updateTokenPrices/updateTokenPrice
 import manualCPMMTraceRouter from './routers/manualCPMMTrace'
 import operationsRouter from './routers/operations'
 import simulateSwapRouter from './routers/simulate/swap'
+import simulateSwapReverseRouter from './routers/simulate/swapReverse'
 
 const swaggerOptions = {
   definition: {
@@ -50,6 +51,7 @@ api.use(traceRouter)
 api.use(manualCPMMTraceRouter)
 api.use(operationsRouter)
 api.use(simulateSwapRouter)
+api.use(simulateSwapReverseRouter)
 api.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec))
 
 // every 1 min
