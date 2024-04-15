@@ -2,6 +2,13 @@ import { Cell } from '@ton/core'
 import { find } from 'lodash'
 
 import prisma from 'src/clients/prisma'
+import {
+  FEE_DIVIDER,
+  LP_FEE,
+  PROTOCOL_FEE,
+  REF_FEE,
+} from 'src/dex/simulate/contant'
+import { calculateOutAmount } from 'src/dex/simulate/utils'
 import { Trace } from 'src/types/ton-api'
 import { findTracesByOpCode, parseRaw } from 'src/utils/address'
 
@@ -185,10 +192,17 @@ export const handleExchange = async ({
     lt,
     utime: poolUtime,
   } = payToNormalTrace.transaction
-  // TODO: fix
-  const lpFeeAmount = Number(amountIn) * 0.002
-  // TODO: use get_amount_out
-  const protocolFeeAmount = lpFeeAmount
+  const { protocolFeeOut } = calculateOutAmount({
+    amountIn: Number(amountIn),
+    hasRef: !!payToRef,
+    lpFee: LP_FEE,
+    protocolFee: PROTOCOL_FEE,
+    refFee: REF_FEE,
+    reserveIn: swapForY ? Number(pool.reserveX) : Number(pool.reserveY),
+    reserveOut: swapForY ? Number(pool.reserveY) : Number(pool.reserveX),
+  })
+  const lpFeeAmount = (Number(amountIn) * LP_FEE) / FEE_DIVIDER
+  const protocolFeeAmount = protocolFeeOut
   const referralFeeAmount = Number(
     payToRef ? payToRef.amount0Out || payToRef.amount1Out : 0,
   )
@@ -255,13 +269,21 @@ export const handleExchange = async ({
 
   let reserveX = BigInt(pool.reserveX)
   let reserveY = BigInt(pool.reserveY)
+  let collectedXProtocolFee = BigInt(pool.collectedXProtocolFee)
+  let collectedYProtocolFee = BigInt(pool.collectedYProtocolFee)
+
+  // !NOTE: Use amountOut, referralFeeAmount of block data, not simulated one.
+  const out =
+    BigInt(amountOut) + BigInt(protocolFeeAmount) + BigInt(referralFeeAmount)
 
   if (swapForY) {
     reserveX = reserveX + BigInt(amountIn)
-    reserveY = reserveY - BigInt(amountOut)
+    reserveY = reserveY - out
+    collectedYProtocolFee = collectedYProtocolFee + BigInt(protocolFeeAmount)
   } else {
-    reserveX = reserveX - BigInt(amountOut)
+    reserveX = reserveX - out
     reserveY = reserveY + BigInt(amountIn)
+    collectedXProtocolFee = collectedXProtocolFee + BigInt(protocolFeeAmount)
   }
 
   await prisma.pool.update({
@@ -271,6 +293,8 @@ export const handleExchange = async ({
     data: {
       reserveX: reserveX.toString(),
       reserveY: reserveY.toString(),
+      collectedXProtocolFee: collectedXProtocolFee.toString(),
+      collectedYProtocolFee: collectedYProtocolFee.toString(),
     },
   })
 }

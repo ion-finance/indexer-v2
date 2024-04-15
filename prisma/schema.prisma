@@ -28,6 +28,8 @@ model Pool {
   reserveX      String   @default("0")
   reserveY      String   @default("0")
   lpSupply      String   @default("0")
+  collectedXProtocolFee String @default("0")
+  collectedYProtocolFee String @default("0")
 }
 
 model Token {
