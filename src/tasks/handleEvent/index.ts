@@ -72,6 +72,7 @@ const handleEvent = async (eventId: string, traces: Trace) => {
     console.log(`Provide Lp Confirmed: ${eventId}`)
     await handleAddLiquidity({ eventId, traces })
   } else if (isRemoveLiquidity) {
+    console.log(`Remove Liquidity event: ${eventId}`)
     await handleRemoveLiquidity({ eventId, traces })
   }
 
