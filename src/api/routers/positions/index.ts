@@ -61,11 +61,8 @@ router.get('/positions/:address', async function handler(req, res) {
       0,
     )
 
-    // TODO: remove this.
-    // Write all the balance and price using database is too unrealistic.
-    // Improve this to utilize blockchain data.
-
-    const tonAddress = 'EQA86VCMKZu1HeSg04UqpY5rRIAG3UvgcptW8xC5VhB8btGn'
+    // TODO: fix , consider the case when tokenX or tokenY is TON
+    const tonAddress = process.env.TON_WALLET_ADDRESS || ''
     const isXisTon = isSameAddress(tokenX?.id, tonAddress)
     const isYisTon = isSameAddress(tokenY?.id, tonAddress)
     const tonAmount = isXisTon ? xSum : isYisTon ? ySum : 0

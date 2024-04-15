@@ -47,7 +47,7 @@ router.get('/pools', async function handler(req, res) {
         reserveY: poolBins
           .reduce((acc, bin) => acc + BigInt(bin.reserveY), BigInt(0))
           .toString(),
-        totalSupply: '2550988259892', // TODO
+        totalSupply: pool.lpSupply,
       }
     } else {
       reserveData = {

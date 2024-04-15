@@ -39,7 +39,6 @@ function extractPaths(node: Trace): Ops[][] {
         const destinationAddress = parseRaw(
           transaction.in_msg?.destination?.address,
         )
-        // TODO: consider case of router jetton wallet deploy
         if (
           Address.parse(destinationAddress).equals(Address.parse(routerAddress))
         ) {

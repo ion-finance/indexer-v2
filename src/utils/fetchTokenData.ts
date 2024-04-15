@@ -8,10 +8,8 @@ const fetchTokenData = async (walletAddress: string) => {
   const jettonWallet = ton.open(
     JettonWallet.create(Address.parse(walletAddress)),
   )
-  // TODO jettonWallet can be null
-  const data = await jettonWallet.getWalletData()
-
   try {
+    const data = await jettonWallet.getWalletData()
     const res = await axios.get(
       `${process.env.TON_API_URL}/jettons/${data?.minter}`,
       {

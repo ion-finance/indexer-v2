@@ -227,7 +227,7 @@ export const handleAddLiquidity = async ({
           routerAddress,
           poolTxLt: String(lt),
           poolTxTimestamp: new Date(utime * 1000).toISOString(),
-          destinationWalletAddress: userAddress, // TODO: check.
+          destinationWalletAddress: to ? to.toString() : '',
           operationType,
           exitCode,
           asset0Address: tokenXAddress,
