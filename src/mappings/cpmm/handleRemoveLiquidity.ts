@@ -1,3 +1,5 @@
+import { Cell } from '@ton/core'
+
 import prisma from 'src/clients/prisma'
 import { OP } from 'src/tasks/handleEvent/opCode'
 import { Trace } from 'src/types/ton-api'
@@ -6,7 +8,6 @@ import {
   findTracesOfPool,
   parseRaw,
 } from 'src/utils/address'
-import { Cell } from '@ton/core'
 
 const parseBurnNotification = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]

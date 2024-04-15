@@ -1,5 +1,5 @@
-import { Router } from 'express'
 import dotenv from 'dotenv'
+import { Router } from 'express'
 dotenv.config()
 
 const router = Router()

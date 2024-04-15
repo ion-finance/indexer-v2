@@ -1,7 +1,8 @@
 import { Address } from '@ton/ton'
+import axios from 'axios'
+
 import ton from '../clients/ton'
 import { JettonWallet } from '../wrappers/JettonWallet'
-import axios from 'axios'
 
 const fetchTokenData = async (walletAddress: string) => {
   const jettonWallet = ton.open(

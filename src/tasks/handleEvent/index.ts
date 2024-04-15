@@ -1,12 +1,12 @@
-import { Trace } from '../../types/ton-api'
-
 import {
   handleAddLiquidity,
   handleExchange,
   handlePoolCreated,
   handleRemoveLiquidity,
   // handleRemoveLiquidity,
-} from '../../mappings/cpmm'
+} from 'src/mappings/cpmm'
+import { Trace } from 'src/types/ton-api'
+
 import extractPaths from './extractPaths'
 import { CustomOP, OP } from './opCode'
 import type { Ops } from './opCode'

@@ -1,7 +1,8 @@
-import { Router } from 'express'
-import prisma from 'src/clients/prisma'
 import { Prisma } from '@prisma/client'
+import { Router } from 'express'
 import { orderBy } from 'lodash'
+
+import prisma from 'src/clients/prisma'
 
 const router = Router()
 

@@ -1,8 +1,10 @@
-import { Event } from '../../types/events'
-import prisma from 'src/clients/prisma'
 import { Prisma } from '@prisma/client'
-import parseTransferBatch from '../../parsers/clmm/parseTransferBatch'
 import _ from 'lodash'
+
+import prisma from 'src/clients/prisma'
+
+import parseTransferBatch from '../../parsers/clmm/parseTransferBatch'
+import { Event } from '../../types/events'
 
 const handleTransferBatch = async (event: Event) => {
   console.log('TransferBatch event is indexed.')

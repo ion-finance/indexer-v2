@@ -1,9 +1,11 @@
 import { Cell } from '@ton/core'
-import { findTracesByOpCode, parseRaw } from 'src/utils/address'
-import { EXIT_CODE, OP } from '../../tasks/handleEvent/opCode'
 import { find } from 'lodash'
-import { Trace } from 'src/types/ton-api'
+
 import prisma from 'src/clients/prisma'
+import { Trace } from 'src/types/ton-api'
+import { findTracesByOpCode, parseRaw } from 'src/utils/address'
+
+import { EXIT_CODE, OP } from '../../tasks/handleEvent/opCode'
 
 const parseSwap = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]

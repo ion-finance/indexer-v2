@@ -1,12 +1,14 @@
-import prisma from 'src/clients/prisma'
 import { Token } from '@prisma/client'
+
+import prisma from 'src/clients/prisma'
+
+import { FEE_DIVIDER, LP_FEE, PROTOCOL_FEE, REF_FEE } from './contant'
+import { SwapSimulateRequest, SwapSimulateResponse } from './type'
 import {
   calculateFeeInNanotons,
   calculateInAmount,
   calculatePriceImpact,
 } from './utils'
-import { FEE_DIVIDER, LP_FEE, PROTOCOL_FEE, REF_FEE } from './contant'
-import { SwapSimulateRequest, SwapSimulateResponse } from './type'
 
 export async function simulateSwapReverse(
   swapData: SwapSimulateRequest,

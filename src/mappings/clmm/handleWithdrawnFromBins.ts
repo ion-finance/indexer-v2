@@ -1,6 +1,7 @@
-import { Event } from '../../types/events'
 import prisma from 'src/clients/prisma'
+
 import parseWithdrawnFromBins from '../../parsers/clmm/parseWithdrawnFromBins'
+import { Event } from '../../types/events'
 
 const handleWithdrawnFromBins = async (event: Event) => {
   const params = parseWithdrawnFromBins(event.body)

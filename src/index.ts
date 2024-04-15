@@ -1,10 +1,12 @@
+import * as Sentry from '@sentry/node'
 import dotenv from 'dotenv'
+
+import api from 'src/api'
+import prisma from 'src/clients/prisma'
+
 import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'
 import handleEventCLMM from './tasks/handleEventCLMM'
-import prisma from 'src/clients/prisma'
-import api from 'src/api'
-import * as Sentry from '@sentry/node'
 import { toLocaleString } from './utils/date'
 import axios from 'axios'
 import { Trace } from './types/ton-api'

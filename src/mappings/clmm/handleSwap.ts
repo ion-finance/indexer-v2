@@ -1,6 +1,7 @@
-import { Event } from '../../types/events'
 import prisma from 'src/clients/prisma'
+
 import parseSwap from '../../parsers/clmm/parseSwap'
+import { Event } from '../../types/events'
 
 const handleSwap = async (event: Event) => {
   const params = parseSwap(event.body)

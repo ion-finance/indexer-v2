@@ -1,6 +1,6 @@
-import axios from 'axios'
-import { Trace } from '../types/ton-api'
 import { Address, Cell } from '@ton/core'
+import axios from 'axios'
+
 import {
   handleDepositedToBins,
   handleInitialized,
@@ -11,6 +11,7 @@ import {
   handleOrderClaimed,
   handleOrderExecuted,
 } from '../mappings/clmm'
+import { Trace } from '../types/ton-api'
 // CLMM
 const DEPOSITED_TO_BINS = '0xafeb11ef'
 const INITIALIZED = '0x9bb3a52e'

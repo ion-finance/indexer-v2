@@ -1,8 +1,10 @@
+import { Token } from '@prisma/client'
+import { has } from 'lodash'
+
 import prisma from 'src/clients/prisma'
 import { isSameAddress } from 'src/utils/address'
-import { Token } from '@prisma/client'
+
 import { FEE_DIVIDER, LP_FEE } from './contant'
-import { has } from 'lodash'
 
 export const calculatePriceImpact = ({
   amountIn,

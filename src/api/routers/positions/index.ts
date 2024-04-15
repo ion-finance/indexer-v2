@@ -1,9 +1,11 @@
-import { Router } from 'express'
-import prisma from 'src/clients/prisma'
-import { formatUnits } from 'ethers'
 import { PoolType } from '@prisma/client'
-import { USD_PRICE_OF_TON } from '../../../mocks/price'
+import { formatUnits } from 'ethers'
+import { Router } from 'express'
+
+import prisma from 'src/clients/prisma'
 import { isSameAddress } from 'src/utils/address'
+
+import { USD_PRICE_OF_TON } from '../../../mocks/price'
 const router = Router()
 
 router.get('/positions/:address', async function handler(req, res) {

@@ -1,5 +1,5 @@
-import router from '../pools'
 import updateTokenPricesLogic from './updateTokenPricesLogic'
+import router from '../pools'
 
 router.get('/update-token-prices', async function handler(req, res) {
   await updateTokenPricesLogic()

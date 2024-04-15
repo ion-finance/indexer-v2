@@ -1,7 +1,9 @@
-import { Event } from '../../types/events'
-import prisma from 'src/clients/prisma'
 import { OrderType } from '@prisma/client'
+
+import prisma from 'src/clients/prisma'
+
 import parseOrder from '../../parsers/clmm/parseOrder'
+import { Event } from '../../types/events'
 
 const handleOrderExecuted = async (event: Event) => {
   const params = parseOrder(event.body)

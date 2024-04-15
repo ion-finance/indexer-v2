@@ -1,5 +1,6 @@
-import { sortBy } from 'lodash'
 import { Address, beginCell } from '@ton/core'
+import { sortBy } from 'lodash'
+
 import { Trace } from '../types/ton-api'
 
 export const parseRaw = (raw?: string): string => {

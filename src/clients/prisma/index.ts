@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+
 import IndexerStateExtenstions from './extensions/indexer'
 
 const extendedPrismaClient = () => {

@@ -1,9 +1,11 @@
 import { Address } from '@ton/core'
-import { Trace } from '../../types/ton-api'
-import { parseRaw } from 'src/utils/address'
 import dotenv from 'dotenv'
+
+import { parseRaw } from 'src/utils/address'
+
 import { CustomOP, OP, Ops } from './opCode'
 import { routerAddress } from '../../address'
+import { Trace } from '../../types/ton-api'
 dotenv.config()
 
 // custom wallet op, that can be ignored

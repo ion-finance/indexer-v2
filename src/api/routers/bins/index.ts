@@ -1,4 +1,5 @@
 import { Router } from 'express'
+
 import prisma from 'src/clients/prisma'
 import { getBinPrice, getNormalPriceByPrice } from 'src/utils/binMath'
 const router = Router()
