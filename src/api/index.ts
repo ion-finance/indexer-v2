@@ -55,8 +55,8 @@ api.use(simulateSwapRouter)
 api.use(simulateSwapReverseRouter)
 api.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec))
 
-// every 1 min
-cron.schedule('*/1 * * * *', async () => {
+// every 1 hour
+cron.schedule('0 */1 * * *', async () => {
   const isCLMM = process.env.IS_CLMM === 'true'
   if (isCLMM) {
     return
