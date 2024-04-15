@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { uniqBy } from 'lodash'
+import { sortBy, uniqBy } from 'lodash'
 
 import { routerAddress } from 'src/address'
 import prisma from 'src/clients/prisma'
@@ -31,8 +31,8 @@ const fetchEvents = async (router?: string) => {
       const parsedEvents = res.data.events.filter(
         (event: Event) => event.in_progress === false,
       ) as AccountEvent[]
-      // TODO: sort by timestamp
-      events.push(...parsedEvents)
+      const sorted = sortBy(parsedEvents, (e) => e.timestamp, 'asc')
+      events.push(...sorted)
 
       if (parsedEvents.length >= 100) {
         // TON API limit is 100 events per request.
@@ -61,7 +61,7 @@ const fetchEvents = async (router?: string) => {
     return []
   }
 
-  const orderedEvents = events.sort((a, b) => a.timestamp - b.timestamp)
+  const orderedEvents = sortBy(events, (e) => e.timestamp, 'asc')
   // !NOTE: events can be duplicated, remove duplicated events
   // when fetch with start_date 1711630630, 1711630633 can be
   const uniqEvents = uniqBy(orderedEvents, (e) => e.event_id)
