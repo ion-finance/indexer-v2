@@ -9,8 +9,8 @@ router.get('/manual-cpmm-trace/:trace_hash', async function handler(req, res) {
     console.warn('This endpoint is only available in development mode')
     return
   }
-  const { trace_hash } = req.params
-  await handleEvent(trace_hash)
+  // const { trace_hash } = req.params
+  // await handleEvent(trace_hash)
   return res.status(200).json(true)
 })
 
