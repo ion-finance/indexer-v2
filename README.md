@@ -160,3 +160,18 @@ If you add new event to index or update router contrat address, you need to rese
 If you want to reset remote database, you need to update `DATABASE_URL` environment variable.
 
 In case of new schema, you need to run `yarn prisma migrate dev` to create new table. It is recommended to remove all `prisma/migrations` files before running the command in test or development environment.
+
+## Testing
+
+In '.env.test' file, you have to set DATABASE_URL to test database.
+See example below:
+
+```
+DATABASE_URL=postgresql://postgres:1q2w3e4r@localhost:5432/ionfi_test
+```
+
+To run tests, you can use the following command:
+
+```
+yarn test test/integrations/index.spec.ts
+```
