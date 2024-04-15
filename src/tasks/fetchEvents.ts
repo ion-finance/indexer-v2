@@ -8,7 +8,7 @@ import { toLocaleString } from '../utils/date'
 // import * as Sentry from "@sentry/node";
 
 let lastEvent: AccountEvent
-const fetchEvents = async () => {
+const fetchEvents = async (router?: string) => {
   const timestamp = await prisma.indexerState.getLastTimestamp()
   // do not fetch the last event
   let endDate = 0
@@ -20,7 +20,7 @@ const fetchEvents = async () => {
         `start_date=${timestamp}&limit=100` +
         (endDate ? `&end_date=${endDate}` : '')
 
-      const url = `${process.env.TON_API_URL}/accounts/${routerAddress}/events?${args}`
+      const url = `${process.env.TON_API_URL}/accounts/${router ? router : routerAddress}/events?${args}`
       const res = await axios(url, {
         headers: {
           Authorization: `Bearer ${process.env.TON_API_KEY}`,
