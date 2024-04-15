@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: Swap Simulation API
+  description: API to simulate swap transactions in a decentralized exchange.
+  version: '1.0.0'
+paths:
+  /simulate-swap:
+    get:
+      summary: Simulate a swap
+      parameters:
+        - name: offerAddress
+          in: query
+          description: The blockchain address offering the swap.
+          required: true
+          schema:
+            type: string
+        - name: askAddress
+          in: query
+          description: The blockchain address asking for the swap.
+          required: true
+          schema:
+            type: string
+        - name: units
+          in: query
+          description: The number of units offered for the swap.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: slippageTolerance
+          in: query
+          description: Maximum tolerated slippage in the transaction as a fraction of 1.
+          required: true
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 1
+        - name: referralAddress
+          in: query
+          description: Optional referral blockchain address involved in the transaction.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful simulation of the swap.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: 'common.yaml#/components/schemas/SimulateSwapResult'
+        '400':
+          description: Bad request parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Units must be a positive integer.'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal Server Error'
+  /simulate-swap-reverse:
+    get:
+      summary: Simulate a reverse-swap
+      parameters:
+        - name: offerAddress
+          in: query
+          description: The blockchain address offering the swap.
+          required: true
+          schema:
+            type: string
+        - name: askAddress
+          in: query
+          description: The blockchain address asking for the swap.
+          required: true
+          schema:
+            type: string
+        - name: units
+          in: query
+          description: The number of units offered for the swap.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: slippageTolerance
+          in: query
+          description: Maximum tolerated slippage in the transaction as a fraction of 1.
+          required: true
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 1
+        - name: referralAddress
+          in: query
+          description: Optional referral blockchain address involved in the transaction.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful simulation of the swap.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: 'common.yaml#/components/schemas/SimulateSwapResult'
+        '400':
+          description: Bad request parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Units must be a positive integer.'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal Server Error'

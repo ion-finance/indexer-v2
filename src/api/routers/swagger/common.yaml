@@ -223,12 +223,26 @@ components:
           type: string
           format: date-time
           description: Last update time of the pool
-
     PoolType:
       type: string
       enum:
         - CLMM
         - OtherType # Replace or extend with actual pool types
+    SimulateSwapResult:
+      type: object
+      properties:
+        offerAddress:
+          type: string
+        askAddress:
+          type: string
+        units:
+          type: integer
+        slippageTolerance:
+          type: number
+          format: float
+        referralAddress:
+          type: string
+          nullable: true
 
 info:
   title: Example API
