@@ -135,6 +135,95 @@ components:
         - amountX
         - amountY
 
+    Operation:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Transaction hash
+        poolTxHash:
+          type: string
+          description: Pool transaction hash
+        poolAddress:
+          type: string
+          description: Pool address
+        routerAddress:
+          type: string
+          description: Router address
+        poolTxLt:
+          type: string
+          description: Pool transaction Lt
+        poolTxTimestamp:
+          type: string
+          format: date-time
+          description: Pool transaction timestamp
+        destinationWalletAddress:
+          type: string
+          description: Destination wallet address
+        operationType:
+          type: string
+          description: Operation type
+        exitCode:
+          type: string
+          description: Exit code
+        asset0Address:
+          type: string
+          description: Asset 0 address
+        asset0Amount:
+          type: string
+          description: Asset 0 amount
+        asset0Delta:
+          type: string
+          description: Asset 0 delta
+        asset0Reserve:
+          type: string
+          description: Asset 0 reserve
+        asset1Address:
+          type: string
+          description: Asset 1 address
+        asset1Amount:
+          type: string
+          description: Asset 1 amount
+        asset1Delta:
+          type: string
+          description: Asset 1 delta
+        asset1Reserve:
+          type: string
+          description: Asset 1 reserve
+        lpTokenDelta:
+          type: string
+          description: LP token delta
+        lpTokenSupply:
+          type: string
+          description: LP token supply
+        protocolFeeAmount:
+          type: string
+          description: Protocol fee amount
+        referralFeeAmount:
+          type: string
+          description: Referral fee amount
+        walletAddress:
+          type: string
+          description: Wallet address
+        walletTxLt:
+          type: string
+          description: Wallet transaction Lt
+        walletTxHash:
+          type: string
+          description: Wallet transaction hash
+        walletTxTimestamp:
+          type: string
+          format: date-time
+          description: Wallet transaction timestamp
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation time of the pool
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update time of the pool
+
     PoolType:
       type: string
       enum:

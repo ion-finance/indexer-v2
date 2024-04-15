@@ -1,0 +1,69 @@
+openapi: '3.0.0'
+info:
+  title: 'Operations API'
+  description: 'This API returns the operation data'
+  version: '1.0.0'
+paths:
+  /operations:
+    get:
+      summary: 'Get operations'
+      parameters:
+        - name: 'since'
+          in: 'query'
+          description: 'The start date for the query.'
+          required: false
+          schema:
+            type: 'string'
+            format: 'date-time'
+        - name: 'until'
+          in: 'query'
+          description: 'The end date for the query.'
+          required: false
+          schema:
+            type: 'string'
+            format: 'date-time'
+        - name: 'poolAddress'
+          in: 'query'
+          description: 'The pool address for the query.'
+          required: false
+          schema:
+            type: 'string'
+        - name: 'destinationWalletAddress'
+          in: 'query'
+          description: 'The destinationWalletAddress for the query.'
+          required: false
+          schema:
+            type: 'string'
+        - name: 'operationType'
+          in: 'query'
+          description: 'The operationType for the query.'
+          required: true
+          schema:
+            type: 'string'
+        - name: 'page'
+          in: 'query'
+          description: 'The page number to retrieve.'
+          required: false
+          schema:
+            type: 'integer'
+        - name: 'pageSize'
+          in: 'query'
+          description: 'The number of items to retrieve per page.'
+          required: false
+          schema:
+            type: 'integer'
+      responses:
+        '200':
+          description: 'Successfully retrieved operations'
+          content:
+            application/json:
+              schema:
+                type: 'array'
+                items:
+                  $ref: 'common.yaml#/components/schemas/Operation'
+        '404':
+          description: 'Operations not found'
+        '400':
+          description: 'Invalid query parameters'
+        '500':
+          description: 'Internal Server Error'

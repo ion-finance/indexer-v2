@@ -103,3 +103,5 @@ router.get(
 )
 
 export default router
+
+// write open api spec for this api.
