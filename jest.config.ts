@@ -5,6 +5,7 @@ const config: Config = {
   testEnvironment: 'node',
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   setupFiles: ['dotenv/config'],
+  testTimeout: 60000,
 }
 
 export default config

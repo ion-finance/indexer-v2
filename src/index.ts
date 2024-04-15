@@ -7,6 +7,8 @@ import sleep from './utils/sleep'
 import api from './api'
 import * as Sentry from '@sentry/node'
 import { toLocaleString } from './utils/date'
+import axios from 'axios'
+import { Trace } from './types/ton-api'
 
 dotenv.config()
 
@@ -39,7 +41,16 @@ const eventPooling = async () => {
       if (isCLMM) {
         await handleEventCLMM(eventId)
       } else {
-        await handleEvent(eventId)
+        const res = await axios(
+          `${process.env.TON_API_URL}/traces/${eventId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.TON_API_KEY}`,
+            },
+          },
+        )
+
+        await handleEvent(eventId, res.data as Trace)
       }
     } catch (e) {
       error = true

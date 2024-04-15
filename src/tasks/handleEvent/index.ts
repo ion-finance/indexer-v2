@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { Trace } from '../../types/ton-api'
 
 import {
@@ -14,15 +13,7 @@ import type { Ops } from './opCode'
 
 // Info
 // * This method can throw an error if the event is processing
-const handleEvent = async (eventId: string) => {
-  const res = await axios(`${process.env.TON_API_URL}/traces/${eventId}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.TON_API_KEY}`,
-    },
-  })
-
-  const traces = res.data as Trace
-
+const handleEvent = async (eventId: string, traces: Trace) => {
   // Extract paths
   // TODO: implement test code
   const paths: Ops[][] = extractPaths(traces)
