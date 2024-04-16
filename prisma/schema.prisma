@@ -93,6 +93,7 @@ model Swap {
   amountOut       String
   swapForY        Boolean
   activeBinId     Int      @default(0)
+  volumeUsd      String   @default("0")
 }
 
 model TransferBatch {
