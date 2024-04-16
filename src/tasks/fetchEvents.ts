@@ -1,16 +1,19 @@
 import axios from 'axios'
 import { sortBy, uniqBy } from 'lodash'
 
-import { routerAddress } from 'src/address'
-import prisma from 'src/clients/prisma'
 import { AccountEvent, Event } from 'src/types/ton-api'
 import { toLocaleString } from 'src/utils/date'
 
 // import * as Sentry from "@sentry/node";
 
 let lastEvent: AccountEvent
-const fetchEvents = async (router?: string) => {
-  const timestamp = await prisma.indexerState.getLastTimestamp()
+const fetchEvents = async ({
+  routerAddress,
+  timestamp = 0,
+}: {
+  routerAddress: string
+  timestamp?: number
+}) => {
   // do not fetch the last event
   let endDate = 0
   const events: AccountEvent[] = []
@@ -21,7 +24,7 @@ const fetchEvents = async (router?: string) => {
         `start_date=${timestamp}&limit=100` +
         (endDate ? `&end_date=${endDate}` : '')
 
-      const url = `${process.env.TON_API_URL}/accounts/${router ? router : routerAddress}/events?${args}`
+      const url = `${process.env.TON_API_URL}/accounts/${routerAddress}/events?${args}`
       const res = await axios(url, {
         headers: {
           Authorization: `Bearer ${process.env.TON_API_KEY}`,

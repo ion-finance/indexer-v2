@@ -1,7 +1,7 @@
 import { Address } from '@ton/core'
 import dotenv from 'dotenv'
 
-import { parseRaw } from 'src/utils/address'
+import { isSameAddress, parseRaw } from 'src/utils/address'
 
 import { CustomOP, OP, Ops } from './opCode'
 import { Trace } from '../../types/ton-api'
@@ -38,12 +38,10 @@ function extractPaths(routerAddress: string, node: Trace): Ops[][] {
         const destinationAddress = parseRaw(
           transaction.in_msg?.destination?.address,
         )
-        if (
-          Address.parse(destinationAddress).equals(Address.parse(routerAddress))
-        ) {
+        if (isSameAddress(destinationAddress, routerAddress)) {
           return CustomOP.ROUTER_DEPLOYED
         }
-        if (Address.parse(sourceAddress).equals(Address.parse(routerAddress))) {
+        if (isSameAddress(sourceAddress, routerAddress)) {
           return CustomOP.POOL_DEPLOYED
         }
         if (isParentJettonMaster) {

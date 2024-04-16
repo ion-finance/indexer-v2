@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/node'
 import axios from 'axios'
 import dotenv from 'dotenv'
 
+import { routerAddress } from 'src/address'
 import api from 'src/api'
 import prisma from 'src/clients/prisma'
 
@@ -24,7 +25,8 @@ Sentry.init({
 const isCLMM = process.env.IS_CLMM === 'true'
 let totalEvents = 0
 const eventPooling = async () => {
-  const events = await fetchEvents()
+  const timestamp = await prisma.indexerState.getLastTimestamp()
+  const events = await fetchEvents({ routerAddress, timestamp })
   totalEvents += events.length
 
   if (events.length === 0) {

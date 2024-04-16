@@ -10,21 +10,19 @@ import { Trace } from '../../../src/types/ton-api'
 
 dotenv.config()
 
-const MAINNET = false
+const MAINNET = true
 const ROUTER_ADDRESS = MAINNET
   ? ROUTER_REVISION_ADDRESS.V1
   : 'kQC3dzNkWKP8LrXOy9G8ULo8W1i11J0eF0f_wmkmt2OwfOfM'
 
 // Mainnet
-/*
-const POOLS = [
-  "EQAxua2Q7nC9dJZwIt2566L820jPLT3ZJYT_HfNW0o_JjCQw",
-  "EQCkoSqB9whEQijA-eS6mI1XXS9T9hzu7pu7wMpRJLPhH0uF"
+const MAINNET_POOLS = [
+  'EQAxua2Q7nC9dJZwIt2566L820jPLT3ZJYT_HfNW0o_JjCQw',
+  'EQCkoSqB9whEQijA-eS6mI1XXS9T9hzu7pu7wMpRJLPhH0uF',
 ]
-*/
 
 // testnet
-const POOLS = [
+const TESTNET_POOLS = [
   'EQBaZhMmxSnaxANMWGJGiL6vxohpPPoGB4Hgq6xW2j5dsxgX',
   'EQDF5O_A2Ytvf2Z5I25kWydBtRX-CyqqAo1_RcY30R01AuBr',
   'EQCGNo76WobXzcjvsGMjiua9HVj64nUUtOoel6E95jgBkdOW',
@@ -36,9 +34,13 @@ const POOLS = [
   'EQBwXaPf7OHBJAtPTpNDdS_Wuih8QlFLY_pmjbeVa3wmr2wW',
   'EQAMDZxxD9C9XNOL9xcMcQFsa6KBW90DMaUK8JsB3P9ccVzK',
 ]
+const POOLS = MAINNET ? MAINNET_POOLS : TESTNET_POOLS
 
 async function generate() {
-  const events = await fetchEvents(ROUTER_ADDRESS)
+  const events = await fetchEvents({
+    routerAddress: ROUTER_ADDRESS,
+    timestamp: 0,
+  })
 
   const data: {
     eventId: string
@@ -76,7 +78,7 @@ async function generate() {
     POOLS.map(async (poolAddress) => {
       const pool = new Pool(provider, {
         revision: 'V1',
-        address: 'EQBaZhMmxSnaxANMWGJGiL6vxohpPPoGB4Hgq6xW2j5dsxgX',
+        address: poolAddress,
         adminAddress: new TonWeb.Address(
           'kQC3dzNkWKP8LrXOy9G8ULo8W1i11J0eF0f_wmkmt2OwfOfM', // dummy
         ),
@@ -98,10 +100,11 @@ async function generate() {
   const testSuite = {
     events: data,
     pools: pools,
+    routerAddress: ROUTER_ADDRESS,
   }
 
   fs.writeFileSync(
-    `test/integrations/scenarios/${moment().format('YYYYMMDD_h:mm:ss')}.json`,
+    `test/integrations/scenarios/${moment().format('YYYYMMDD_h:mm:ss')}_${MAINNET ? 'mainnet' : 'testnet'}.json`,
     JSON.stringify(testSuite, null, 2),
   )
 }
