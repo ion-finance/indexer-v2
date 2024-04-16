@@ -57,18 +57,6 @@ paths:
                         balanceUsd:
                           type: number
                         tokenX:
-                          allOf:
-                            - $ref: 'common.yaml#/components/schemas/Token'
-                            - type: object
-                              properties:
-                                balanceUsd: # TODO: show balanceUSD in swagger
-                                  type: number
-                                  description: The balance in USD
+                          $ref: 'common.yaml#/components/schemas/Token'
                         tokenY:
-                          allOf:
-                            - $ref: 'common.yaml#/components/schemas/Token'
-                            - type: object
-                              properties:
-                                balanceUsd: # TODO: show balanceUSD in swagger
-                                  type: number
-                                  description: The balance in USD
+                          $ref: 'common.yaml#/components/schemas/Token'

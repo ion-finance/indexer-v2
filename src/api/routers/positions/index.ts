@@ -1,27 +1,29 @@
 import { PoolType } from '@prisma/client'
+import { Address } from '@ton/core'
 import { formatUnits } from 'ethers'
 import { Router } from 'express'
+import { compact } from 'lodash'
 
 import prisma from 'src/clients/prisma'
 import { isSameAddress } from 'src/utils/address'
 
-import { USD_PRICE_OF_TON } from '../../../mocks/price'
 const router = Router()
 
 router.get('/positions/:address', async function handler(req, res) {
-  const address = req.params.address
+  const parsed = Address.parse(req.params.address).toString()
+  const tokenPrices = await prisma.tokenPrice.findMany()
 
   const [tokens, pools, lpTokenWallets, deposits] = await Promise.all([
     prisma.token.findMany(),
     prisma.pool.findMany(),
     prisma.lpTokenWallet.findMany({
       where: {
-        ownerAddress: address,
+        ownerAddress: parsed,
       },
     }),
     prisma.deposit.findMany({
       where: {
-        senderAddress: address,
+        senderAddress: parsed,
       },
     }),
   ])
@@ -30,6 +32,14 @@ router.get('/positions/:address', async function handler(req, res) {
     const pool = pools.find((p) => p.id === wallet.poolAddress)
     const tokenX = tokens.find((t) => t.id === pool?.tokenXAddress)
     const tokenY = tokens.find((t) => t.id === pool?.tokenYAddress)
+    const tokenPriceX = tokenPrices.find((t) => isSameAddress(t.id, tokenX?.id))
+    const tokenPriceY = tokenPrices.find((t) => isSameAddress(t.id, tokenY?.id))
+    const priceX = Number(tokenPriceX?.price) || 0
+    const priceY = Number(tokenPriceY?.price) || 0
+
+    if (!pool || !tokenX || !tokenY || !tokenPriceX || !tokenPriceY) {
+      return null
+    }
 
     const depositsOfPool = deposits.filter((d) => d.poolAddress === pool?.id)
     const xSum = depositsOfPool.reduce(
@@ -61,17 +71,27 @@ router.get('/positions/:address', async function handler(req, res) {
       0,
     )
 
-    // TODO: fix , consider the case when tokenX or tokenY is TON
-    const tonAddress = process.env.TON_WALLET_ADDRESS || ''
-    const isXisTon = isSameAddress(tokenX?.id, tonAddress)
-    const isYisTon = isSameAddress(tokenY?.id, tonAddress)
-    const tonAmount = isXisTon ? xSum : isYisTon ? ySum : 0
-    const totalPriceOfPool = (2 * tonAmount * USD_PRICE_OF_TON) / 10 ** 9
-    const balanceUsd = (lpBalance * totalPriceOfPool) / totalLpAmount
+    // total usd price of pool reserve
+    const totalPrice =
+      priceX * Number(formatUnits(BigInt(pool.reserveX), tokenX?.decimals)) +
+      priceY * Number(formatUnits(BigInt(pool.reserveY), tokenY?.decimals))
+
+    const balanceUsd = totalPrice * (lpBalance / totalLpAmount)
+
+    // total usd price of pool collected protocol fee
+    const feeUsd =
+      priceX *
+        Number(
+          formatUnits(BigInt(pool.collectedXProtocolFee), tokenX?.decimals),
+        ) +
+      priceY *
+        Number(
+          formatUnits(BigInt(pool.collectedYProtocolFee), tokenY?.decimals),
+        )
 
     return {
       ...wallet,
-      feeUsd: 0,
+      feeUsd,
       balanceUsd,
       tokenX: {
         ...tokenX,
@@ -84,13 +104,18 @@ router.get('/positions/:address', async function handler(req, res) {
     }
   })
 
+  const positions = compact(data)
+
+  // TODO: calculate apy
+  // to calculate apy, we need to write the price of token, when deposit occur.
+  const apy = 12.2
   return res.json({
     summary: {
-      balanceUsd: data.reduce((res, cur) => res + cur.balanceUsd, 0),
-      apy: 12.2,
-      earnedUsd: 0,
+      balanceUsd: positions.reduce((res, cur) => res + cur.balanceUsd, 0),
+      earnedUsd: positions.reduce((res, cur) => res + cur.feeUsd, 0),
+      apy,
     },
-    positions: data,
+    positions,
   })
 })
 

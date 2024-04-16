@@ -142,7 +142,7 @@ export const handleAddLiquidity = async ({
     },
     update: {
       senderAddress: userAddress,
-      receiverAddress: userAddress,
+      receiverAddress: to ? to.toString() : '',
       poolAddress,
       amountX,
       amountY,
@@ -152,7 +152,7 @@ export const handleAddLiquidity = async ({
       id: hash,
       eventId,
       senderAddress: userAddress,
-      receiverAddress: userAddress,
+      receiverAddress: to ? to.toString() : '',
       poolAddress,
       tokenAddress: pool.tokenXAddress, // TODO : In case of cpmm, tokenXAddress is unnecessary.
       amountX,
