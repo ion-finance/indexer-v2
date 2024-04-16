@@ -5,7 +5,7 @@ import swaggerJSDoc from 'swagger-jsdoc'
 import * as swaggerUI from 'swagger-ui-express'
 
 import binRouter from './routers/bins'
-import manualCPMMTraceRouter from './routers/manualCPMMTrace'
+import manualCPMMEventRouter from './routers/manualCPMMEvent'
 import operationsRouter from './routers/operations'
 import orderRouter from './routers/orders'
 import poolRouter from './routers/pools'
@@ -49,7 +49,7 @@ api.use(routerAddressRouter)
 api.use(tokenPricesRouter)
 api.use(updateTokenPrices)
 api.use(traceRouter)
-api.use(manualCPMMTraceRouter)
+api.use(manualCPMMEventRouter)
 api.use(operationsRouter)
 api.use(simulateSwapRouter)
 api.use(simulateSwapReverseRouter)
