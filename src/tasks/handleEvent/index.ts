@@ -14,9 +14,14 @@ import type { Ops } from './opCode'
 
 // Info
 // * This method can throw an error if the event is processing
-const handleEvent = async (eventId: string, traces: Trace) => {
+const handleEvent = async (params: {
+  routerAddress: string
+  eventId: string
+  traces: Trace
+}) => {
+  const { eventId, traces, routerAddress } = params
   // Extract paths
-  const paths: Ops[][] = extractPaths(traces)
+  const paths: Ops[][] = extractPaths(routerAddress, params.traces)
   // console.log("paths", paths);
   const checkPathHasOp = (paths: Ops[][], op: string) =>
     paths.some((path) =>

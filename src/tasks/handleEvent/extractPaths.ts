@@ -4,14 +4,13 @@ import dotenv from 'dotenv'
 import { parseRaw } from 'src/utils/address'
 
 import { CustomOP, OP, Ops } from './opCode'
-import { routerAddress } from '../../address'
 import { Trace } from '../../types/ton-api'
 dotenv.config()
 
 // custom wallet op, that can be ignored
 const blackList = ['0xb8abad10']
 
-function extractPaths(node: Trace): Ops[][] {
+function extractPaths(routerAddress: string, node: Trace): Ops[][] {
   // This function recursively extracts the paths using the spread operator.
   function recurse(
     currentNode: Trace,
