@@ -1,8 +1,9 @@
-import fs from 'fs'
-import { Trace } from '../../src/types/ton-api'
-import handleEvent from '../../src/tasks/handleEvent'
-import prisma from '../../src/clients/prisma'
 import { Address } from '@ton/core'
+import fs from 'fs'
+
+import prisma from '../../src/clients/prisma'
+import handleEvent from '../../src/tasks/handleEvent'
+import { Trace } from '../../src/types/ton-api'
 
 jest.mock('../../src/utils/fetchTokenData', () => {
   return {
