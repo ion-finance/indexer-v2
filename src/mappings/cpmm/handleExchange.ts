@@ -1,4 +1,5 @@
 import { Cell } from '@ton/core'
+import { formatUnits } from 'ethers'
 import { find } from 'lodash'
 
 import prisma from 'src/clients/prisma'
@@ -10,7 +11,7 @@ import {
 } from 'src/dex/simulate/contant'
 import { calculateOutAmount } from 'src/dex/simulate/utils'
 import { Trace } from 'src/types/ton-api'
-import { findTracesByOpCode, parseRaw } from 'src/utils/address'
+import { findTracesByOpCode, isSameAddress, parseRaw } from 'src/utils/address'
 
 import { EXIT_CODE, OP } from '../../tasks/handleEvent/opCode'
 
@@ -70,6 +71,9 @@ export const handleExchange = async ({
   eventId: string
   traces: Trace
 }) => {
+  const tokenPrices = await prisma.tokenPrice.findMany()
+  const tokens = await prisma.token.findMany()
+
   const routerAddress = process.env.ROUTER_ADDRESS || ''
   const { hash, utime } = traces.transaction
 
@@ -148,6 +152,16 @@ export const handleExchange = async ({
   }
 
   const { tokenXAddress, tokenYAddress } = pool
+  const tokenX = tokens.find((token) => token.id === tokenXAddress)
+  const tokenY = tokens.find((token) => token.id === tokenYAddress)
+  const tokenPriceX = tokenPrices.find((price) =>
+    isSameAddress(price.id, tokenXAddress),
+  )
+  const tokenPriceY = tokenPrices.find((price) =>
+    isSameAddress(price.id, tokenYAddress),
+  )
+  const priceX = Number(tokenPriceX?.price) || 0
+  const priceY = Number(tokenPriceY?.price) || 0
   const swapForY = senderAddress === tokenXAddress
 
   const swap = await prisma.swap.findFirst({
@@ -159,20 +173,16 @@ export const handleExchange = async ({
     return
   }
 
+  const volumeUsd = swapForY
+    ? priceX * Number(formatUnits(Number(amountIn), tokenX?.decimals || 0))
+    : priceY * Number(formatUnits(Number(amountIn), tokenY?.decimals || 0))
+
   await prisma.swap.upsert({
     where: {
       id: hash,
       eventId,
     },
-    update: {
-      timestamp: utime,
-      poolAddress,
-      senderAddress,
-      receiverAddress,
-      amountIn,
-      amountOut,
-      swapForY,
-    },
+    update: {},
     create: {
       id: hash,
       eventId,
@@ -183,6 +193,7 @@ export const handleExchange = async ({
       amountIn,
       amountOut,
       swapForY,
+      volumeUsd: String(volumeUsd),
     },
   })
 
