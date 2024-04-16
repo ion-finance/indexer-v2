@@ -14,6 +14,7 @@ paths:
             type: string
           required: true
           description: The address of the wallet
+          example: 'UQAFFzJLx4ThDW5YqPbdG5nAfg8E7fzZDs2UDErDaljOLvYB'
       responses:
         '200':
           description: OK

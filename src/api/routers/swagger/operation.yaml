@@ -15,6 +15,7 @@ paths:
           schema:
             type: 'string'
             format: 'date-time'
+          example: '2024-04-05T00:00:00Z'
         - name: 'until'
           in: 'query'
           description: 'The end date for the query.'
@@ -22,12 +23,14 @@ paths:
           schema:
             type: 'string'
             format: 'date-time'
+          example: '2024-04-15T00:00:00Z'
         - name: 'poolAddress'
           in: 'query'
           description: 'The pool address for the query.'
           required: false
           schema:
             type: 'string'
+          example: 'EQCkoSqB9whEQijA-eS6mI1XXS9T9hzu7pu7wMpRJLPhH0uF'
         - name: 'destinationWalletAddress'
           in: 'query'
           description: 'The destinationWalletAddress for the query.'
@@ -40,6 +43,12 @@ paths:
           required: true
           schema:
             type: 'string'
+            enum:
+              - 'swap'
+              - 'add-liquidity'
+              - 'send_liquidity'
+              - 'withdraw_liquidity'
+          example: 'swap'
         - name: 'page'
           in: 'query'
           description: 'The page number to retrieve.'

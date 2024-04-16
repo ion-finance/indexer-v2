@@ -14,12 +14,14 @@ paths:
           required: true
           schema:
             type: string
+          example: EQDpKrPWD9olggJI9NAEt2b9WOxUYuspoQRCia0kQyO6EayJ
         - name: askAddress
           in: query
           description: The blockchain address asking for the swap.
           required: true
           schema:
             type: string
+          example: EQDXPXpCRQScbFgRu_TXfAOHpKP6WmmOP1nICGq6ujaEKWsF
         - name: units
           in: query
           description: The number of units offered for the swap.
@@ -27,6 +29,7 @@ paths:
           schema:
             type: integer
             minimum: 1
+          example: 200
         - name: slippageTolerance
           in: query
           description: Maximum tolerated slippage in the transaction as a fraction of 1.
@@ -36,12 +39,14 @@ paths:
             format: float
             minimum: 0
             maximum: 1
+          example: 0.01
         - name: referralAddress
           in: query
           description: Optional referral blockchain address involved in the transaction.
           required: false
           schema:
             type: string
+          example: UQAFFzJLx4ThDW5YqPbdG5nAfg8E7fzZDs2UDErDaljOLvYB
       responses:
         '200':
           description: Successful simulation of the swap.
@@ -52,26 +57,6 @@ paths:
                 properties:
                   data:
                     $ref: 'common.yaml#/components/schemas/SimulateSwapResult'
-        '400':
-          description: Bad request parameters.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Units must be a positive integer.'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Internal Server Error'
   /simulate-swap-reverse:
     get:
       summary: Simulate a reverse-swap
@@ -82,12 +67,14 @@ paths:
           required: true
           schema:
             type: string
+          example: EQDpKrPWD9olggJI9NAEt2b9WOxUYuspoQRCia0kQyO6EayJ
         - name: askAddress
           in: query
           description: The blockchain address asking for the swap.
           required: true
           schema:
             type: string
+          example: EQDXPXpCRQScbFgRu_TXfAOHpKP6WmmOP1nICGq6ujaEKWsF
         - name: units
           in: query
           description: The number of units offered for the swap.
@@ -95,6 +82,7 @@ paths:
           schema:
             type: integer
             minimum: 1
+          example: 14774
         - name: slippageTolerance
           in: query
           description: Maximum tolerated slippage in the transaction as a fraction of 1.
@@ -104,12 +92,14 @@ paths:
             format: float
             minimum: 0
             maximum: 1
+          example: 0.01
         - name: referralAddress
           in: query
           description: Optional referral blockchain address involved in the transaction.
           required: false
           schema:
             type: string
+          example: UQAFFzJLx4ThDW5YqPbdG5nAfg8E7fzZDs2UDErDaljOLvYB
       responses:
         '200':
           description: Successful simulation of the swap.
@@ -120,23 +110,3 @@ paths:
                 properties:
                   data:
                     $ref: 'common.yaml#/components/schemas/SimulateSwapResult'
-        '400':
-          description: Bad request parameters.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Units must be a positive integer.'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Internal Server Error'
