@@ -79,6 +79,7 @@ router.get('/positions/:address', async function handler(req, res) {
     const balanceUsd = totalPrice * (lpBalance / totalLpAmount)
 
     // total usd price of pool collected protocol fee
+    // TODO: this is wrong, need to track lp Fee
     const feeUsd =
       priceX *
         Number(
