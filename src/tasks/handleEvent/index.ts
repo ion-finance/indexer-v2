@@ -1,3 +1,4 @@
+import updateTokenPricesLogic from 'src/api/routers/updateTokenPrices/updateTokenPricesLogic'
 import {
   handleAddLiquidity,
   handleExchange,
@@ -70,6 +71,7 @@ const handleEvent = async (eventId: string, traces: Trace) => {
   } else if (isProvideLpConfirmed) {
     console.log(`Provide Lp Confirmed: ${eventId}`)
     await handleAddLiquidity({ eventId, traces })
+    await updateTokenPricesLogic()
   } else if (isRemoveLiquidity) {
     console.log(`Remove Liquidity event: ${eventId}`)
     await handleRemoveLiquidity({ eventId, traces })
