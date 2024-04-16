@@ -1,3 +1,18 @@
+-- AlterTable
+ALTER TABLE "Pool" ADD COLUMN     "collectedXProtocolFee" TEXT NOT NULL DEFAULT '0',
+ADD COLUMN     "collectedYProtocolFee" TEXT NOT NULL DEFAULT '0';
+
+-- CreateTable
+CREATE TABLE "TokenPrice" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tokenSymbol" TEXT NOT NULL,
+    "price" TEXT NOT NULL,
+
+    CONSTRAINT "TokenPrice_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateTable
 CREATE TABLE "Operation" (
     "id" SERIAL NOT NULL,
