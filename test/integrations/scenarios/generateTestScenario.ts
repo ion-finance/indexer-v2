@@ -10,7 +10,7 @@ import { Trace } from '../../../src/types/ton-api'
 
 dotenv.config()
 
-const MAINNET = true
+const MAINNET = false
 const ROUTER_ADDRESS = MAINNET
   ? ROUTER_REVISION_ADDRESS.V1
   : 'kQC3dzNkWKP8LrXOy9G8ULo8W1i11J0eF0f_wmkmt2OwfOfM'
@@ -41,6 +41,7 @@ async function generate() {
     routerAddress: ROUTER_ADDRESS,
     timestamp: 0,
   })
+  console.log('Total events:', events.length)
 
   const data: {
     eventId: string
@@ -50,6 +51,9 @@ async function generate() {
   for (let i = 0; i < events.length; i++) {
     const event = events[i]
     const eventId = event.event_id
+    if (i % 10 === 0) {
+      console.log(`Processing event ${i} of ${events.length}`)
+    }
     const res = await axios(`${process.env.TON_API_URL}/traces/${eventId}`, {
       headers: {
         Authorization: `Bearer ${process.env.TON_API_KEY}`,
