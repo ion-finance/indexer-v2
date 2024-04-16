@@ -50,8 +50,9 @@ export const calculateOutAmount = ({
   const baseOut = (amountInWithFee * reserveOut) / (reserveIn + amountInWithFee)
 
   const protocolFeeOut =
-    protocolFee > 0 ? (baseOut * protocolFee) / FEE_DIVIDER : 0
-  const refFeeOut = hasRef && refFee > 0 ? (baseOut * refFee) / FEE_DIVIDER : 0
+    protocolFee > 0 ? Math.ceil((baseOut * protocolFee) / FEE_DIVIDER) : 0
+  const refFeeOut =
+    hasRef && refFee > 0 ? Math.ceil((baseOut * refFee) / FEE_DIVIDER) : 0
 
   const finalOut = baseOut - protocolFeeOut - refFeeOut
 
