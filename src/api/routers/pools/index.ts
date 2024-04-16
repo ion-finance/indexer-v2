@@ -1,21 +1,40 @@
+import { formatUnits } from 'ethers'
 import { Router } from 'express'
 import { compact } from 'lodash'
 
 import prisma from 'src/clients/prisma'
+import { isSameAddress } from 'src/utils/address'
 
 import { getPriceUsd } from '../../../mocks/price'
 
 const router = Router()
 
+const ONE_DAY = 24 * 60 * 60 * 1000
 router.get('/pools', async function handler(req, res) {
   const rawPools = await prisma.pool.findMany()
   const tokens = await prisma.token.findMany()
   const bins = await prisma.bins.findMany()
+  const tokenPrices = await prisma.tokenPrice.findMany()
+
+  const exchanges24h = await prisma.swap.findMany({
+    where: {
+      createdAt: {
+        gte: new Date(Date.now() - ONE_DAY),
+      },
+    },
+  })
 
   const pools = rawPools.map((pool) => {
     const tokenX = tokens.find((token) => token.id === pool.tokenXAddress)
     const tokenY = tokens.find((token) => token.id === pool.tokenYAddress)
+    const exchanges = exchanges24h.filter((d) => d.poolAddress === pool.id)
     const { reserveX, reserveY } = pool
+
+    const tokenPriceX = tokenPrices.find((t) => isSameAddress(t.id, tokenX?.id))
+    const tokenPriceY = tokenPrices.find((t) => isSameAddress(t.id, tokenY?.id))
+    const priceX = Number(tokenPriceX?.price) || 0
+    const priceY = Number(tokenPriceY?.price) || 0
+
     if (pool.type === 'CPMM') {
       if (!Number(reserveX) || !Number(reserveY)) {
         console.warn('Reserve not found', pool.id)
@@ -57,23 +76,38 @@ router.get('/pools', async function handler(req, res) {
       }
     }
 
+    // total usd price of pool reserve
+    const totalPrice =
+      priceX * Number(formatUnits(BigInt(pool.reserveX), tokenX?.decimals)) +
+      priceY * Number(formatUnits(BigInt(pool.reserveY), tokenY?.decimals))
+
+    // total usd price of pool collected protocol fee
+    const feeUsd =
+      priceX *
+        Number(
+          formatUnits(BigInt(pool.collectedXProtocolFee), tokenX?.decimals),
+        ) +
+      priceY *
+        Number(
+          formatUnits(BigInt(pool.collectedYProtocolFee), tokenY?.decimals),
+        )
+
     return {
       ...pool,
       tokenX: {
         ...tokenX,
         priceUsd: priceXUsd,
-        apy: 7.23, // mock
       },
       tokenY: {
         ...tokenY,
         priceUsd: priceYUsd,
-        apy: 7.23, // mock
       },
       ...reserveData,
-      // mock data
-      liquidityUsd: 17732929.594,
-      volumeUsd: 18123142.156,
-      feesUsd: 12123,
+      liquidityUsd: totalPrice, // tvl
+      // TODO: sum of volume usd of all swap
+      volumeUsd: 0, // 24h volume usd
+      feeUsd,
+      // TODO: imple apy
       apy: 12.16,
     }
   })
