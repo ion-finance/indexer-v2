@@ -6,7 +6,7 @@
     "clean": "rimraf ./build",
     "build": "npm-run-all format lint clean && tsc",
     "start": "ts-node -r tsconfig-paths/register build/src",
-    "ts-node": "ts-node -r tsconfig-paths/register ./src/index.ts",
+    "ts-node": "ts-node -r tsconfig-paths/register",
     "local": "ts-node -r tsconfig-paths/register src",
     "local:watch": "nodemon src -e ts,json,yaml --exec 'node -r tsconfig-paths/register -r ts-node/register src'",
     "lint": "eslint src",
