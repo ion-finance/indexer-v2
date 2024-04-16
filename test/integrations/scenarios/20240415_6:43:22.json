@@ -1,4 +1,5 @@
 {
+  "routerAddress": "EQD07PmfUr8PLaWr-2sWtQuxQdz8etmz6TRlhZx1273fKqEc",
   "events": [
     {
       "eventId": "188c42bf6d798723ccd3e69db01c79ced928bea66dfea98c6dbf4956e8006990",
@@ -65,9 +66,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -134,9 +133,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "stonfi_router"
-            ]
+            "interfaces": ["stonfi_router"]
           }
         ]
       }
@@ -206,9 +203,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -281,9 +276,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "stonfi_router"
-            ]
+            "interfaces": ["stonfi_router"]
           }
         ]
       }
@@ -353,9 +346,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -447,9 +438,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -526,9 +515,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -607,9 +594,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "wallet_v4r2"
-                    ]
+                    "interfaces": ["wallet_v4r2"]
                   },
                   {
                     "transaction": {
@@ -698,9 +683,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -769,10 +752,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -919,9 +899,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -1013,9 +991,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -1104,9 +1080,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "stonfi_router"
-                ],
+                "interfaces": ["stonfi_router"],
                 "children": [
                   {
                     "transaction": {
@@ -1182,10 +1156,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "jetton_master",
-                      "stonfi_pool"
-                    ],
+                    "interfaces": ["jetton_master", "stonfi_pool"],
                     "children": [
                       {
                         "transaction": {
@@ -1336,10 +1307,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "jetton_master",
-                              "stonfi_pool"
-                            ],
+                            "interfaces": ["jetton_master", "stonfi_pool"],
                             "children": [
                               {
                                 "transaction": {
@@ -1416,9 +1384,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ]
+                                "interfaces": ["jetton_wallet"]
                               }
                             ]
                           }
@@ -1498,9 +1464,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -1592,9 +1556,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -1683,9 +1645,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "stonfi_router"
-                ],
+                "interfaces": ["stonfi_router"],
                 "children": [
                   {
                     "transaction": {
@@ -1761,10 +1721,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "jetton_master",
-                      "stonfi_pool"
-                    ],
+                    "interfaces": ["jetton_master", "stonfi_pool"],
                     "children": [
                       {
                         "transaction": {
@@ -1938,9 +1895,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -2023,9 +1978,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -2104,9 +2057,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "wallet_v4r2"
-                    ]
+                    "interfaces": ["wallet_v4r2"]
                   },
                   {
                     "transaction": {
@@ -2195,9 +2146,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -2273,10 +2222,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -2427,10 +2373,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_master",
-                                  "stonfi_pool"
-                                ],
+                                "interfaces": ["jetton_master", "stonfi_pool"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -2507,9 +2450,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "jetton_wallet"
-                                    ],
+                                    "interfaces": ["jetton_wallet"],
                                     "children": [
                                       {
                                         "transaction": {
@@ -2588,9 +2529,7 @@
                                           "aborted": false,
                                           "destroyed": false
                                         },
-                                        "interfaces": [
-                                          "wallet_v4r2"
-                                        ]
+                                        "interfaces": ["wallet_v4r2"]
                                       }
                                     ]
                                   }
@@ -2674,9 +2613,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -2768,9 +2705,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -2859,9 +2794,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "stonfi_router"
-                ],
+                "interfaces": ["stonfi_router"],
                 "children": [
                   {
                     "transaction": {
@@ -2937,10 +2870,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "jetton_master",
-                      "stonfi_pool"
-                    ],
+                    "interfaces": ["jetton_master", "stonfi_pool"],
                     "children": [
                       {
                         "transaction": {
@@ -3015,9 +2945,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "stonfi_router"
-                        ],
+                        "interfaces": ["stonfi_router"],
                         "children": [
                           {
                             "transaction": {
@@ -3109,9 +3037,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "jetton_wallet"
-                            ],
+                            "interfaces": ["jetton_wallet"],
                             "children": [
                               {
                                 "transaction": {
@@ -3194,9 +3120,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -3275,9 +3199,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "wallet_v4r2"
-                                    ]
+                                    "interfaces": ["wallet_v4r2"]
                                   }
                                 ]
                               }
@@ -3359,9 +3281,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -3453,9 +3373,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -3538,9 +3456,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -3619,9 +3535,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "wallet_v4r2"
-                    ]
+                    "interfaces": ["wallet_v4r2"]
                   },
                   {
                     "transaction": {
@@ -3710,9 +3624,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -3788,10 +3700,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -3866,9 +3775,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "stonfi_router"
-                            ],
+                            "interfaces": ["stonfi_router"],
                             "children": [
                               {
                                 "transaction": {
@@ -3960,9 +3867,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -4051,9 +3956,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "wallet_v4r2"
-                                    ]
+                                    "interfaces": ["wallet_v4r2"]
                                   }
                                 ]
                               }
@@ -4135,9 +4038,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -4229,9 +4130,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -4320,9 +4219,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "stonfi_router"
-                ],
+                "interfaces": ["stonfi_router"],
                 "children": [
                   {
                     "transaction": {
@@ -4398,10 +4295,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "jetton_master",
-                      "stonfi_pool"
-                    ],
+                    "interfaces": ["jetton_master", "stonfi_pool"],
                     "children": [
                       {
                         "transaction": {
@@ -4476,9 +4370,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "stonfi_router"
-                        ],
+                        "interfaces": ["stonfi_router"],
                         "children": [
                           {
                             "transaction": {
@@ -4570,9 +4462,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "jetton_wallet"
-                            ],
+                            "interfaces": ["jetton_wallet"],
                             "children": [
                               {
                                 "transaction": {
@@ -4649,9 +4539,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -4730,9 +4618,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "wallet_v4r2"
-                                    ]
+                                    "interfaces": ["wallet_v4r2"]
                                   }
                                 ]
                               }
@@ -4814,9 +4700,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -4908,9 +4792,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -4999,9 +4881,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "stonfi_router"
-                ],
+                "interfaces": ["stonfi_router"],
                 "children": [
                   {
                     "transaction": {
@@ -5077,10 +4957,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "jetton_master",
-                      "stonfi_pool"
-                    ],
+                    "interfaces": ["jetton_master", "stonfi_pool"],
                     "children": [
                       {
                         "transaction": {
@@ -5151,9 +5028,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "stonfi_router"
-                        ],
+                        "interfaces": ["stonfi_router"],
                         "children": [
                           {
                             "transaction": {
@@ -5245,9 +5120,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "jetton_wallet"
-                            ],
+                            "interfaces": ["jetton_wallet"],
                             "children": [
                               {
                                 "transaction": {
@@ -5330,9 +5203,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -5407,9 +5278,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "wallet_v4r2"
-                                    ]
+                                    "interfaces": ["wallet_v4r2"]
                                   }
                                 ]
                               }
@@ -5491,9 +5360,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -5585,9 +5452,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -5664,9 +5529,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -5755,9 +5618,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -5826,10 +5687,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -5981,9 +5839,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "wallet_v4r2"
-                    ]
+                    "interfaces": ["wallet_v4r2"]
                   }
                 ]
               }
@@ -6057,9 +5913,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -6151,9 +6005,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -6236,9 +6088,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -6327,9 +6177,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -6405,10 +6253,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -6559,10 +6404,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_master",
-                                  "stonfi_pool"
-                                ],
+                                "interfaces": ["jetton_master", "stonfi_pool"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -6639,9 +6481,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "jetton_wallet"
-                                    ]
+                                    "interfaces": ["jetton_wallet"]
                                   }
                                 ]
                               }
@@ -6728,9 +6568,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "wallet_v4r2"
-                    ]
+                    "interfaces": ["wallet_v4r2"]
                   }
                 ]
               }
@@ -6804,9 +6642,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -6898,9 +6734,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -6989,9 +6823,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "stonfi_router"
-                ],
+                "interfaces": ["stonfi_router"],
                 "children": [
                   {
                     "transaction": {
@@ -7067,10 +6899,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "jetton_master",
-                      "stonfi_pool"
-                    ],
+                    "interfaces": ["jetton_master", "stonfi_pool"],
                     "children": [
                       {
                         "transaction": {
@@ -7145,9 +6974,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "stonfi_router"
-                        ],
+                        "interfaces": ["stonfi_router"],
                         "children": [
                           {
                             "transaction": {
@@ -7239,9 +7066,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "jetton_wallet"
-                            ],
+                            "interfaces": ["jetton_wallet"],
                             "children": [
                               {
                                 "transaction": {
@@ -7324,9 +7149,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -7405,9 +7228,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "wallet_v4r2"
-                                    ]
+                                    "interfaces": ["wallet_v4r2"]
                                   }
                                 ]
                               }
@@ -7489,9 +7310,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -7583,9 +7402,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -7674,9 +7491,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "stonfi_router"
-                ],
+                "interfaces": ["stonfi_router"],
                 "children": [
                   {
                     "transaction": {
@@ -7752,10 +7567,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "jetton_master",
-                      "stonfi_pool"
-                    ],
+                    "interfaces": ["jetton_master", "stonfi_pool"],
                     "children": [
                       {
                         "transaction": {
@@ -7830,9 +7642,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "stonfi_router"
-                        ],
+                        "interfaces": ["stonfi_router"],
                         "children": [
                           {
                             "transaction": {
@@ -7924,9 +7734,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "jetton_wallet"
-                            ],
+                            "interfaces": ["jetton_wallet"],
                             "children": [
                               {
                                 "transaction": {
@@ -8009,9 +7817,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -8090,9 +7896,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "wallet_v4r2"
-                                    ]
+                                    "interfaces": ["wallet_v4r2"]
                                   }
                                 ]
                               }
@@ -8174,9 +7978,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -8268,9 +8070,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -8359,9 +8159,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "stonfi_router"
-                ],
+                "interfaces": ["stonfi_router"],
                 "children": [
                   {
                     "transaction": {
@@ -8437,10 +8235,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "jetton_master",
-                      "stonfi_pool"
-                    ],
+                    "interfaces": ["jetton_master", "stonfi_pool"],
                     "children": [
                       {
                         "transaction": {
@@ -8515,9 +8310,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "stonfi_router"
-                        ],
+                        "interfaces": ["stonfi_router"],
                         "children": [
                           {
                             "transaction": {
@@ -8609,9 +8402,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "jetton_wallet"
-                            ],
+                            "interfaces": ["jetton_wallet"],
                             "children": [
                               {
                                 "transaction": {
@@ -8694,9 +8485,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -8775,9 +8564,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "wallet_v4r2"
-                                    ]
+                                    "interfaces": ["wallet_v4r2"]
                                   }
                                 ]
                               }
@@ -8859,9 +8646,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -8953,9 +8738,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -9038,9 +8821,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -9129,9 +8910,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -9207,10 +8986,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -9285,9 +9061,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "stonfi_router"
-                            ],
+                            "interfaces": ["stonfi_router"],
                             "children": [
                               {
                                 "transaction": {
@@ -9379,9 +9153,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -9464,9 +9236,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "jetton_wallet"
-                                    ],
+                                    "interfaces": ["jetton_wallet"],
                                     "children": [
                                       {
                                         "transaction": {
@@ -9545,9 +9315,7 @@
                                           "aborted": false,
                                           "destroyed": false
                                         },
-                                        "interfaces": [
-                                          "wallet_v4r2"
-                                        ]
+                                        "interfaces": ["wallet_v4r2"]
                                       }
                                     ]
                                   }
@@ -9631,9 +9399,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -9725,9 +9491,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -9810,9 +9574,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -9901,9 +9663,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -9979,10 +9739,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -10129,9 +9886,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -10223,9 +9978,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -10308,9 +10061,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -10399,9 +10150,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -10477,10 +10226,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -10627,9 +10373,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -10721,9 +10465,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -10806,9 +10548,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -10897,9 +10637,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -10975,10 +10713,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -11129,10 +10864,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_master",
-                                  "stonfi_pool"
-                                ],
+                                "interfaces": ["jetton_master", "stonfi_pool"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -11209,9 +10941,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "jetton_wallet"
-                                    ],
+                                    "interfaces": ["jetton_wallet"],
                                     "children": [
                                       {
                                         "transaction": {
@@ -11290,9 +11020,7 @@
                                           "aborted": false,
                                           "destroyed": false
                                         },
-                                        "interfaces": [
-                                          "wallet_v4r2"
-                                        ]
+                                        "interfaces": ["wallet_v4r2"]
                                       }
                                     ]
                                   }
@@ -11376,9 +11104,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -11470,9 +11196,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -11555,9 +11279,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -11646,9 +11368,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -11724,10 +11444,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -11881,9 +11598,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -11958,9 +11673,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -12043,10 +11756,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_master",
-                  "stonfi_pool"
-                ],
+                "interfaces": ["jetton_master", "stonfi_pool"],
                 "children": [
                   {
                     "transaction": {
@@ -12121,9 +11831,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -12215,9 +11923,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_wallet"
-                        ],
+                        "interfaces": ["jetton_wallet"],
                         "children": [
                           {
                             "transaction": {
@@ -12300,9 +12006,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "jetton_wallet"
-                            ],
+                            "interfaces": ["jetton_wallet"],
                             "children": [
                               {
                                 "transaction": {
@@ -12381,9 +12085,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "wallet_v4r2"
-                                ]
+                                "interfaces": ["wallet_v4r2"]
                               }
                             ]
                           }
@@ -12479,9 +12181,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_wallet"
-                        ],
+                        "interfaces": ["jetton_wallet"],
                         "children": [
                           {
                             "transaction": {
@@ -12564,9 +12264,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "jetton_wallet"
-                            ],
+                            "interfaces": ["jetton_wallet"],
                             "children": [
                               {
                                 "transaction": {
@@ -12645,9 +12343,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "wallet_v4r2"
-                                ]
+                                "interfaces": ["wallet_v4r2"]
                               }
                             ]
                           }
@@ -12732,9 +12428,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "wallet_v4r2"
-                    ]
+                    "interfaces": ["wallet_v4r2"]
                   }
                 ]
               }
@@ -12808,9 +12502,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -12902,9 +12594,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -12993,9 +12683,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "stonfi_router"
-                ],
+                "interfaces": ["stonfi_router"],
                 "children": [
                   {
                     "transaction": {
@@ -13071,10 +12759,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "jetton_master",
-                      "stonfi_pool"
-                    ],
+                    "interfaces": ["jetton_master", "stonfi_pool"],
                     "children": [
                       {
                         "transaction": {
@@ -13225,10 +12910,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "jetton_master",
-                              "stonfi_pool"
-                            ],
+                            "interfaces": ["jetton_master", "stonfi_pool"],
                             "children": [
                               {
                                 "transaction": {
@@ -13305,9 +12987,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -13386,9 +13066,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "wallet_v4r2"
-                                    ]
+                                    "interfaces": ["wallet_v4r2"]
                                   }
                                 ]
                               }
@@ -13470,9 +13148,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -13564,9 +13240,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -13655,9 +13329,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "stonfi_router"
-                ],
+                "interfaces": ["stonfi_router"],
                 "children": [
                   {
                     "transaction": {
@@ -13733,10 +13405,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "jetton_master",
-                      "stonfi_pool"
-                    ],
+                    "interfaces": ["jetton_master", "stonfi_pool"],
                     "children": [
                       {
                         "transaction": {
@@ -13888,9 +13557,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -13982,9 +13649,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -14073,9 +13738,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "stonfi_router"
-                ],
+                "interfaces": ["stonfi_router"],
                 "children": [
                   {
                     "transaction": {
@@ -14151,10 +13814,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "jetton_master",
-                      "stonfi_pool"
-                    ],
+                    "interfaces": ["jetton_master", "stonfi_pool"],
                     "children": [
                       {
                         "transaction": {
@@ -14327,9 +13987,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -14412,9 +14070,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -14503,9 +14159,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -14581,10 +14235,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -14735,10 +14386,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_master",
-                                  "stonfi_pool"
-                                ],
+                                "interfaces": ["jetton_master", "stonfi_pool"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -14821,9 +14469,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "jetton_wallet"
-                                    ],
+                                    "interfaces": ["jetton_wallet"],
                                     "children": [
                                       {
                                         "transaction": {
@@ -14902,9 +14548,7 @@
                                           "aborted": false,
                                           "destroyed": false
                                         },
-                                        "interfaces": [
-                                          "wallet_v4r2"
-                                        ]
+                                        "interfaces": ["wallet_v4r2"]
                                       }
                                     ]
                                   }
@@ -14988,9 +14632,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -15082,9 +14724,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -15167,9 +14807,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -15258,9 +14896,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -15335,10 +14971,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -15413,9 +15046,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "stonfi_router"
-                            ],
+                            "interfaces": ["stonfi_router"],
                             "children": [
                               {
                                 "transaction": {
@@ -15507,9 +15138,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -15592,9 +15221,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "jetton_wallet"
-                                    ],
+                                    "interfaces": ["jetton_wallet"],
                                     "children": [
                                       {
                                         "transaction": {
@@ -15673,9 +15300,7 @@
                                           "aborted": false,
                                           "destroyed": false
                                         },
-                                        "interfaces": [
-                                          "wallet_v4r2"
-                                        ]
+                                        "interfaces": ["wallet_v4r2"]
                                       }
                                     ]
                                   }
@@ -15759,9 +15384,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -15853,9 +15476,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -15938,9 +15559,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -16029,9 +15648,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -16106,10 +15723,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -16184,9 +15798,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "stonfi_router"
-                            ],
+                            "interfaces": ["stonfi_router"],
                             "children": [
                               {
                                 "transaction": {
@@ -16278,9 +15890,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -16363,9 +15973,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "jetton_wallet"
-                                    ],
+                                    "interfaces": ["jetton_wallet"],
                                     "children": [
                                       {
                                         "transaction": {
@@ -16444,9 +16052,7 @@
                                           "aborted": false,
                                           "destroyed": false
                                         },
-                                        "interfaces": [
-                                          "wallet_v4r2"
-                                        ]
+                                        "interfaces": ["wallet_v4r2"]
                                       }
                                     ]
                                   }
@@ -16530,9 +16136,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -16624,9 +16228,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -16709,9 +16311,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -16800,9 +16400,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -16877,10 +16475,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -16955,9 +16550,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "stonfi_router"
-                            ],
+                            "interfaces": ["stonfi_router"],
                             "children": [
                               {
                                 "transaction": {
@@ -17049,9 +16642,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -17134,9 +16725,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "jetton_wallet"
-                                    ],
+                                    "interfaces": ["jetton_wallet"],
                                     "children": [
                                       {
                                         "transaction": {
@@ -17215,9 +16804,7 @@
                                           "aborted": false,
                                           "destroyed": false
                                         },
-                                        "interfaces": [
-                                          "wallet_v4r2"
-                                        ]
+                                        "interfaces": ["wallet_v4r2"]
                                       }
                                     ]
                                   }
@@ -17301,9 +16888,7 @@
           "aborted": false,
           "destroyed": false
         },
-        "interfaces": [
-          "wallet_v4r2"
-        ],
+        "interfaces": ["wallet_v4r2"],
         "children": [
           {
             "transaction": {
@@ -17395,9 +16980,7 @@
               "aborted": false,
               "destroyed": false
             },
-            "interfaces": [
-              "jetton_wallet"
-            ],
+            "interfaces": ["jetton_wallet"],
             "children": [
               {
                 "transaction": {
@@ -17480,9 +17063,7 @@
                   "aborted": false,
                   "destroyed": false
                 },
-                "interfaces": [
-                  "jetton_wallet"
-                ],
+                "interfaces": ["jetton_wallet"],
                 "children": [
                   {
                     "transaction": {
@@ -17571,9 +17152,7 @@
                       "aborted": false,
                       "destroyed": false
                     },
-                    "interfaces": [
-                      "stonfi_router"
-                    ],
+                    "interfaces": ["stonfi_router"],
                     "children": [
                       {
                         "transaction": {
@@ -17648,10 +17227,7 @@
                           "aborted": false,
                           "destroyed": false
                         },
-                        "interfaces": [
-                          "jetton_master",
-                          "stonfi_pool"
-                        ],
+                        "interfaces": ["jetton_master", "stonfi_pool"],
                         "children": [
                           {
                             "transaction": {
@@ -17726,9 +17302,7 @@
                               "aborted": false,
                               "destroyed": false
                             },
-                            "interfaces": [
-                              "stonfi_router"
-                            ],
+                            "interfaces": ["stonfi_router"],
                             "children": [
                               {
                                 "transaction": {
@@ -17820,9 +17394,7 @@
                                   "aborted": false,
                                   "destroyed": false
                                 },
-                                "interfaces": [
-                                  "jetton_wallet"
-                                ],
+                                "interfaces": ["jetton_wallet"],
                                 "children": [
                                   {
                                     "transaction": {
@@ -17905,9 +17477,7 @@
                                       "aborted": false,
                                       "destroyed": false
                                     },
-                                    "interfaces": [
-                                      "jetton_wallet"
-                                    ],
+                                    "interfaces": ["jetton_wallet"],
                                     "children": [
                                       {
                                         "transaction": {
@@ -17986,9 +17556,7 @@
                                           "aborted": false,
                                           "destroyed": false
                                         },
-                                        "interfaces": [
-                                          "wallet_v4r2"
-                                        ]
+                                        "interfaces": ["wallet_v4r2"]
                                       }
                                     ]
                                   }
