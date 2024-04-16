@@ -91,6 +91,9 @@ router.get('/pools', async function handler(req, res) {
         Number(
           formatUnits(BigInt(pool.collectedYProtocolFee), tokenY?.decimals),
         )
+    const volumeUsd = exchanges.reduce((acc, exchange) => {
+      return acc + Number(exchange.volumeUsd)
+    }, 0)
 
     return {
       ...pool,
@@ -104,8 +107,7 @@ router.get('/pools', async function handler(req, res) {
       },
       ...reserveData,
       liquidityUsd: totalPrice, // tvl
-      // TODO: sum of volume usd of all swap
-      volumeUsd: 0, // 24h volume usd
+      volumeUsd, // 24h volume (sum of all exchanges)
       feeUsd,
       // TODO: imple apy
       apy: 12.16,
