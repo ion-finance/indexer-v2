@@ -1,6 +1,6 @@
 import { Pool, Token } from '@prisma/client'
 import axios from 'axios'
-import { compact, filter, find, forEach, map, reduce } from 'lodash'
+import { compact, filter, find, forEach, map, reduce, uniqBy } from 'lodash'
 
 import prisma from 'src/clients/prisma'
 import { isSameAddress } from 'src/utils/address'
@@ -23,7 +23,7 @@ const getPrice = async () => {
 
     return { TON, JUSDT, JUSDC }
   } catch (e) {
-    console.warn('Error fetching price data from CoinMarketCap:', e)
+    console.warn('Error fetching price data from CoinMarketCap:')
     return {
       TON: 0,
       JUSDT: 0,
@@ -108,8 +108,9 @@ const updateTokenPricesLogic = async () => {
     tokenSymbol: 'TON',
     price: tonPrice,
   })
+  const uniqTokenPrices = uniqBy(tokenPrices, 'id')
 
-  bulkUpsertTokenPrices(prisma, tokenPrices)
+  bulkUpsertTokenPrices(prisma, uniqTokenPrices)
 }
 
 async function bulkUpsertTokenPrices(
@@ -123,8 +124,6 @@ async function bulkUpsertTokenPrices(
     })
     .join(',')
 
-  // PostgreSQL UPSERT syntax (ON CONFLICT DO UPDATE)
-  // Assumes 'id' is the unique primary key column
   const query = `
     INSERT INTO "TokenPrice" (id, "tokenSymbol", "price")
     VALUES ${values}
