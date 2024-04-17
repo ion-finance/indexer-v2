@@ -10,7 +10,6 @@ jest.mock('../../src/utils/fetchTokenData', () => {
   return {
     __esModule: true,
     default: jest.fn((address: string) => {
-      console.log(address)
       return JettonMetadata[address]
     }),
   }
@@ -55,6 +54,7 @@ describe('ScenarioTest', () => {
       const pools = await prisma.pool.findMany()
 
       scenario.pools.forEach((pool) => {
+        console.log(pool.address)
         const dbpool = pools.find(
           (p) => p.id === Address.parse(pool.address).toString(),
         )
