@@ -91,6 +91,8 @@ async function generate() {
       })
 
       const poolData = await pool.getData()
+
+      // TODO: improve sdk to get pool's lpSupply from blockchain
       pools.push({
         address: poolAddress.toString(),
         reserve0: poolData.reserve0.toString(),

@@ -146,6 +146,7 @@ export const handleAddLiquidity = async ({
       poolAddress,
       amountX,
       amountY,
+      minted: String(minted),
       timestamp,
     },
     create: {
@@ -157,6 +158,7 @@ export const handleAddLiquidity = async ({
       tokenAddress: pool.tokenXAddress, // TODO : In case of cpmm, tokenXAddress is unnecessary.
       amountX,
       amountY,
+      minted: String(minted),
       timestamp,
     },
   })

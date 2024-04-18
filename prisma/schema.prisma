@@ -65,6 +65,7 @@ model Deposit {
   tokenAddress    String
   amountX         String   @default("0")
   amountY         String   @default("0")
+  minted          String   @default("0")
 }
 
 model Withdraw {
@@ -78,6 +79,7 @@ model Withdraw {
   receiverAddress String
   amountX         String   @default("0")
   amountY         String   @default("0")
+  burned         String   @default("0")
 }
 
 model Swap {

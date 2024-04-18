@@ -134,6 +134,7 @@ export const handleRemoveLiquidity = async ({
       amountX: String(amount0Out),
       amountY: String(amount1Out),
       timestamp: utime,
+      burned: String(burned),
     },
   })
 
