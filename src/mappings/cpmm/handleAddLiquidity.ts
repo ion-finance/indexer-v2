@@ -185,10 +185,11 @@ export const handleAddLiquidity = async ({
     },
   })
 
+  const receiverAddress = to ? to.toString() : ''
   const lpTokenWallet = await prisma.lpTokenWallet.findFirst({
     where: {
       poolAddress,
-      ownerAddress: userAddress,
+      ownerAddress: receiverAddress,
     },
   })
 
