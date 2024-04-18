@@ -24,12 +24,12 @@ paths:
           example: EQDXPXpCRQScbFgRu_TXfAOHpKP6WmmOP1nICGq6ujaEKWsF
         - name: units
           in: query
-          description: The number of units offered for the swap.
+          description: The number of units offered for the swap, consider decimals
           required: true
           schema:
             type: integer
             minimum: 1
-          example: 200
+          example: 2000000000
         - name: slippageTolerance
           in: query
           description: Maximum tolerated slippage in the transaction as a fraction of 1.
