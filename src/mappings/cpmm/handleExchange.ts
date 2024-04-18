@@ -1,4 +1,4 @@
-import { Cell } from '@ton/core'
+import { Address, Cell } from '@ton/core'
 import { formatUnits } from 'ethers'
 import { find } from 'lodash'
 
@@ -219,22 +219,22 @@ export const handleExchange = async ({
   )
 
   const res = (function () {
-    const assetOutDelta = Number(amountOut)
-    const assetOutAmount =
-      assetOutDelta - (protocolFeeAmount + referralFeeAmount)
+    const assetOutAmount = Number(amountOut)
+    const assetOutDelta =
+      assetOutAmount + (protocolFeeAmount + referralFeeAmount)
     if (swapForY) {
       return {
-        asset0Delta: -Number(amountIn),
-        asset0Amount: -Number(amountIn),
-        asset1Delta: assetOutDelta,
-        asset1Amount: assetOutAmount,
+        asset0Delta: Number(amountIn),
+        asset0Amount: Number(amountIn),
+        asset1Delta: -assetOutDelta,
+        asset1Amount: -assetOutAmount,
       }
     } else {
       return {
-        asset0Delta: assetOutDelta,
-        asset0Amount: assetOutAmount,
-        asset1Delta: -Number(amountIn),
-        asset1Amount: -Number(amountIn),
+        asset0Delta: -assetOutDelta,
+        asset0Amount: -assetOutAmount,
+        asset1Delta: Number(amountIn),
+        asset1Amount: Number(amountIn),
       }
     }
   })()

@@ -98,9 +98,11 @@ export const calculateInAmount = ({
   const denominator =
     ((reserveOut - amountOutBeforeFee) * (FEE_DIVIDER - lpFee)) / FEE_DIVIDER
 
-  const amountAfterFee = numerator / denominator + 1
-  const amountIn = (amountAfterFee * FEE_DIVIDER) / (FEE_DIVIDER - lpFee)
+  const amountInAfterFee = numerator / denominator + 1
+  const amountIn = (amountInAfterFee * FEE_DIVIDER) / (FEE_DIVIDER - lpFee)
+
   const amountInWithSlippage = amountIn * (1 + slippageTolerance) // slippage applied to amountIn
+
   return Math.floor(amountInWithSlippage)
 }
 
@@ -118,15 +120,20 @@ export async function calculateFeeInNanotons({
   const isTon = isSameAddress(offerToken.id, TON_WALLET_ADDRESS)
 
   if (isTon) {
-    return Math.floor((feePercent / 100) * offerAmount)
+    return Math.floor((offerAmount * feePercent) / 100)
   }
 
-  const offerTokenPrice = tokenPrices.find(
-    (tokenPrice) => tokenPrice.id === offerToken.id,
+  const tonPrice = tokenPrices.find((tokenPrice) =>
+    isSameAddress(tokenPrice.id, TON_WALLET_ADDRESS),
   )
-  if (!offerTokenPrice) {
+  const offerTokenPrice = tokenPrices.find((tokenPrice) =>
+    isSameAddress(tokenPrice.id, offerToken.id),
+  )
+  if (!offerTokenPrice || !tonPrice) {
     console.warn('Token price not found.')
     return 0
   }
-  return (Number(offerTokenPrice.price) * offerAmount * feePercent) / 100
+  const offerTokenPriceByTon =
+    Number(offerTokenPrice.price) / Number(tonPrice.price)
+  return (offerAmount * feePercent * offerTokenPriceByTon) / 100
 }

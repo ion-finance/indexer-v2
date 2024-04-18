@@ -15,8 +15,8 @@ export async function simulateSwap(
 ): Promise<SwapSimulateResponse | null> {
   const routerAddress = process.env.ROUTER_ADDRESS || ''
   const {
-    askAddress,
     offerAddress,
+    askAddress,
     slippageTolerance,
     units,
     referralAddress,
@@ -87,19 +87,19 @@ export async function simulateSwap(
   })
 
   return {
-    askAddress: askAddress,
-    askUnits: askUnits,
+    askAddress,
+    askUnits,
     feeAddress: askAddress,
-    feePercent: feePercent,
+    feePercent,
     feeUnits: protocolFeeOut + refFeeOut,
-    minAskUnits: minAskUnits,
-    offerAddress: offerAddress,
+    minAskUnits,
+    offerAddress,
     offerUnits: amountIn,
     poolAddress: pool.id,
-    priceImpact: priceImpact,
+    priceImpact,
     routerAddress,
-    slippageTolerance: slippageTolerance,
-    swapRate: swapRate,
+    slippageTolerance,
+    swapRate,
     tonFeeUnits: feeNanotons,
   }
 }

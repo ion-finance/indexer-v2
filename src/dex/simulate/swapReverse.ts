@@ -75,13 +75,12 @@ export async function simulateSwapReverse(
 
   const swapRate = offerUnits > 0 ? units / offerUnits : 0
 
-  // TODO: check
-  const protocolFeeOut =
-    amountOut * (FEE_DIVIDER / (FEE_DIVIDER - PROTOCOL_FEE)) * PROTOCOL_FEE
-  const refFeeOut =
-    amountOut * (FEE_DIVIDER / (FEE_DIVIDER - REF_FEE)) * REF_FEE
+  const protocolFeeOut = (amountOut * PROTOCOL_FEE) / FEE_DIVIDER
+  const refFeeOut = hasRef ? (amountOut * REF_FEE) / FEE_DIVIDER : 0
   const feePercent =
-    minAskUnits > 0 ? (protocolFeeOut + refFeeOut) / minAskUnits : 0
+    minAskUnits > 0
+      ? (protocolFeeOut + refFeeOut) / (minAskUnits * (1 + slippageTolerance))
+      : 0
 
   const offerToken = swapForY ? tokenX : tokenY
   const feeNanotons = await calculateFeeInNanotons({
