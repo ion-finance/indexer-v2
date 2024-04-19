@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/node'
 import axios from 'axios'
 import dotenv from 'dotenv'
+import fs from 'fs'
 
 import { routerAddress } from 'src/address'
 import api from 'src/api'
@@ -24,6 +25,22 @@ Sentry.init({
 })
 
 const isCLMM = process.env.IS_CLMM === 'true'
+// const useCache = true && process.env.IS_DEV === 'true'
+const useCache = false
+
+let cachedTrace = {} as { [key: string]: Trace }
+
+if (useCache) {
+  console.log('Using cache...')
+  fs.readdirSync('cache/events').forEach((file) => {
+    if (file.includes('.json')) {
+      const data = fs.readFileSync(`cache/events/${file}`, 'utf-8')
+      cachedTrace = JSON.parse(data)
+      return
+    }
+  })
+}
+
 let totalEvents = 0
 const eventPooling = async () => {
   const timestamp = await prisma.indexerState.getLastTimestamp()
@@ -46,19 +63,25 @@ const eventPooling = async () => {
       if (isCLMM) {
         await handleEventCLMM(eventId)
       } else {
-        const res = await axios(
-          `${process.env.TON_API_URL}/traces/${eventId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.TON_API_KEY}`,
+        const trace = await (async function () {
+          if (useCache) {
+            return cachedTrace[eventId]
+          }
+          const res = await axios(
+            `${process.env.TON_API_URL}/traces/${eventId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${process.env.TON_API_KEY}`,
+              },
             },
-          },
-        )
+          )
+          return res.data as Trace
+        })()
 
         await handleEvent({
           routerAddress: process.env.ROUTER_ADDRESS || '',
           eventId,
-          traces: res.data as Trace,
+          traces: trace,
         })
       }
     } catch (e) {
