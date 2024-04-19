@@ -89,8 +89,10 @@ model Swap {
   updatedAt       DateTime @default(now()) @updatedAt
   timestamp       Int
   poolAddress     String
-  senderAddress   String
-  receiverAddress String
+  sendTokenAddress String
+  receiveTokenAddress String
+  senderAddress   String // sender v4 wallet address
+  receiverAddress String // receiver v4 wallet address
   amountIn        String
   amountOut       String
   swapForY        Boolean

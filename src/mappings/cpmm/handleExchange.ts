@@ -20,8 +20,8 @@ const parseSwap = (raw_body: string) => {
   const body = message.beginParse()
   const op = body.loadUint(32)
   const queryId = body.loadUint(64)
-  const toAddress = body.loadAddress().toString()
-  const senderAddress = body.loadAddress().toString()
+  const toAddress = body.loadAddress().toString() //  == pay_to's to_address -> wallet v4
+  const senderAddress = body.loadAddress().toString() // router jetton wallet
   const jettonAmount = body.loadCoins()
   const minOut = body.loadCoins()
   const hasRef = body.loadUint(1)
@@ -42,12 +42,12 @@ const parsePayTo = (raw_body: string) => {
   const body = message.beginParse()
   const op = body.loadUint(32)
   const queryId = body.loadUint(64)
-  const toAddress = body.loadAddress().toString()
+  const toAddress = body.loadAddress().toString() // == swap's to_address -> wallet v4
   const exitCode = body.loadUint(32)
   const hasMore = body.loadUint(0)
   const ref = body.loadRef().beginParse()
   const amount0Out = ref.loadCoins()
-  const token0Address = ref.loadAddress().toString()
+  const token0Address = ref.loadAddress().toString() // router jetton wallet
   const amount1Out = ref.loadCoins()
   const token1Address = ref.loadAddress().toString()
 
@@ -95,8 +95,12 @@ export const handleExchange = async ({
     return null
   }
 
-  const { senderAddress, jettonAmount, hasRef, toAddress } =
-    parseSwap(swapTraceRawBody)
+  const {
+    senderAddress: sendTokenAddress,
+    jettonAmount,
+    hasRef,
+    toAddress: receiverAddress,
+  } = parseSwap(swapTraceRawBody)
 
   const payToNormalTrace = find(payToTraces, (payToTrace) => {
     const rawBody = payToTrace.transaction.in_msg?.raw_body || ''
@@ -134,7 +138,6 @@ export const handleExchange = async ({
     parsePayTo(payToRefTrace?.transaction.in_msg?.raw_body || '')
 
   const { amount0Out, amount1Out } = payToNormal
-  const receiverAddress = senderAddress
   const poolAddress = parseRaw(swapTrace?.transaction.account.address)
 
   const amountIn = String(jettonAmount)
@@ -162,7 +165,7 @@ export const handleExchange = async ({
   )
   const priceX = Number(tokenPriceX?.price) || 0
   const priceY = Number(tokenPriceY?.price) || 0
-  const swapForY = senderAddress === tokenXAddress
+  const swapForY = sendTokenAddress === tokenXAddress
 
   const swap = await prisma.swap.findFirst({
     where: { id: hash, eventId },
@@ -172,6 +175,9 @@ export const handleExchange = async ({
     console.log('Swap already exists.')
     return
   }
+
+  const walletTrace = traces
+  const senderAddress = parseRaw(walletTrace.transaction.account.address)
 
   const volumeUsd = swapForY
     ? priceX * Number(formatUnits(Number(amountIn), tokenX?.decimals || 0))
@@ -188,6 +194,8 @@ export const handleExchange = async ({
       eventId,
       timestamp: utime,
       poolAddress,
+      sendTokenAddress,
+      receiveTokenAddress: swapForY ? tokenYAddress : tokenXAddress,
       senderAddress,
       receiverAddress,
       amountIn,
@@ -197,7 +205,6 @@ export const handleExchange = async ({
     },
   })
 
-  const walletTrace = traces
   const {
     hash: poolTxHash,
     lt,
@@ -247,7 +254,7 @@ export const handleExchange = async ({
       routerAddress,
       poolTxLt: String(lt),
       poolTxTimestamp: new Date(poolUtime * 1000).toISOString(), // save timestamp in UTC+0
-      destinationWalletAddress: toAddress,
+      destinationWalletAddress: receiverAddress,
       operationType: 'swap',
       exitCode: 'swap_ok',
 
@@ -269,7 +276,7 @@ export const handleExchange = async ({
       protocolFeeAmount: String(protocolFeeAmount),
       referralFeeAmount: String(referralFeeAmount),
 
-      walletAddress: walletTrace.transaction.in_msg?.source?.address,
+      walletAddress: senderAddress,
       walletTxLt: String(walletTrace.transaction.lt),
       walletTxHash: walletTrace.transaction.hash,
       walletTxTimestamp: new Date(

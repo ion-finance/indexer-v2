@@ -27,6 +27,8 @@ const handleSwap = async (event: Event) => {
       eventId: event.transaction.eventId,
       timestamp: event.transaction.timestamp,
       poolAddress: event.transaction.source,
+      sendTokenAddress: '',
+      receiveTokenAddress: '',
       senderAddress: params.senderAddress,
       receiverAddress: params.receiverAddress,
       amountIn: params.amountIn.toString(),

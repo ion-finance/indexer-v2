@@ -246,7 +246,7 @@ export const handleAddLiquidity = async ({
           lpFeeAmount: '0',
           protocolFeeAmount: '0',
           referralFeeAmount: '0',
-          walletAddress: walletTrace.transaction.in_msg?.source?.address,
+          walletAddress: parseRaw(walletTrace.transaction.account.address),
           walletTxLt: String(walletTrace.transaction.lt),
           walletTxHash: walletTrace.transaction.hash,
           walletTxTimestamp: new Date(
