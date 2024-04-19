@@ -6,6 +6,7 @@ import { routerAddress } from 'src/address'
 import api from 'src/api'
 import prisma from 'src/clients/prisma'
 
+import { updateBaseTokenPrices } from './api/routers/updateTokenPrices/updateTokenPricesLogic'
 import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'
 import handleEventCLMM from './tasks/handleEventCLMM'
@@ -93,6 +94,7 @@ const eventPooling = async () => {
 
 const main = async () => {
   console.log('Event pooling is started. ')
+  await updateBaseTokenPrices()
   for (;;) {
     await eventPooling()
   }
