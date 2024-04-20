@@ -41,6 +41,7 @@ const getPrice = async () => {
   }
 }
 
+// TODO: use quote historical v3 api
 export const updateBaseTokenPrices = async () => {
   const prices = await getPrice()
   const tonPrice = String(prices.TON)
@@ -50,6 +51,7 @@ export const updateBaseTokenPrices = async () => {
       id: TON_WALLET_ADDRESS,
       tokenSymbol: 'TON',
       price: tonPrice,
+      timestamp: new Date(),
     },
   })
 
@@ -62,7 +64,7 @@ export const updateBaseTokenPrices = async () => {
   //   },
   // })
 }
-const updateTokenPricesLogic = async () => {
+const updateTokenPricesLogic = async (timestamp?: Date) => {
   const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS as string
   const rawPools = (await prisma.pool.findMany()) as Pool[]
   const pools = rawPools.filter(
@@ -141,6 +143,7 @@ const updateTokenPricesLogic = async () => {
       id,
       tokenSymbol: symbol,
       price: tonPrice * ratio,
+      timestamp: timestamp || new Date(),
     }
   })
 
@@ -176,6 +179,7 @@ const updateTokenPricesLogic = async () => {
         id,
         tokenSymbol: symbol,
         price: indexed.price * ratio,
+        timestamp: timestamp || new Date(),
       }
       // add to reference pools
       newTokenPrices.push(tokenPrice)
@@ -195,28 +199,33 @@ const updateTokenPricesLogic = async () => {
   }
 
   const uniqTokenPrices = uniqBy(newTokenPrices, 'id')
-  await bulkUpsertTokenPrices(uniqTokenPrices)
+  await bulkInsertTokenPrices(uniqTokenPrices)
 }
 
-async function bulkUpsertTokenPrices(
-  tokenPrices: { id: string; tokenSymbol: string; price: number }[],
+async function bulkInsertTokenPrices(
+  tokenPrices: {
+    id: string
+    tokenSymbol: string
+    price: number
+    timestamp: Date
+  }[],
 ) {
   const prisma = new PrismaClient()
   if (isEmpty(tokenPrices)) {
     return
   }
+
   const values = tokenPrices
     .map((tp) => {
-      const { id, tokenSymbol, price } = tp
-      return `('${id}', '${tokenSymbol}', '${String(price).replace(/'/g, "''")}')`
+      const { id, tokenSymbol, price, timestamp } = tp
+      return `('${id}', '${tokenSymbol}', '${String(price).replace(/'/g, "''")}', '${timestamp.toISOString()}')`
     })
     .join(',')
 
   const query = `
-    INSERT INTO "TokenPrice" (id, "tokenSymbol", "price")
+    INSERT INTO "TokenPrice" (id, "tokenSymbol", "price", "timestamp")
     VALUES ${values}
-    ON CONFLICT (id) DO UPDATE
-    SET "tokenSymbol" = EXCLUDED."tokenSymbol", "price" = EXCLUDED."price";
+    ON CONFLICT ("id", "timestamp") DO NOTHING;
   `
 
   await prisma.$executeRawUnsafe(query)

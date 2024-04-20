@@ -165,11 +165,13 @@ model Order {
 }
 
 model TokenPrice {
-  id          String   @id
+  id         String   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
-  tokenSymbol String
+  tokenSymbol String 
   price        String
+  timestamp   DateTime @db.Timestamptz
+  @@unique([timestamp, id])
 }
 
 model Operation {
