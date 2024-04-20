@@ -88,3 +88,9 @@ export const isSameAddress = (a?: string, b?: string) => {
   if (!a || !b) return false
   return Address.parse(a).equals(Address.parse(b))
 }
+
+export const isTONAddress = (a?: string) => {
+  if (!a) return false
+  const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS || ''
+  return isSameAddress(a, TON_WALLET_ADDRESS)
+}

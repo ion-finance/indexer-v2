@@ -14,10 +14,11 @@ import routerAddressRouter from './routers/routerAddress/routerAddress'
 import simulateSwapRouter from './routers/simulate/swap'
 import simulateSwapReverseRouter from './routers/simulate/swapReverse'
 import taskRouter from './routers/tasks'
-import tokenPricesRouter from './routers/tokenPrices/tokenPrices'
+import tokenPricesRouter from './routers/tokenPrices'
 import tokenRouter from './routers/tokens'
 import traceRouter from './routers/trace'
 import transactionRouter from './routers/transactions'
+import trendingAssetsRouter from './routers/trendingAssets'
 import updateTokenPrices from './routers/updateTokenPrices'
 import updateTokenPricesLogic from './routers/updateTokenPrices/updateTokenPricesLogic'
 
@@ -47,6 +48,7 @@ api.use(orderRouter)
 api.use(taskRouter)
 api.use(routerAddressRouter)
 api.use(tokenPricesRouter)
+api.use(trendingAssetsRouter)
 api.use(updateTokenPrices)
 api.use(traceRouter)
 api.use(manualCPMMEventRouter)

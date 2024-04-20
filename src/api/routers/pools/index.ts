@@ -4,12 +4,12 @@ import { compact } from 'lodash'
 
 import prisma from 'src/clients/prisma'
 import { isSameAddress } from 'src/utils/address'
+import { ONE_DAY } from 'src/utils/date'
 
 import { getPriceUsd } from '../../../mocks/price'
 
 const router = Router()
 
-const ONE_DAY = 24 * 60 * 60 * 1000
 router.get('/pools', async function handler(req, res) {
   const rawPools = await prisma.pool.findMany()
   const tokens = await prisma.token.findMany()
@@ -28,6 +28,10 @@ router.get('/pools', async function handler(req, res) {
     const tokenX = tokens.find((token) => token.id === pool.tokenXAddress)
     const tokenY = tokens.find((token) => token.id === pool.tokenYAddress)
     const exchanges = exchanges24h.filter((d) => d.poolAddress === pool.id)
+    const volumeUsd = exchanges.reduce((acc, exchange) => {
+      return acc + Number(exchange.volumeUsd)
+    }, 0)
+
     const { reserveX, reserveY } = pool
 
     const tokenPriceX = tokenPrices.find((t) => isSameAddress(t.id, tokenX?.id))
@@ -91,9 +95,6 @@ router.get('/pools', async function handler(req, res) {
         Number(
           formatUnits(BigInt(pool.collectedYProtocolFee), tokenY?.decimals),
         )
-    const volumeUsd = exchanges.reduce((acc, exchange) => {
-      return acc + Number(exchange.volumeUsd)
-    }, 0)
 
     return {
       ...pool,

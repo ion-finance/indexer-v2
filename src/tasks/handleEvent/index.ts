@@ -76,7 +76,9 @@ const handleEvent = async (params: {
   } else if (isProvideLpConfirmed) {
     console.log(`Provide Lp Confirmed: ${eventId}`)
     await handleAddLiquidity({ eventId, traces })
-    await updateTokenPricesLogic()
+    const utime = traces.transaction.utime
+    const timestamp = new Date(utime * 1000)
+    await updateTokenPricesLogic(timestamp)
   } else if (isRemoveLiquidity) {
     console.log(`Remove Liquidity event: ${eventId}`)
     await handleRemoveLiquidity({ eventId, traces })
