@@ -64,7 +64,6 @@ const fetchEvents = async ({
     return []
   }
   if (events.length === 0) {
-    console.warn('No events found')
     return []
   }
 
