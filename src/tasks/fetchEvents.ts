@@ -54,13 +54,17 @@ const fetchEvents = async ({
 
       break
     } catch (e) {
-      console.error('Error fetching events', e)
+      console.error('Error fetching events')
       // Sentry.captureException(e);
       break
     }
   }
   // event
   if (events.length === 1 && events[0].event_id === lastEvent?.event_id) {
+    return []
+  }
+  if (events.length === 0) {
+    console.warn('No events found')
     return []
   }
 
