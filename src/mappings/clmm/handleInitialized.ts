@@ -7,7 +7,7 @@ import { Event } from '../../types/events'
 const handleInitialized = async (event: Event) => {
   const params = parseInitialized(event.body)
   console.log('Initialized event is indexed.')
-  console.log(event)
+  // console.log(event)
 
   const [tokenXdata, tokenYdata] = await Promise.all([
     fetchTokenData(params.tokenXAddress),

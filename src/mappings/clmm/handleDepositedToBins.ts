@@ -6,7 +6,7 @@ import { Event } from '../../types/events'
 const handleDepositedToBins = async (event: Event) => {
   const params = parseDepositedToBins(event.body)
   console.log('DepositedToBins event is indexed.')
-  console.log(event)
+  // console.log(event)
 
   const pool = await prisma.pool.findFirst({
     where: {

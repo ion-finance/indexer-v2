@@ -8,7 +8,7 @@ import { Event } from '../../types/events'
 const handleOrderExecuted = async (event: Event) => {
   const params = parseOrder(event.body)
   console.log('OrderExecuted event is indexed.')
-  console.log(event)
+  // console.log(event)
 
   const orders = await prisma.order.findMany({
     where: {

@@ -6,7 +6,7 @@ import { Event } from '../../types/events'
 const handleWithdrawnFromBins = async (event: Event) => {
   const params = parseWithdrawnFromBins(event.body)
   console.log('WithdrawnFromBins event is indexed.')
-  console.log(event)
+  // console.log(event)
 
   const withdrawnArray = params.withdrawn.keys().map((key) => {
     return {
