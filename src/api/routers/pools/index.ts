@@ -107,7 +107,7 @@ router.get('/pools', async function handler(req, res) {
         priceUsd: priceYUsd,
       },
       ...reserveData,
-      liquidityUsd: totalPrice, // tvl
+      tvl: totalPrice, // tvl
       volumeUsd, // 24h volume (sum of all exchanges)
       feeUsd,
       // TODO: imple apy
