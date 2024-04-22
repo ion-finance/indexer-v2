@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client'
 import { Router } from 'express'
 import _ from 'lodash'
 
@@ -10,10 +9,8 @@ router.get('/transactions', async function handler(req, res) {
   const { poolAddress, senderAddress, type } = req.query
 
   const query = {} as { poolAddress?: string; senderAddress?: string }
-  let orderQuery = {} as Prisma.OrderHistoryWhereInput
-  prisma.orderHistory
 
-  if (!senderAddress) {
+  if (!poolAddress) {
     return res.json({
       status: 400,
       data: [],
@@ -22,22 +19,12 @@ router.get('/transactions', async function handler(req, res) {
 
   if (poolAddress) {
     query.poolAddress = poolAddress as string
-    orderQuery.poolAddress = poolAddress as string
   }
   if (senderAddress) {
     query.senderAddress = senderAddress as string
-    orderQuery = {
-      ...orderQuery,
-      AND: {
-        OR: [
-          { senderAddress: senderAddress as string },
-          { relatedOwnerAddres: { contains: senderAddress as string } },
-        ],
-      },
-    }
   }
 
-  const [deposit, withdraw, swap, orderHistory] = await Promise.all([
+  const [deposit, withdraw, swap] = await Promise.all([
     !type || type === 'deposit'
       ? prisma.deposit.findMany({ where: query })
       : [],
@@ -45,18 +32,12 @@ router.get('/transactions', async function handler(req, res) {
       ? prisma.withdraw.findMany({ where: query })
       : [],
     !type || type === 'swap' ? prisma.swap.findMany({ where: query }) : [],
-    !type || type === 'order'
-      ? prisma.orderHistory.findMany({
-          where: orderQuery,
-        })
-      : [],
   ])
 
   const transactions = [
     ...deposit.map((t) => ({ ...t, type: 'add' })),
     ...withdraw.map((t) => ({ ...t, type: 'remove' })),
     ...swap.map((t) => ({ ...t, type: 'swap' })),
-    ...orderHistory.map((t) => ({ ...t, type: 'order' })),
   ]
 
   return res.json({
@@ -91,20 +72,16 @@ router.get('/transactions/:event_id', async function handler(req, res) {
     eventId: event_id as string,
   }
 
-  const [deposit, withdraw, swap, orderHistory] = await Promise.all([
+  const [deposit, withdraw, swap] = await Promise.all([
     prisma.deposit.findMany({ where: query }),
     prisma.withdraw.findMany({ where: query }),
     prisma.swap.findMany({ where: query }),
-    prisma.orderHistory.findMany({
-      where: query,
-    }),
   ])
 
   const transactions = [
     ...deposit.map((t) => ({ ...t, type: 'add' })),
     ...withdraw.map((t) => ({ ...t, type: 'remove' })),
     ...swap.map((t) => ({ ...t, type: 'swap' })),
-    ...orderHistory.map((t) => ({ ...t, type: 'order' })),
   ]
 
   return res.json({
