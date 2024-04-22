@@ -8,9 +8,10 @@ import api from 'src/api'
 import prisma from 'src/clients/prisma'
 
 import { updateBaseTokenPrices } from './api/routers/updateTokenPrices/updateTokenPricesLogic'
+import seedCLMM from './scripts/seedCLMM'
 import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'
-import handleEventCLMM from './tasks/handleEventCLMM'
+// import handleEventCLMM from './tasks/handleEventCLMM'
 import { Trace } from './types/ton-api'
 import { toLocaleString } from './utils/date'
 import sleep from './utils/sleep'
@@ -60,30 +61,26 @@ const eventPooling = async () => {
     const event = events[i]
     const eventId = event.event_id
     try {
-      if (isCLMM) {
-        await handleEventCLMM(eventId)
-      } else {
-        const trace = await (async function () {
-          if (useCache) {
-            return cachedTrace[eventId]
-          }
-          const res = await axios(
-            `${process.env.TON_API_URL}/traces/${eventId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${process.env.TON_API_KEY}`,
-              },
+      const trace = await (async function () {
+        if (useCache) {
+          return cachedTrace[eventId]
+        }
+        const res = await axios(
+          `${process.env.TON_API_URL}/traces/${eventId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.TON_API_KEY}`,
             },
-          )
-          return res.data as Trace
-        })()
+          },
+        )
+        return res.data as Trace
+      })()
 
-        await handleEvent({
-          routerAddress: process.env.ROUTER_ADDRESS || '',
-          eventId,
-          traces: trace,
-        })
-      }
+      await handleEvent({
+        routerAddress: process.env.ROUTER_ADDRESS || '',
+        eventId,
+        traces: trace,
+      })
     } catch (e) {
       error = true
       console.error(e)
@@ -117,9 +114,13 @@ const eventPooling = async () => {
 
 const main = async () => {
   console.log('Event pooling is started. ')
-  await updateBaseTokenPrices()
-  for (;;) {
-    await eventPooling()
+  if (isCLMM) {
+    await seedCLMM()
+  } else {
+    await updateBaseTokenPrices()
+    for (;;) {
+      await eventPooling()
+    }
   }
 }
 
