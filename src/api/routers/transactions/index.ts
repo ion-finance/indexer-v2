@@ -10,18 +10,18 @@ router.get('/transactions', async function handler(req, res) {
 
   const query = {} as { poolAddress?: string; senderAddress?: string }
 
-  if (!poolAddress) {
-    return res.json({
-      status: 400,
-      data: [],
-    })
-  }
-
   if (poolAddress) {
     query.poolAddress = poolAddress as string
   }
   if (senderAddress) {
     query.senderAddress = senderAddress as string
+  }
+
+  if (!poolAddress && !senderAddress) {
+    return res.json({
+      status: 400,
+      data: [],
+    })
   }
 
   const [deposit, withdraw, swap] = await Promise.all([
