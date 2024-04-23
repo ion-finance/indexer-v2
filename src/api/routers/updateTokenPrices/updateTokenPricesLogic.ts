@@ -8,6 +8,7 @@ import {
   isEmpty,
   map,
   reduce,
+  sortBy,
   uniqBy,
 } from 'lodash'
 
@@ -45,6 +46,7 @@ export const updateBaseTokenPrices = async () => {
   const tonPrice = String(prices.TON)
   const usdtPrice = String(prices.USDT)
   const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS as string
+  const USDT_WALLET_ADDRESS = process.env.USDT_WALLET_ADDRESS as string
   await prisma.tokenPrice.create({
     data: {
       id: TON_WALLET_ADDRESS,
@@ -55,34 +57,33 @@ export const updateBaseTokenPrices = async () => {
   })
   await prisma.tokenPrice.create({
     data: {
-      id: TON_WALLET_ADDRESS,
+      id: USDT_WALLET_ADDRESS,
       tokenSymbol: 'USDT',
       price: usdtPrice,
       timestamp: new Date(),
     },
   })
-
-  // // TODO: remove
-  // await prisma.tokenPrice.create({
-  //   data: {
-  //     id: 'EQDJHdS-w9CCllpU6kOAUzZrhS86mKcImCdfuqcF-r1nN5zU',
-  //     tokenSymbol: 'TON',
-  //     price: tonPrice,
-  //   },
-  // })
 }
 const updateTokenPricesLogic = async (timestamp?: Date) => {
   const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS as string
+  const USDT_WALLET_ADDRESS = process.env.USDT_WALLET_ADDRESS as string
   const rawPools = (await prisma.pool.findMany()) as Pool[]
   const pools = rawPools.filter(
     (pool) => Number(pool.reserveX) && Number(pool.reserveY),
   )
+
   const tokens = (await prisma.token.findMany()) as Token[]
   const tokenPrices = await prisma.tokenPrice.findMany()
+  const sortedTokenPrices = sortBy(tokenPrices, 'timestamp').reverse() // to get latest price
 
-  const tonPrice = Number(find(tokenPrices, { id: TON_WALLET_ADDRESS })?.price)
-  if (!tonPrice) {
-    console.warn('TON price is not found.')
+  const tonPrice = Number(
+    find(sortedTokenPrices, { id: TON_WALLET_ADDRESS })?.price,
+  )
+  const usdtPrice = Number(
+    find(sortedTokenPrices, { id: USDT_WALLET_ADDRESS })?.price,
+  )
+  if (!tonPrice || !usdtPrice) {
+    console.warn('TON or USDT price is not found.')
     return
   }
 
@@ -95,56 +96,54 @@ const updateTokenPricesLogic = async (timestamp?: Date) => {
     {},
   ) as Record<string, Token>
 
-  // const TON_WALLET_ADDRESSES = [
-  //   TON_WALLET_ADDRESS,
-  //   'EQDJHdS-w9CCllpU6kOAUzZrhS86mKcImCdfuqcF-r1nN5zU',
-  // ]
-  // const poolHasTON = filter(
-  //   pools,
-  //   (pool) =>
-  //     TON_WALLET_ADDRESSES.includes(pool.tokenXAddress) ||
-  //     TON_WALLET_ADDRESSES.includes(pool.tokenYAddress),
-  // )
-  // let poolNotHaveTON = filter(
-  //   pools,
-  //   (pool) =>
-  //     !TON_WALLET_ADDRESSES.includes(pool.tokenXAddress) &&
-  //     !TON_WALLET_ADDRESSES.includes(pool.tokenYAddress),
-  // )
+  const baseTokenAddrs = [TON_WALLET_ADDRESS, USDT_WALLET_ADDRESS]
+  const poolsHaveBase = [] as Pool[]
+  let poolsNotHaveBase = [] as Pool[]
 
-  const poolHasTON = filter(
-    pools,
-    (pool) =>
-      isSameAddress(pool.tokenXAddress, TON_WALLET_ADDRESS) ||
-      isSameAddress(pool.tokenYAddress, TON_WALLET_ADDRESS),
-  )
-  let poolNotHaveTON = filter(
-    pools,
-    (pool) =>
-      !isSameAddress(pool.tokenXAddress, TON_WALLET_ADDRESS) &&
-      !isSameAddress(pool.tokenYAddress, TON_WALLET_ADDRESS),
-  )
+  forEach(pools, (pool) => {
+    const { tokenXAddress, tokenYAddress } = pool
+    const hasBase = baseTokenAddrs.find(
+      (addr) =>
+        isSameAddress(addr, tokenXAddress) ||
+        isSameAddress(addr, tokenYAddress),
+    )
+    if (hasBase) {
+      poolsHaveBase.push(pool)
+    } else {
+      poolsNotHaveBase.push(pool)
+    }
+  })
 
-  const tokenPricesWithTonPool = map(poolHasTON, (pool) => {
-    const tokenX = tokensMap[pool.tokenXAddress]
-    const tokenY = tokensMap[pool.tokenYAddress]
+  const checkTokenIsBase = (token: Token) => {
+    return (
+      isSameAddress(token.id, TON_WALLET_ADDRESS) ||
+      isSameAddress(token.id, USDT_WALLET_ADDRESS)
+    )
+  }
+
+  const tokenPricesInBasePool = map(poolsHaveBase, (pool) => {
+    const { tokenXAddress, tokenYAddress, reserveX, reserveY } = pool
+    const tokenX = tokensMap[tokenXAddress]
+    const tokenY = tokensMap[tokenYAddress]
     if (!tokenX || !tokenY) {
       return
     }
-    // const xIsTON = TON_WALLET_ADDRESSES.includes(pool.tokenXAddress)
-    // const yIsTON = TON_WALLET_ADDRESSES.includes(pool.tokenYAddress)
-
-    const xIsTON = isSameAddress(tokenX.id, TON_WALLET_ADDRESS)
-    const yIsTON = isSameAddress(tokenY.id, TON_WALLET_ADDRESS)
-    if (!xIsTON && !yIsTON) {
+    const xIsBase = checkTokenIsBase(tokenX)
+    const yIsBase = checkTokenIsBase(tokenY)
+    if (!xIsBase && !yIsBase) {
+      return
+    }
+    if (xIsBase && yIsBase) {
+      // TON - USDT pool
       return
     }
 
-    const quote = xIsTON ? tokenY : tokenX
+    const quote = xIsBase ? tokenY : tokenX
     const { id, symbol } = quote
-    const ratio = xIsTON
-      ? Number(pool.reserveX) / Number(pool.reserveY)
-      : Number(pool.reserveY) / Number(pool.reserveX)
+
+    const ratio = xIsBase
+      ? Number(reserveX) / Number(reserveY)
+      : Number(reserveY) / Number(reserveX)
 
     return {
       id,
@@ -155,17 +154,17 @@ const updateTokenPricesLogic = async (timestamp?: Date) => {
   })
 
   // group to reference
-  const newTokenPrices = compact(tokenPricesWithTonPool)
+  const newTokenPrices = compact(tokenPricesInBasePool)
 
   // BFS
   // newTokenPrices <- reference prices
-  // poolNotHaveTON <- target pools
+  // poolsNotHaveBase <- target pools
   // loop until all target pools are indexed
   // if cannot index any more, break
   let flag = true
   while (flag) {
-    const beforeLength = poolNotHaveTON.length
-    forEach(poolNotHaveTON, (pool) => {
+    const beforeLength = poolsNotHaveBase.length
+    forEach(poolsNotHaveBase, (pool) => {
       const tokenX = tokensMap[pool.tokenXAddress]
       const tokenY = tokensMap[pool.tokenYAddress]
       const tokenXIndexed = find(newTokenPrices, { id: tokenX.id })
@@ -191,16 +190,16 @@ const updateTokenPricesLogic = async (timestamp?: Date) => {
       // add to reference pools
       newTokenPrices.push(tokenPrice)
       // remove from target pools
-      poolNotHaveTON = filter(
-        poolNotHaveTON,
+      poolsNotHaveBase = filter(
+        poolsNotHaveBase,
         (p) => !isSameAddress(p.id, pool.id),
       )
     })
     // if cannot index any more, break
-    if (isEmpty(poolNotHaveTON)) {
+    if (isEmpty(poolsNotHaveBase)) {
       flag = false
     }
-    if (beforeLength === poolNotHaveTON.length) {
+    if (beforeLength === poolsNotHaveBase.length) {
       flag = false
     }
   }
