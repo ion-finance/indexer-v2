@@ -6,8 +6,6 @@ import prisma from 'src/clients/prisma'
 import { isSameAddress } from 'src/utils/address'
 import { ONE_DAY } from 'src/utils/date'
 
-import { getPriceUsd } from '../../../mocks/price'
-
 const router = Router()
 
 router.get('/pools', async function handler(req, res) {
@@ -55,9 +53,6 @@ router.get('/pools', async function handler(req, res) {
       return
     }
 
-    const priceXUsd = getPriceUsd(tokenX?.symbol)
-    const priceYUsd = getPriceUsd(tokenY?.symbol)
-
     let reserveData = {}
 
     if (pool.type === 'CLMM') {
@@ -98,14 +93,8 @@ router.get('/pools', async function handler(req, res) {
 
     return {
       ...pool,
-      tokenX: {
-        ...tokenX,
-        priceUsd: priceXUsd,
-      },
-      tokenY: {
-        ...tokenY,
-        priceUsd: priceYUsd,
-      },
+      tokenX,
+      tokenY,
       ...reserveData,
       tvl: totalPrice, // tvl
       volumeUsd, // 24h volume (sum of all exchanges)
