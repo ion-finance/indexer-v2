@@ -7,6 +7,15 @@ paths:
   /token-prices:
     get:
       summary: Get the latest token prices
+      parameters:
+        - name: tokenIds
+          in: query
+          description: Token ids to retrieve prices for.
+          required: true
+          schema:
+            type: array
+          example: ['id']
+
       responses:
         '200':
           description: OK
