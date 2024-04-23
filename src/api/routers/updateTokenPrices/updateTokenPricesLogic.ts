@@ -18,7 +18,7 @@ const getUSDPrice = (data: any) => data?.quote?.USD?.price || 0
 const getPrice = async () => {
   try {
     const response = await axios.get(
-      'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=TON,JUSDT,JUSDC',
+      'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=TON,USDT',
       {
         headers: {
           'X-CMC_PRO_API_KEY': process.env.COINMARKET_CAP_API_KEY,
@@ -27,16 +27,14 @@ const getPrice = async () => {
     )
     const { data } = response.data
     const TON = getUSDPrice(data.TON)
-    const JUSDT = getUSDPrice(data.JUSDT)
-    const JUSDC = getUSDPrice(data.JUSDC)
+    const USDT = getUSDPrice(data.USDT)
 
-    return { TON, JUSDT, JUSDC }
+    return { TON, USDT }
   } catch (e) {
     console.warn('Error fetching price data from CoinMarketCap:')
     return {
       TON: 0,
-      JUSDT: 0,
-      JUSDC: 0,
+      USDT: 0,
     }
   }
 }
@@ -45,12 +43,21 @@ const getPrice = async () => {
 export const updateBaseTokenPrices = async () => {
   const prices = await getPrice()
   const tonPrice = String(prices.TON)
+  const usdtPrice = String(prices.USDT)
   const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS as string
   await prisma.tokenPrice.create({
     data: {
       id: TON_WALLET_ADDRESS,
       tokenSymbol: 'TON',
       price: tonPrice,
+      timestamp: new Date(),
+    },
+  })
+  await prisma.tokenPrice.create({
+    data: {
+      id: TON_WALLET_ADDRESS,
+      tokenSymbol: 'USDT',
+      price: usdtPrice,
       timestamp: new Date(),
     },
   })
