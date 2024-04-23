@@ -19,12 +19,13 @@ const fetchEvents = async ({
   const events: AccountEvent[] = []
 
   for (;;) {
+    const baseUrl = `${process.env.TON_API_URL}/accounts/${routerAddress}/events`
     try {
       const args =
         `start_date=${timestamp}&limit=100` +
         (endDate ? `&end_date=${endDate}` : '')
 
-      const url = `${process.env.TON_API_URL}/accounts/${routerAddress}/events?${args}`
+      const url = `${baseUrl}?${args}`
       const res = await axios(url, {
         headers: {
           Authorization: `Bearer ${process.env.TON_API_KEY}`,
@@ -55,6 +56,7 @@ const fetchEvents = async ({
       break
     } catch (e) {
       console.error('Error fetching events')
+      console.log('baseUrl', baseUrl)
       // Sentry.captureException(e);
       break
     }
