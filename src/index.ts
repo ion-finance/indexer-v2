@@ -3,9 +3,9 @@ import axios from 'axios'
 import dotenv from 'dotenv'
 import fs from 'fs'
 
-import { routerAddress } from 'src/address'
 import api from 'src/api'
 import prisma from 'src/clients/prisma'
+import { routerAddress } from 'src/constant/address'
 
 import { updateBaseTokenPrices } from './api/routers/updateTokenPrices/updateTokenPricesLogic'
 import seedCLMM from './scripts/seedCLMM'
@@ -77,7 +77,7 @@ const eventPooling = async () => {
       })()
 
       await handleEvent({
-        routerAddress: process.env.ROUTER_ADDRESS || '',
+        routerAddress,
         eventId,
         traces: trace,
       })

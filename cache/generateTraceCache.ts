@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import fs from 'fs'
 import moment from 'moment'
 
-import { routerAddress } from 'src/address'
+import { routerAddress } from 'src/constant/address'
 import fetchEvents from 'src/tasks/fetchEvents'
 import { Trace } from 'src/types/ton-api'
 import { toLocaleString } from 'src/utils/date'
