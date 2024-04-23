@@ -18,21 +18,21 @@ router.get('/pools', async function handler(req, res) {
 
   const exchanges30d = await prisma.swap.findMany({
     where: {
-      createdAt: {
+      timestamp: {
         gte: moment().subtract(30, 'days').toDate(),
       },
     },
   })
   const exchanges7d = await prisma.swap.findMany({
     where: {
-      createdAt: {
+      timestamp: {
         gte: moment().subtract(7, 'days').toDate(),
       },
     },
   })
   const exchanges1d = await prisma.swap.findMany({
     where: {
-      createdAt: {
+      timestamp: {
         gte: moment().subtract(1, 'days').toDate(),
       },
     },
