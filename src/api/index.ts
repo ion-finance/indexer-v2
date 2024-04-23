@@ -6,6 +6,7 @@ import * as swaggerUI from 'swagger-ui-express'
 
 import binRouter from './routers/bins'
 import manualCPMMEventRouter from './routers/manualCPMMEvent'
+import myPoolsRouter from './routers/myPools'
 import operationsRouter from './routers/operations'
 import orderRouter from './routers/orders'
 import poolRouter from './routers/pools'
@@ -41,6 +42,7 @@ const api = express()
 
 api.use(cors())
 api.use(poolRouter)
+api.use(myPoolsRouter)
 api.use(positionRouter)
 api.use(tokenRouter)
 api.use(transactionRouter)
