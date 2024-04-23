@@ -15,6 +15,7 @@ import simulateSwapRouter from './routers/simulate/swap'
 import simulateSwapReverseRouter from './routers/simulate/swapReverse'
 import taskRouter from './routers/tasks'
 import tokenPricesRouter from './routers/tokenPrices'
+import tokenPricesHistoryRouter from './routers/tokenPricesHistory'
 import tokenRouter from './routers/tokens'
 import traceRouter from './routers/trace'
 import transactionRouter from './routers/transactions'
@@ -48,6 +49,7 @@ api.use(orderRouter)
 api.use(taskRouter)
 api.use(routerAddressRouter)
 api.use(tokenPricesRouter)
+api.use(tokenPricesHistoryRouter)
 api.use(trendingAssetsRouter)
 api.use(updateTokenPrices)
 api.use(traceRouter)
