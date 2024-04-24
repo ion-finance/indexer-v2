@@ -9,7 +9,7 @@ const seedCLMM = async () => {
 
   try {
     await prisma.pool.createMany({
-      data: pools as Pool[],
+      data: pools as unknown as Pool[],
       skipDuplicates: true,
     })
 
@@ -28,15 +28,15 @@ const seedCLMM = async () => {
       skipDuplicates: true,
     })
 
-    await prisma.orderHistory.createMany({
-      data: orderHistory as OrderHistory[],
-      skipDuplicates: true,
-    })
+    // await prisma.orderHistory.createMany({
+    //   data: orderHistory as OrderHistory[],
+    //   skipDuplicates: true,
+    // })
 
-    await prisma.order.createMany({
-      data: orders as Order[],
-      skipDuplicates: true,
-    })
+    // await prisma.order.createMany({
+    //   data: orders as Order[],
+    //   skipDuplicates: true,
+    // })
 
     await prisma.bins.createMany({
       data: bins,
