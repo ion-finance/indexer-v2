@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto'
+
 const POOL_ADDRESS = 'EQCnrRZ7fZ8gtoHhDdMRWU_vMc7d2j4lkDwiCdGhat51SNxG'
 const token1 = {
   id: 'EQCEyLaxdrSavRTTVFonHsEXfhwaDQCHUmKw9epamY_fNmD0',
@@ -22,6 +24,7 @@ const token2 = {
   timestamp: new Date().toISOString(),
 }
 
+const binStep = 10
 export const pools = [
   {
     id: POOL_ADDRESS,
@@ -29,7 +32,7 @@ export const pools = [
     name: 'TON - USDT',
     tokenXAddress: token1.id,
     tokenYAddress: token2.id,
-    binStep: 100,
+    binStep,
     activeBinId: 8388608,
     type: 'CLMM',
     lpSupply: '0',
@@ -2312,6 +2315,42 @@ export const orderHistory = [
 //     reserveX: '19654269582',
 //     reserveY: '0',
 //   },
+
+const CENTER_BIN_ID = 8388608
+
+const priceToId = (price: number, binStep: number) =>
+  Math.round(CENTER_BIN_ID + Math.log(price) / Math.log(1 + binStep / 10000))
+const activeId = priceToId(6.1, binStep)
+
+const activeBin = {
+  id: randomUUID(),
+  binId: activeId,
+  poolAddress: POOL_ADDRESS,
+  reserveX: '173020331896',
+  reserveY: '147270747918',
+}
+
+const lowerBins = Array.from({ length: 500 }, (_, i) => {
+  return {
+    id: randomUUID(),
+    binId: activeId - i,
+    poolAddress: POOL_ADDRESS,
+    reserveX: '0',
+    reserveY: Math.round(+activeBin.reserveY * (1 - i / 500)).toString(),
+  }
+}).filter((bin) => bin.binId != activeId)
+
+const upperBins = Array.from({ length: 500 }, (_, i) => {
+  return {
+    id: randomUUID(),
+    binId: activeId + i,
+    poolAddress: POOL_ADDRESS,
+    reserveX: Math.round(+activeBin.reserveX * (1 - i / 500)).toString(),
+    reserveY: '0',
+  }
+}).filter((bin) => bin.binId != activeId)
+
+const binss = [...lowerBins, activeBin, ...upperBins]
 
 const bins = [
   {
