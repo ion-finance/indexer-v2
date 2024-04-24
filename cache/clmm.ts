@@ -1,28 +1,82 @@
+import { Address, beginCell } from '@ton/core'
 import { randomUUID } from 'crypto'
+import dotenv from 'dotenv'
+import { sortBy } from 'lodash'
+dotenv.config()
 
 const POOL_ADDRESS = 'EQCnrRZ7fZ8gtoHhDdMRWU_vMc7d2j4lkDwiCdGhat51SNxG'
-const token1 = {
-  id: 'EQCEyLaxdrSavRTTVFonHsEXfhwaDQCHUmKw9epamY_fNmD0',
-  jettonMinterAddress: 'kQBXkj37K2KP7i2GFNwEE_-z-yNZJfNTEhsYq2q9RDnIfoxB',
-  name: 'TON',
-  symbol: 'TON',
-  image:
-    'https://cache.tonapi.io/imgproxy/Hog4f0QWzlFp-aGWSDn3k9xhDyK4xrgjDmQXZTbRqLE/rs:fill:200:200:1/g:no/aHR0cHM6Ly9jYWNoZS50b25hcGkuaW8vaW1ncHJveHkvVHhPbmZEbDQ5VUpoTG5tYnlUaU9mSGtmY2NreGU4anJfUnVRYmV2dWNRay9yczpmaWxsOjIwMDoyMDA6MS9nOm5vL2FIUjBjSE02THk5emRHRjBhV011YzNSdmJpNW1hUzlzYjJkdkwzUnZibDl6ZVcxaWIyd3VjRzVuLndlYnA.webp',
+const IS_MAINNET = process.env.IS_MAINNET === 'true'
 
-  decimals: 6,
-  timestamp: new Date().toISOString(),
+export const sortByAddress = (addresses: Address[]) =>
+  sortBy(addresses, (address) =>
+    BigInt(
+      '0x' + beginCell().storeAddress(address).endCell().hash().toString('hex'),
+    ),
+  ).reverse()
+
+const testnet = {
+  token1: {
+    id: 'EQCEyLaxdrSavRTTVFonHsEXfhwaDQCHUmKw9epamY_fNmD0',
+    jettonMinterAddress: 'kQBXkj37K2KP7i2GFNwEE_-z-yNZJfNTEhsYq2q9RDnIfoxB',
+    name: 'TON',
+    symbol: 'TON',
+    image:
+      'https://cache.tonapi.io/imgproxy/Hog4f0QWzlFp-aGWSDn3k9xhDyK4xrgjDmQXZTbRqLE/rs:fill:200:200:1/g:no/aHR0cHM6Ly9jYWNoZS50b25hcGkuaW8vaW1ncHJveHkvVHhPbmZEbDQ5VUpoTG5tYnlUaU9mSGtmY2NreGU4anJfUnVRYmV2dWNRay9yczpmaWxsOjIwMDoyMDA6MS9nOm5vL2FIUjBjSE02THk5emRHRjBhV011YzNSdmJpNW1hUzlzYjJkdkwzUnZibDl6ZVcxaWIyd3VjRzVuLndlYnA.webp',
+
+    decimals: 6,
+    timestamp: new Date().toISOString(),
+  },
+
+  token2: {
+    id: 'EQD2bKffQqv5SVT1847-0Cra9tX6zwBkIPC-r3Or5B2CUD8z',
+    jettonMinterAddress: 'EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs',
+    name: 'USDT',
+    symbol: 'USDT',
+    image:
+      'https://cache.tonapi.io/imgproxy/T3PB4s7oprNVaJkwqbGg54nexKE0zzKhcrPv8jcWYzU/rs:fill:200:200:1/g:no/aHR0cHM6Ly90ZXRoZXIudG8vaW1hZ2VzL2xvZ29DaXJjbGUucG5n.webp',
+    decimals: 6,
+    timestamp: new Date().toISOString(),
+  },
 }
 
-const token2 = {
-  id: 'EQD2bKffQqv5SVT1847-0Cra9tX6zwBkIPC-r3Or5B2CUD8z',
-  jettonMinterAddress: 'EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs',
-  name: 'USDT',
-  symbol: 'USDT',
-  image:
-    'https://cache.tonapi.io/imgproxy/T3PB4s7oprNVaJkwqbGg54nexKE0zzKhcrPv8jcWYzU/rs:fill:200:200:1/g:no/aHR0cHM6Ly90ZXRoZXIudG8vaW1hZ2VzL2xvZ29DaXJjbGUucG5n.webp',
-  decimals: 6,
-  timestamp: new Date().toISOString(),
+const mainnet = {
+  token1: {
+    id: 'EQCpTiANFaLwWiLphbo_FD7VXsfMf-aNjSpALJ4vQHbFiZm5',
+    jettonMinterAddress: 'EQBXkj37K2KP7i2GFNwEE_-z-yNZJfNTEhsYq2q9RDnIfjfL',
+    name: 'TON',
+    symbol: 'TON',
+    image:
+      'https://cache.tonapi.io/imgproxy/Hog4f0QWzlFp-aGWSDn3k9xhDyK4xrgjDmQXZTbRqLE/rs:fill:200:200:1/g:no/aHR0cHM6Ly9jYWNoZS50b25hcGkuaW8vaW1ncHJveHkvVHhPbmZEbDQ5VUpoTG5tYnlUaU9mSGtmY2NreGU4anJfUnVRYmV2dWNRay9yczpmaWxsOjIwMDoyMDA6MS9nOm5vL2FIUjBjSE02THk5emRHRjBhV011YzNSdmJpNW1hUzlzYjJkdkwzUnZibDl6ZVcxaWIyd3VjRzVuLndlYnA.webp',
+
+    decimals: 6,
+    timestamp: new Date().toISOString(),
+  },
+
+  token2: {
+    id: 'EQAlo0UG58M-DAliBEE0d6jWX0-nveb4YU0WU4vOAsteZLn_',
+    jettonMinterAddress: 'EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs',
+    name: 'USDT',
+    symbol: 'USDT',
+    image:
+      'https://cache.tonapi.io/imgproxy/T3PB4s7oprNVaJkwqbGg54nexKE0zzKhcrPv8jcWYzU/rs:fill:200:200:1/g:no/aHR0cHM6Ly90ZXRoZXIudG8vaW1hZ2VzL2xvZ29DaXJjbGUucG5n.webp',
+    decimals: 6,
+    timestamp: new Date().toISOString(),
+  },
 }
+const { token1, token2 } = IS_MAINNET ? mainnet : testnet
+
+const parseAddress = (address?: string) => {
+  if (!address) return null
+  try {
+    return Address.parse(address)
+  } catch (error) {
+    return null
+  }
+}
+const [tokenXAddress, tokenYAddress] = sortByAddress([
+  Address.parse(token1.id) as Address,
+  Address.parse(token2.id) as Address,
+])
 
 const binStep = 10
 export const pools = [
@@ -30,8 +84,8 @@ export const pools = [
     id: POOL_ADDRESS,
 
     name: 'TON - USDT',
-    tokenXAddress: token1.id,
-    tokenYAddress: token2.id,
+    tokenXAddress: tokenXAddress.toString(),
+    tokenYAddress: tokenYAddress.toString(),
     binStep,
     activeBinId: 8388608,
     type: 'CLMM',
