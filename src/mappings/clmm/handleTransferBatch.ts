@@ -111,6 +111,7 @@ const handleTransferBatch = async (event: Event) => {
         poolAddress: event.transaction.source,
         ownerAddress: params.toAddress,
         shares: amountArray as Prisma.JsonArray,
+        timestamp: new Date(event.transaction.timestamp),
       },
     })
   }

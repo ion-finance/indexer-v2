@@ -8,6 +8,7 @@ import {
   findTracesOfPool,
   parseRaw,
 } from 'src/utils/address'
+import { toISOString } from 'src/utils/date'
 
 const parseBurnNotification = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
@@ -64,6 +65,7 @@ export const handleRemoveLiquidity = async ({
 }) => {
   const routerAddress = process.env.ROUTER_ADDRESS || ''
   const { hash, utime } = traces.transaction
+  const timestamp = toISOString(utime)
   const payToTrace = findTracesByOpCode(traces, OP.PAY_TO)?.[0]
   const burnNotificationTrace = findTracesByOpCode(
     traces,
@@ -133,8 +135,8 @@ export const handleRemoveLiquidity = async ({
       poolAddress,
       amountX: String(amount0Out),
       amountY: String(amount1Out),
-      timestamp: utime,
       burned: String(burned),
+      timestamp,
     },
   })
 
@@ -214,6 +216,7 @@ export const handleRemoveLiquidity = async ({
         poolAddress,
         ownerAddress: senderAddress,
         amount: '0',
+        timestamp,
       },
     })
   }

@@ -10,6 +10,7 @@ import {
   isSameAddress,
   parseRaw,
 } from 'src/utils/address'
+import { toISOString } from 'src/utils/date'
 
 import { upsertToken } from './upsertToken'
 
@@ -121,7 +122,8 @@ export const handleAddLiquidity = async ({
   }
 
   const hash = traces.transaction.hash
-  const timestamp = traces.transaction.utime
+  const utime = traces.transaction.utime
+  const timestamp = toISOString(utime)
 
   const deposit = await prisma.deposit.findFirst({
     where: { id: hash, eventId },
@@ -147,7 +149,6 @@ export const handleAddLiquidity = async ({
       amountX,
       amountY,
       minted: String(minted),
-      timestamp,
     },
     create: {
       id: hash,
@@ -169,8 +170,12 @@ export const handleAddLiquidity = async ({
   const tokenY = tokens.find((token) => token.id === tokenYAddress)
 
   // if tokenX is empty, it means router_token_x is not initilized yet.
-  const updatedTokenX = tokenX ? tokenX : await upsertToken(tokenXAddress)
-  const updatedTokenY = tokenY ? tokenY : await upsertToken(tokenYAddress)
+  const updatedTokenX = tokenX
+    ? tokenX
+    : await upsertToken(tokenXAddress, timestamp)
+  const updatedTokenY = tokenY
+    ? tokenY
+    : await upsertToken(tokenYAddress, timestamp)
   const name = `${updatedTokenX?.symbol}-${updatedTokenY?.symbol}`
 
   await prisma.pool.update({
@@ -208,6 +213,7 @@ export const handleAddLiquidity = async ({
         poolAddress,
         ownerAddress: to ? to.toString() : '',
         amount: BigInt(minted).toString(),
+        timestamp,
       },
     })
   }

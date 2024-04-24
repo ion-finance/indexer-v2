@@ -30,6 +30,7 @@ model Pool {
   lpSupply      String   @default("0")
   collectedXProtocolFee String @default("0")
   collectedYProtocolFee String @default("0")
+  timestamp     DateTime
 }
 
 model Token {
@@ -41,6 +42,7 @@ model Token {
   symbol              String
   image               String
   decimals            Int
+  timestamp           DateTime
 }
 
 model Bins {
@@ -58,7 +60,6 @@ model Deposit {
   eventId         String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
-  timestamp       Int
   poolAddress     String
   senderAddress   String
   receiverAddress String
@@ -66,6 +67,7 @@ model Deposit {
   amountX         String   @default("0")
   amountY         String   @default("0")
   minted          String   @default("0")
+  timestamp       DateTime
 }
 
 model Withdraw {
@@ -73,13 +75,13 @@ model Withdraw {
   eventId         String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
-  timestamp       Int
   poolAddress     String
   senderAddress   String
   receiverAddress String
   amountX         String   @default("0")
   amountY         String   @default("0")
   burned         String   @default("0")
+  timestamp       DateTime
 }
 
 model Swap {
@@ -87,7 +89,6 @@ model Swap {
   eventId         String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
-  timestamp       Int
   poolAddress     String
   sendTokenAddress String
   receiveTokenAddress String
@@ -98,6 +99,7 @@ model Swap {
   swapForY        Boolean
   activeBinId     Int      @default(0)
   volumeUsd      String   @default("0")
+  timestamp       DateTime
 }
 
 model TransferBatch {
@@ -121,6 +123,7 @@ model LpTokenWallet {
   ownerAddress String
   amount       String   @default("0") // CPMM
   shares       Json     @default("{}") // CLMM
+  timestamp    DateTime
 }
 
 enum OrderType {

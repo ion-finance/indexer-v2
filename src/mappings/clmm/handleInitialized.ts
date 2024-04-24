@@ -33,6 +33,7 @@ const handleInitialized = async (event: Event) => {
         symbol: tokenXdata.metadata.symbol,
         decimals: parseInt(tokenXdata.metadata.decimals),
         image: tokenXdata.metadata.image,
+        timestamp: new Date(event.transaction.timestamp),
       },
     })
   }
@@ -55,6 +56,7 @@ const handleInitialized = async (event: Event) => {
         symbol: tokenYdata.metadata.symbol,
         decimals: parseInt(tokenYdata.metadata.decimals),
         image: tokenYdata.metadata.image,
+        timestamp: new Date(event.transaction.timestamp),
       },
     })
   }
@@ -74,6 +76,7 @@ const handleInitialized = async (event: Event) => {
       binStep: params.binStep,
       name: `${tokenXSymbol} - ${tokenYSymbol}`,
       activeBinId: params.activeId,
+      timestamp: new Date(event.transaction.timestamp),
     },
   })
 }

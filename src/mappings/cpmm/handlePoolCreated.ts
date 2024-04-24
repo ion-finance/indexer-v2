@@ -10,6 +10,7 @@ import {
   parseRaw,
   sortByAddress,
 } from 'src/utils/address'
+import { toISOString } from 'src/utils/date'
 import fetchTokenData from 'src/utils/fetchTokenData'
 
 import { Trace } from '../../types/ton-api'
@@ -74,6 +75,9 @@ export const handlePoolCreated = async ({
     return null
   }
 
+  const utime = transferNotificationTrace.transaction.utime
+  const timestamp = toISOString(utime)
+
   // router jetton wallets
   const { tokenWallet1 } = parseTransferNotification(raw_body)
   const sourceAddress = parseRaw(source.address)
@@ -114,6 +118,7 @@ export const handlePoolCreated = async ({
         symbol: tokenXSymbol,
         decimals: parseInt(tokenXdata.metadata.decimals),
         image: tokenXdata.metadata.image,
+        timestamp,
       },
     })
   }
@@ -137,6 +142,7 @@ export const handlePoolCreated = async ({
         symbol: tokenYSymbol,
         decimals: parseInt(tokenYdata.metadata.decimals),
         image: tokenYdata.metadata.image,
+        timestamp,
       },
     })
   }
@@ -151,6 +157,7 @@ export const handlePoolCreated = async ({
       type: PoolType.CPMM,
       tokenXAddress: tokenXAddress,
       tokenYAddress: tokenYAddress,
+      timestamp,
     },
     update: {},
   })

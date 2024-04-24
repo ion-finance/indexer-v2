@@ -13,7 +13,7 @@ const handleSwap = async (event: Event) => {
       id: event.transaction.hash,
     },
     update: {
-      timestamp: event.transaction.timestamp,
+      timestamp: new Date(event.transaction.timestamp),
       poolAddress: event.transaction.source,
       senderAddress: params.senderAddress,
       receiverAddress: params.receiverAddress,
@@ -25,7 +25,7 @@ const handleSwap = async (event: Event) => {
     create: {
       id: event.transaction.hash,
       eventId: event.transaction.eventId,
-      timestamp: event.transaction.timestamp,
+      timestamp: new Date(event.transaction.timestamp),
       poolAddress: event.transaction.source,
       sendTokenAddress: '',
       receiveTokenAddress: '',

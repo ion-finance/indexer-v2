@@ -12,6 +12,7 @@ import {
 import { calculateOutAmount } from 'src/dex/simulate/utils'
 import { Trace } from 'src/types/ton-api'
 import { findTracesByOpCode, isSameAddress, parseRaw } from 'src/utils/address'
+import { toISOString } from 'src/utils/date'
 
 import { EXIT_CODE, OP } from '../../tasks/handleEvent/opCode'
 
@@ -76,6 +77,7 @@ export const handleExchange = async ({
 
   const routerAddress = process.env.ROUTER_ADDRESS || ''
   const { hash, utime } = traces.transaction
+  const timestamp = toISOString(utime)
 
   const swapTrace = findTracesByOpCode(traces, OP.SWAP)?.[0]
   const payToTraces = findTracesByOpCode(traces, OP.PAY_TO)
@@ -192,7 +194,6 @@ export const handleExchange = async ({
     create: {
       id: hash,
       eventId,
-      timestamp: utime,
       poolAddress,
       sendTokenAddress,
       receiveTokenAddress: swapForY ? tokenYAddress : tokenXAddress,
@@ -202,6 +203,7 @@ export const handleExchange = async ({
       amountOut,
       swapForY,
       volumeUsd: String(volumeUsd),
+      timestamp,
     },
   })
 
