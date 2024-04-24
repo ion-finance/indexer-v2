@@ -114,10 +114,10 @@ const eventPooling = async () => {
 
 const main = async () => {
   console.log('Event pooling is started. ')
+  await updateBaseTokenPrices()
   if (isCLMM) {
     await seedCLMM()
   } else {
-    await updateBaseTokenPrices()
     for (;;) {
       await eventPooling()
     }
