@@ -77,6 +77,7 @@ const handleInitialized = async (event: Event) => {
       name: `${tokenXSymbol} - ${tokenYSymbol}`,
       activeBinId: params.activeId,
       timestamp: new Date(event.transaction.timestamp),
+      creator: '',
     },
   })
 }

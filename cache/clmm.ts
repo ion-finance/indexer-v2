@@ -95,6 +95,7 @@ export const pools = [
     collectedXProtocolFee: '0',
     collectedYProtocolFee: '0',
     timestamp: new Date().toISOString(),
+    creator: '',
   },
 ]
 

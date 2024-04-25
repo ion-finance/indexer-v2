@@ -46,6 +46,7 @@ export const handlePoolCreated = async ({
   eventId: string
   traces: Trace
 }) => {
+  const creator = parseRaw(traces.transaction.account.address)
   const provideLpTrace = findTracesByOpCode(traces, OP.PROVIDE_LP)?.[0]
   const transferNotificationTrace = findTracesByOpCode(
     traces,
@@ -158,6 +159,7 @@ export const handlePoolCreated = async ({
       tokenXAddress: tokenXAddress,
       tokenYAddress: tokenYAddress,
       timestamp,
+      creator,
     },
     update: {},
   })

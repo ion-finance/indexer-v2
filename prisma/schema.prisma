@@ -31,6 +31,7 @@ model Pool {
   collectedXProtocolFee String @default("0")
   collectedYProtocolFee String @default("0")
   timestamp     DateTime
+  creator       String
 }
 
 model Token {
