@@ -88,6 +88,8 @@ export enum RAW_CUSTOM_OP {
   ROUTER_JETTON_WALLET_DEPLOYED = 'router_jetton_wallet_deployed',
   LP_WALLET_DEPLOYED = 'lp_wallet_deployed',
   LP_ACCOUNT_DEPLOYED = 'lp_account_deployed',
+
+  TON_TRANSFER_FROM_WALLET = 'ton_transfer_from_wallet',
 }
 
 export type Ops = {

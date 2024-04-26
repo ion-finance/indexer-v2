@@ -10,6 +10,7 @@ dotenv.config()
 // custom wallet op, that can be ignored
 const blackList = ['0xb8abad10']
 
+const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS || ''
 function extractPaths(routerAddress: string, node: Trace): Ops[][] {
   // This function recursively extracts the paths using the spread operator.
   function recurse(
@@ -24,9 +25,14 @@ function extractPaths(routerAddress: string, node: Trace): Ops[][] {
       return
     }
     const opCode = transaction.in_msg.op_code || ''
+    const sourceAddress = parseRaw(transaction.in_msg.source?.address)
+
     const customOp = (function () {
       if (isFirst) {
         return 'ext_in_msg'
+      }
+      if (!opCode && isSameAddress(sourceAddress, TON_WALLET_ADDRESS)) {
+        return CustomOP.TON_TRANSFER_FROM_WALLET
       }
       const interfaces = parentNode?.interfaces || []
       const isParentJettonMaster =
@@ -34,7 +40,6 @@ function extractPaths(routerAddress: string, node: Trace): Ops[][] {
         interfaces.includes('stonfi_pool')
       const { orig_status, end_status } = transaction
       if (orig_status === 'nonexist' && end_status === 'active') {
-        const sourceAddress = parseRaw(transaction.in_msg.source?.address)
         const destinationAddress = parseRaw(
           transaction.in_msg?.destination?.address,
         )
