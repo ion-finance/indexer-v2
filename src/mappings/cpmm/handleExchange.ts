@@ -81,7 +81,6 @@ export const handleExchange = async ({
 
   const swapTrace = findTracesByOpCode(traces, OP.SWAP)?.[0]
   const payToTraces = findTracesByOpCode(traces, OP.PAY_TO)
-  const payToTrace = findTracesByOpCode(traces, OP.PAY_TO)?.[0]
   if (!swapTrace) {
     console.warn('Empty swapTrace')
     return
@@ -123,7 +122,24 @@ export const handleExchange = async ({
   })
 
   if (!payToNormalTrace) {
-    console.warn('Empty payToNormalTrace')
+    const exitCodes = payToTraces.map((payToTrace) => {
+      const rawBody = payToTrace.transaction.in_msg?.raw_body || ''
+      if (!rawBody) {
+        return null
+      }
+      const { exitCode } = parsePayTo(rawBody)
+      return exitCode
+    })
+    exitCodes.forEach((exitCode) => {
+      if (exitCode === Number(EXIT_CODE.SWAP_REFUND_NO_LIQ)) {
+        console.log('Skip failed swap. exit code: SWAP_REFUND_NO_LIQ')
+        return
+      } else if (exitCode === Number(EXIT_CODE.SWAP_REFUND_RESERVE_ERR)) {
+        console.log('Skip failed swap. exit code: SWAP_REFUND_RESERVE_ERR')
+        return
+      }
+    })
+    console.warn('Skip failed swap. no pay to with exit code SWAP_OK')
     return
   }
 
