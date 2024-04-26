@@ -83,7 +83,7 @@ export const changeNameOfProxyTon = (name: string) => {
 
 export const changeSymbolOfProxyTon = (symbol: string) => {
   if (symbol === 'pTON' || symbol === 'SCAM') {
-    console.warn(`Symbol is wrong. Change to ${symbol} to TON`)
+    console.log(`Symbol is wrong. Change to ${symbol} to TON`)
     return 'TON'
   }
   return symbol
