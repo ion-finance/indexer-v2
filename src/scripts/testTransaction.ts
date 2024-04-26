@@ -1,24 +1,10 @@
 import axios from 'axios'
-import readline from 'readline'
 
 import { checkPathHasOp } from 'src/tasks/handleEvent'
 import extractPaths from 'src/tasks/handleEvent/extractPaths'
 import { CustomOP, OP, Ops } from 'src/tasks/handleEvent/opCode'
 import { Trace } from 'src/types/ton-api'
-
-export const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-})
-
-const getInput = (prompt: string): Promise<string> => {
-  return new Promise((resolve) => {
-    rl.question(prompt, (answer) => {
-      resolve(answer)
-      rl.close()
-    })
-  })
-}
+import { getInput } from 'src/utils/userInput'
 
 const testTransaction = async () => {
   const userInput = await getInput('Enter event id: ')

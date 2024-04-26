@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/node'
 import axios from 'axios'
 import dotenv from 'dotenv'
 import fs from 'fs'
+import { filter } from 'lodash'
 
 import api from 'src/api'
 import prisma from 'src/clients/prisma'
@@ -15,6 +16,7 @@ import handleEvent from './tasks/handleEvent'
 import { Trace } from './types/ton-api'
 import { toLocaleString } from './utils/date'
 import sleep from './utils/sleep'
+import { getInput } from './utils/userInput'
 
 dotenv.config()
 
@@ -30,15 +32,26 @@ const useCache = process.env.USE_CACHE === 'true'
 
 let cachedTrace = {} as { [key: string]: Trace }
 
-if (useCache) {
-  console.log('Using cache...')
-  fs.readdirSync('cache/events').forEach((file) => {
-    if (file.includes('.json')) {
-      const data = fs.readFileSync(`cache/events/${file}`, 'utf-8')
-      cachedTrace = JSON.parse(data)
+const checkCache = async () => {
+  if (useCache) {
+    console.log('Using cache...')
+    const names = fs.readdirSync('cache/events').map((file) => {
+      if (file.includes('.json')) {
+        return file
+      }
+    })
+    const value = await getInput('Input cache file name briefly')
+    const files = filter(names, (name) => name?.includes(value))
+    if (!files?.length) {
+      console.log('No file found')
       return
     }
-  })
+    const file = files[files.length - 1]
+    console.log('file', file)
+    const data = fs.readFileSync(`cache/events/${file}`, 'utf-8')
+    cachedTrace = JSON.parse(data)
+    return
+  }
 }
 
 let totalEvents = 0
@@ -113,6 +126,7 @@ const eventPooling = async () => {
 
 const main = async () => {
   console.log('Event pooling is started. ')
+  await checkCache()
   await updateBaseTokenPrices()
   if (isCLMM) {
     await seedCLMM()
