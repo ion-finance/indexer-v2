@@ -12,6 +12,13 @@ import extractPaths from './extractPaths'
 import { CustomOP, OP } from './opCode'
 import type { Ops } from './opCode'
 
+export const checkPathHasOp = (paths: Ops[][], op: string) =>
+  paths.some((path) =>
+    path.some(
+      ({ op: _op, customOp: _customOp }) => _op === op || _customOp === op,
+    ),
+  )
+
 // Info
 // * This method can throw an error if the event is processing
 const handleEvent = async (params: {
@@ -23,13 +30,6 @@ const handleEvent = async (params: {
   // Extract paths
   const paths: Ops[][] = extractPaths(routerAddress, params.traces)
   // console.log("paths", paths);
-  const checkPathHasOp = (paths: Ops[][], op: string) =>
-    paths.some((path) =>
-      path.some(
-        ({ op: _op, customOp: _customOp }) => _op === op || _customOp === op,
-      ),
-    )
-
   const isRouterDeployed = checkPathHasOp(paths, CustomOP.ROUTER_DEPLOYED)
   const isPoolDeployed = checkPathHasOp(paths, CustomOP.POOL_DEPLOYED)
   const isLpWalletDeployed = checkPathHasOp(paths, CustomOP.LP_WALLET_DEPLOYED)
