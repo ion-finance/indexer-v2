@@ -7,7 +7,12 @@ export const parseRaw = (raw?: string): string => {
   if (!raw) {
     return ''
   }
-  return Address.parseRaw(raw).toString()
+  try {
+    return Address.parse(raw).toString()
+  } catch (e) {
+    console.warn(`Failed to parse address: ${raw}`)
+    return ''
+  }
 }
 
 export const findTracesByOpCode = (
