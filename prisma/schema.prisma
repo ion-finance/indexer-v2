@@ -54,6 +54,7 @@ model Bins {
   poolAddress String
   reserveX    String
   reserveY    String
+  @@unique([poolAddress, binId])
 }
 
 model Deposit {
