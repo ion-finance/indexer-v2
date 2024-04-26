@@ -8,6 +8,7 @@
     "start": "ts-node -r tsconfig-paths/register build/src",
     "ts-node": "ts-node -r tsconfig-paths/register",
     "generate-test": "ts-node -r tsconfig-paths/register ./test/integrations/scenarios/generateTestScenario.ts",
+    "generate-trace-cache": "ts-node -r tsconfig-paths/register ./cache/generateTraceCache.ts",
     "local": "ts-node -r tsconfig-paths/register src",
     "local:watch": "nodemon src -e ts,json,yaml --exec 'node -r tsconfig-paths/register -r ts-node/register src'",
     "reset": "yarn prisma migrate reset && yarn apply-hypertable",

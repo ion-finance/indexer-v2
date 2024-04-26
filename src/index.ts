@@ -26,8 +26,7 @@ Sentry.init({
 })
 
 const isCLMM = process.env.IS_CLMM === 'true'
-// const useCache = true && process.env.IS_DEV === 'true'
-const useCache = false
+const useCache = process.env.USE_CACHE === 'true'
 
 let cachedTrace = {} as { [key: string]: Trace }
 
