@@ -1,4 +1,5 @@
 import { Cell } from '@ton/core'
+import BigNumber from 'bignumber.js'
 
 import prisma from 'src/clients/prisma'
 import { OP } from 'src/tasks/handleEvent/opCode'
@@ -8,6 +9,7 @@ import {
   findTracesOfPool,
   parseRaw,
 } from 'src/utils/address'
+import { bigIntToBigNumber } from 'src/utils/bigNumber'
 import { toISOString } from 'src/utils/date'
 
 const parseBurnNotification = (raw_body: string) => {
@@ -23,7 +25,7 @@ const parseBurnNotification = (raw_body: string) => {
   return {
     op,
     queryId,
-    jettonAmount,
+    jettonAmount: bigIntToBigNumber(jettonAmount),
     fromAddress,
     responseAddress,
   }
@@ -49,9 +51,9 @@ const parsePayTo = (raw_body: string) => {
     toAddress,
     exitCode,
     hasMore,
-    amount0Out,
+    amount0Out: bigIntToBigNumber(amount0Out),
     token0Address,
-    amount1Out,
+    amount1Out: bigIntToBigNumber(amount1Out),
     token1Address,
   }
 }
@@ -133,9 +135,9 @@ export const handleRemoveLiquidity = async ({
       senderAddress,
       receiverAddress: toAddress,
       poolAddress,
-      amountX: String(amount0Out),
-      amountY: String(amount1Out),
-      burned: String(burned),
+      amountX: amount0Out.toString(),
+      amountY: amount1Out.toString(),
+      burned: burned.toString(),
       timestamp,
     },
   })
@@ -158,12 +160,12 @@ export const handleRemoveLiquidity = async ({
       exitCode: 'burn_ok',
 
       asset0Address: tokenXAddress,
-      asset0Amount: String(-amount0Out),
+      asset0Amount: (-amount0Out).toString(),
       asset0Delta: '0', // always 0 for withdraw
       asset0Reserve: pool.reserveX,
 
       asset1Address: tokenYAddress,
-      asset1Amount: String(-amount1Out),
+      asset1Amount: (-amount1Out).toString(),
       asset1Delta: '0',
       asset1Reserve: pool.reserveY,
 
@@ -188,9 +190,9 @@ export const handleRemoveLiquidity = async ({
       id: pool.id,
     },
     data: {
-      reserveX: (BigInt(pool.reserveX) - amount0Out).toString(),
-      reserveY: (BigInt(pool.reserveY) - amount1Out).toString(),
-      lpSupply: (BigInt(pool.lpSupply) - BigInt(burned)).toString(),
+      reserveX: BigNumber(pool.reserveX).minus(amount0Out).toString(),
+      reserveY: BigNumber(pool.reserveY).minus(amount1Out).toString(),
+      lpSupply: BigNumber(pool.lpSupply).minus(burned).toString(),
     },
   })
 
@@ -207,7 +209,7 @@ export const handleRemoveLiquidity = async ({
         id: lpTokenWallet.id,
       },
       data: {
-        amount: (BigInt(lpTokenWallet.amount) - BigInt(burned)).toString(),
+        amount: BigNumber(lpTokenWallet.amount).minus(burned).toString(),
       },
     })
   } else {
