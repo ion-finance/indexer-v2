@@ -10,6 +10,7 @@ import {
   parseRaw,
   sortByAddress,
 } from 'src/utils/address'
+import { bigIntToBigNumber } from 'src/utils/bigNumber'
 import { toISOString } from 'src/utils/date'
 import fetchTokenData from 'src/utils/fetchTokenData'
 
@@ -31,11 +32,11 @@ const parseTransferNotification = (raw_body: string) => {
   return {
     op,
     queryId,
-    jettonAmount,
+    jettonAmount: bigIntToBigNumber(jettonAmount),
     fromUser,
     transferredOp,
     tokenWallet1,
-    minLpOut,
+    minLpOut: bigIntToBigNumber(minLpOut),
   }
 }
 
