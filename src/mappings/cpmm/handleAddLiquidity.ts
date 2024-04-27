@@ -1,4 +1,5 @@
 import { Cell } from '@ton/core'
+import BigNumber from 'bignumber.js'
 import { map } from 'lodash'
 
 import prisma from 'src/clients/prisma'
@@ -10,6 +11,7 @@ import {
   isSameAddress,
   parseRaw,
 } from 'src/utils/address'
+import { bigIntToBigNumber } from 'src/utils/bigNumber'
 import { toISOString } from 'src/utils/date'
 
 import { upsertToken } from './upsertToken'
@@ -26,7 +28,7 @@ const parseMint = (raw_body: string) => {
   return {
     op,
     queryId,
-    amount,
+    amount: bigIntToBigNumber(amount),
     poolAddress,
     to,
   }
@@ -46,10 +48,10 @@ const parseCbAddLiquidity = (raw_body: string) => {
   return {
     op,
     queryId,
-    amount0,
-    amount1,
+    amount0: bigIntToBigNumber(amount0),
+    amount1: bigIntToBigNumber(amount1),
     userAddress,
-    minLpOut,
+    minLpOut: bigIntToBigNumber(minLpOut),
   }
 }
 
@@ -134,8 +136,8 @@ export const handleAddLiquidity = async ({
     return
   }
 
-  const amountX = String(amount0)
-  const amountY = String(amount1)
+  const amountX = amount0.toString()
+  const amountY = amount1.toString()
 
   await prisma.deposit.upsert({
     where: {
@@ -148,7 +150,7 @@ export const handleAddLiquidity = async ({
       poolAddress,
       amountX,
       amountY,
-      minted: String(minted),
+      minted: minted.toString(),
     },
     create: {
       id: hash,
@@ -159,7 +161,7 @@ export const handleAddLiquidity = async ({
       tokenAddress: pool.tokenXAddress, // TODO : In case of cpmm, tokenXAddress is unnecessary.
       amountX,
       amountY,
-      minted: String(minted),
+      minted: minted.toString(),
       timestamp,
     },
   })
@@ -184,9 +186,9 @@ export const handleAddLiquidity = async ({
     },
     data: {
       name,
-      reserveX: (BigInt(pool.reserveX) + BigInt(amountX)).toString(),
-      reserveY: (BigInt(pool.reserveY) + BigInt(amountY)).toString(),
-      lpSupply: (BigInt(pool.lpSupply) + BigInt(minted)).toString(),
+      reserveX: BigNumber(pool.reserveX).plus(amountX).toString(),
+      reserveY: BigNumber(pool.reserveY).plus(amountY).toString(),
+      lpSupply: BigNumber(pool.lpSupply).plus(minted).toString(),
     },
   })
 
@@ -204,7 +206,7 @@ export const handleAddLiquidity = async ({
         id: lpTokenWallet.id,
       },
       data: {
-        amount: (BigInt(lpTokenWallet.amount) + BigInt(minted)).toString(),
+        amount: BigNumber(lpTokenWallet.amount).plus(minted).toString(),
       },
     })
   } else {
@@ -212,7 +214,7 @@ export const handleAddLiquidity = async ({
       data: {
         poolAddress,
         ownerAddress: to ? to.toString() : '',
-        amount: BigInt(minted).toString(),
+        amount: minted.toString(),
         timestamp,
       },
     })
