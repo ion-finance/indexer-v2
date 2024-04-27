@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { Request, Response, NextFunction, Router } from 'express'
 import { query, validationResult } from 'express-validator'
 
@@ -57,7 +58,7 @@ router.get(
     const swapData = {
       offerAddress,
       askAddress,
-      units: Number(units),
+      units: BigNumber(units),
       slippageTolerance: Number(slippageTolerance),
       referralAddress,
     } as SwapSimulateRequest

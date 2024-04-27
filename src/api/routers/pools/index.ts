@@ -1,5 +1,5 @@
 import { Swap } from '@prisma/client'
-import { formatUnits } from 'ethers'
+import BigNumber from 'bignumber.js'
 import { Router } from 'express'
 import { compact, filter, isEmpty } from 'lodash'
 import moment from 'moment'
@@ -7,6 +7,7 @@ import moment from 'moment'
 import prisma from 'src/clients/prisma'
 import { FEE_DIVIDER, LP_FEE } from 'src/dex/simulate/contant'
 import { isSameAddress } from 'src/utils/address'
+import { bFormatUnits } from 'src/utils/bigNumber'
 
 const router = Router()
 
@@ -46,11 +47,11 @@ router.get('/pools', async function handler(req, res) {
 
     const tokenPriceX = tokenPrices.find((t) => isSameAddress(t.id, tokenX?.id))
     const tokenPriceY = tokenPrices.find((t) => isSameAddress(t.id, tokenY?.id))
-    const priceX = Number(tokenPriceX?.price) || 0
-    const priceY = Number(tokenPriceY?.price) || 0
+    const priceX = BigNumber(tokenPriceX?.price || 0)
+    const priceY = BigNumber(tokenPriceY?.price || 0)
 
     if (type === 'CPMM') {
-      if (!Number(reserveX) || !Number(reserveY)) {
+      if (BigNumber(reserveX).isZero() || BigNumber(reserveY).isZero()) {
         console.warn('Reserve not found', pool.id)
         return
       }
@@ -88,20 +89,24 @@ router.get('/pools', async function handler(req, res) {
     }
 
     // total usd price of pool reserve
-    const tvl =
-      priceX * Number(formatUnits(BigInt(reserveX), tokenX?.decimals)) +
-      priceY * Number(formatUnits(BigInt(reserveY), tokenY?.decimals))
+    const tvl = priceX
+      .multipliedBy(bFormatUnits(BigNumber(reserveX), tokenX?.decimals || 0))
+      .plus(
+        priceY.multipliedBy(
+          bFormatUnits(BigNumber(reserveY), tokenY?.decimals || 0),
+        ),
+      )
 
     // total usd price of pool collected protocol fee
-    const feeUsd =
-      priceX *
-        Number(
-          formatUnits(BigInt(pool.collectedXProtocolFee), tokenX?.decimals),
-        ) +
-      priceY *
-        Number(
-          formatUnits(BigInt(pool.collectedYProtocolFee), tokenY?.decimals),
-        )
+    // const feeUsd =
+    //   priceX *
+    //     Number(
+    //       formatUnits(BigInt(pool.collectedXProtocolFee), tokenX?.decimals),
+    //     ) +
+    //   priceY *
+    //     Number(
+    //       formatUnits(BigInt(pool.collectedYProtocolFee), tokenY?.decimals),
+    //     )
 
     const volumeUsd30d = getVolumeUsdOfExchange(
       filter(exchanges30d, (d) => d.poolAddress === pool.id),
@@ -139,7 +144,7 @@ router.get('/pools', async function handler(req, res) {
       volumeUsd: volumeUsd1d, // 24h volume (sum of all exchanges)
       volumeUsd7d: volumeUsd7d,
       volumeUsd30d: volumeUsd30d,
-      feeUsd,
+      // feeUsd,
       apy: apy1d,
       apy7d,
       apy30d,
@@ -153,32 +158,49 @@ export default router
 // get cumulated volume, apply current token price
 const getVolumeUsdOfExchange = (
   exchanges: Swap[],
-  priceX: number,
-  priceY: number,
+  priceX: BigNumber,
+  priceY: BigNumber,
   decimalsX: number,
   decimalsY: number,
 ) => {
-  if (isEmpty(exchanges) || !priceX || !priceY || !decimalsX || !decimalsY) {
-    return 0
+  if (
+    isEmpty(exchanges) ||
+    priceX.isZero() ||
+    priceY.isZero() ||
+    !decimalsX ||
+    !decimalsY
+  ) {
+    return BigNumber(0)
   }
 
-  let tokenXAmount = 0
-  let tokenYAmount = 0
+  let tokenXAmount = BigNumber(0)
+  let tokenYAmount = BigNumber(0)
 
   exchanges.forEach((exchange) => {
     const { amountIn, swapForY } = exchange
     if (swapForY) {
-      tokenYAmount += Number(amountIn)
+      tokenYAmount = tokenYAmount.plus(amountIn)
     } else {
-      tokenXAmount += Number(amountIn)
+      tokenXAmount = tokenXAmount.plus(amountIn)
     }
   })
 
-  return (
-    priceX * Number(formatUnits(tokenXAmount, decimalsX)) +
-    priceY * Number(formatUnits(tokenYAmount, decimalsY))
-  )
+  return priceX
+    .multipliedBy(bFormatUnits(tokenXAmount, decimalsX))
+    .plus(priceY.multipliedBy(bFormatUnits(tokenYAmount, decimalsY)))
 }
 
-const getApy = (volumeUsd: number, tvl: number, timestampForYear: number) =>
-  (volumeUsd / tvl) * (LP_FEE / FEE_DIVIDER) * 100 * timestampForYear
+const getApy = (
+  volumeUsd: BigNumber,
+  tvl: BigNumber,
+  timestampForYear: number,
+) => {
+  if (volumeUsd.isZero() || tvl.isZero() || timestampForYear === 0) {
+    return 0
+  }
+  return volumeUsd
+    .div(tvl)
+    .multipliedBy(1 - LP_FEE / FEE_DIVIDER)
+    .multipliedBy(timestampForYear)
+    .toNumber()
+}

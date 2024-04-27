@@ -1,4 +1,5 @@
 import { Token } from '@prisma/client'
+import BigNumber from 'bignumber.js'
 
 import prisma from 'src/clients/prisma'
 
@@ -46,8 +47,8 @@ export async function simulateSwap(
     return null
   }
 
-  const reserveX = Number(pool.reserveX)
-  const reserveY = Number(pool.reserveY)
+  const reserveX = BigNumber(pool.reserveX)
+  const reserveY = BigNumber(pool.reserveY)
   const amountIn = units
   const hasRef = !!referralAddress
   const swapForY = pool.tokenXAddress === offerAddress
@@ -74,32 +75,42 @@ export async function simulateSwap(
     reserveIn,
   })
 
-  const minAskUnits =
-    askUnits > 0 ? Math.floor(askUnits * (1 - slippageTolerance)) : 0
-  const swapRate = amountIn > 0 ? askUnits / amountIn : 0
-  const feePercent = askUnits > 0 ? (protocolFeeOut + refFeeOut) / askUnits : 0
+  // askUnits > 0 ? Math.floor(askUnits * (1 - slippageTolerance)) : 0
+  // const swapRate = amountIn > 0 ? askUnits / amountIn : 0
+  // const feePercent = askUnits > 0 ? (protocolFeeOut + refFeeOut) / askUnits : 0
+  const minAskUnits = askUnits.gt(0)
+    ? askUnits
+        .multipliedBy(1 - slippageTolerance)
+        .integerValue(BigNumber.ROUND_FLOOR)
+    : BigNumber(0)
+
+  const swapRate = amountIn.gt(0) ? askUnits.div(amountIn) : BigNumber(0)
+  const feePercent = askUnits.gt(0)
+    ? protocolFeeOut.plus(refFeeOut).div(askUnits)
+    : BigNumber(0)
 
   const offerToken = swapForY ? tokenX : tokenY
   const feeNanotons = await calculateFeeInNanotons({
     offerAmount: amountIn,
     offerToken,
-    feePercent,
+    feePercent: feePercent.toNumber(),
   })
 
   return {
     askAddress,
-    askUnits,
+    askUnits: askUnits.toString(),
     feeAddress: askAddress,
-    feePercent,
-    feeUnits: protocolFeeOut + refFeeOut,
-    minAskUnits,
+    feePercent: feePercent.toNumber(),
+    // feeUnits: protocolFeeOut + refFeeOut,
+    feeUnits: protocolFeeOut.plus(refFeeOut).toString(),
+    minAskUnits: minAskUnits.toString(),
     offerAddress,
-    offerUnits: amountIn,
+    offerUnits: amountIn.toString(),
     poolAddress: pool.id,
     priceImpact,
     routerAddress,
     slippageTolerance,
-    swapRate,
-    tonFeeUnits: feeNanotons,
+    swapRate: swapRate.toNumber(),
+    tonFeeUnits: feeNanotons.toString(),
   }
 }

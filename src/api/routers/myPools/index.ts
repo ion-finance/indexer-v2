@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { Request, Response, Router } from 'express'
 import { query } from 'express-validator'
 import { filter, map } from 'lodash'
@@ -22,9 +23,8 @@ router.get(
       },
     })
     const poolAddresses = map(
-      filter(
-        lpTokenWallets,
-        (lpTokenWallet) => Number(lpTokenWallet.amount) > 0,
+      filter(lpTokenWallets, (lpTokenWallet) =>
+        BigNumber(lpTokenWallet.amount).gt(0),
       ),
       (lpTokenWallet) => lpTokenWallet.poolAddress,
     )

@@ -1,4 +1,5 @@
 import { Token } from '@prisma/client'
+import BigNumber from 'bignumber.js'
 
 import prisma from 'src/clients/prisma'
 
@@ -46,8 +47,8 @@ export async function simulateSwapReverse(
     return null
   }
 
-  const reserveX = Number(pool.reserveX)
-  const reserveY = Number(pool.reserveY)
+  const reserveX = BigNumber(pool.reserveX)
+  const reserveY = BigNumber(pool.reserveY)
   const amountOut = units
   const hasRef = !!referralAddress
   const swapForY = pool.tokenXAddress === offerAddress
@@ -73,36 +74,46 @@ export async function simulateSwapReverse(
 
   const minAskUnits = units
 
-  const swapRate = offerUnits > 0 ? units / offerUnits : 0
+  // const swapRate = offerUnits > 0 ? units / offerUnits : 0
+  // const protocolFeeOut = (amountOut * PROTOCOL_FEE) / FEE_DIVIDER
+  // const refFeeOut = hasRef ? (amountOut * REF_FEE) / FEE_DIVIDER : 0
+  // const feePercent =
+  //   minAskUnits > 0
+  //     ? (protocolFeeOut + refFeeOut) / (minAskUnits * (1 + slippageTolerance))
+  //     : 0
 
-  const protocolFeeOut = (amountOut * PROTOCOL_FEE) / FEE_DIVIDER
-  const refFeeOut = hasRef ? (amountOut * REF_FEE) / FEE_DIVIDER : 0
-  const feePercent =
-    minAskUnits > 0
-      ? (protocolFeeOut + refFeeOut) / (minAskUnits * (1 + slippageTolerance))
-      : 0
-
+  const swapRate = offerUnits.gt(0) ? units.div(offerUnits) : BigNumber(0)
+  const protocolFeeOut = amountOut.multipliedBy(PROTOCOL_FEE).div(FEE_DIVIDER)
+  const refFeeOut = hasRef
+    ? amountOut.multipliedBy(REF_FEE).div(FEE_DIVIDER)
+    : BigNumber(0)
+  const feePercent = minAskUnits.gt(0)
+    ? protocolFeeOut
+        .plus(refFeeOut)
+        .div(minAskUnits.multipliedBy(1 + slippageTolerance))
+    : BigNumber(0)
   const offerToken = swapForY ? tokenX : tokenY
+
   const feeNanotons = await calculateFeeInNanotons({
     offerAmount: offerUnits,
     offerToken,
-    feePercent,
+    feePercent: feePercent.toNumber(),
   })
 
   return {
     askAddress: askAddress,
-    askUnits: minAskUnits,
+    askUnits: minAskUnits.toString(),
     feeAddress: askAddress,
-    feePercent: feePercent,
-    feeUnits: protocolFeeOut + refFeeOut,
-    minAskUnits: minAskUnits,
+    feePercent: feePercent.toNumber(),
+    feeUnits: protocolFeeOut.plus(refFeeOut).toString(),
+    minAskUnits: minAskUnits.toString(),
     offerAddress: offerAddress,
-    offerUnits: offerUnits,
+    offerUnits: offerUnits.toString(),
     poolAddress: pool.id,
     priceImpact: priceImpact,
     routerAddress,
     slippageTolerance: slippageTolerance,
-    swapRate: swapRate,
-    tonFeeUnits: feeNanotons,
+    swapRate: swapRate.toNumber(),
+    tonFeeUnits: feeNanotons.toString(),
   }
 }

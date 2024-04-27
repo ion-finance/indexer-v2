@@ -34,9 +34,10 @@ router.get('/trending-assets', async function handler(req, res) {
 
   const poolsWithVolume = pools.map((pool) => {
     const exchanges = exchanges24h.filter((d) => d.poolAddress === pool.id)
+    // To use lodash 'sortby', use BigInt instead of BigNumber
     const volumeUsd = exchanges.reduce((acc, exchange) => {
-      return acc + Number(exchange.volumeUsd)
-    }, 0)
+      return acc + BigInt(exchange.volumeUsd)
+    }, BigInt(0))
     return { ...pool, volumeUsd }
   })
 
@@ -51,9 +52,9 @@ router.get('/trending-assets', async function handler(req, res) {
     const tokenAddress = xIsTON ? tokenYAddress : tokenXAddress
     const exchanges = exchanges24h.filter((d) => d.poolAddress === pool.id)
     const volumeUsd = exchanges.reduce((acc, exchange) => {
-      return acc + Number(exchange.volumeUsd)
-    }, 0)
-    if (volumeUsd === 0) {
+      return acc + BigInt(exchange.volumeUsd)
+    }, BigInt(0))
+    if (volumeUsd === BigInt(0)) {
       return null
     }
     const token = tokensMap[tokenAddress]
