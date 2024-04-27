@@ -26,8 +26,7 @@ router.get('/trending-assets', async function handler(req, res) {
 
   const exchanges24h = await prisma.swap.findMany({
     where: {
-      // TODO: change as timestamp
-      createdAt: {
+      timestamp: {
         gte: new Date(Date.now() - ONE_DAY),
       },
     },
