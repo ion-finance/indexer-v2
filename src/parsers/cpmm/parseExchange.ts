@@ -1,5 +1,7 @@
 import { Cell } from '@ton/core'
 
+import { bigIntToBigNumber } from 'src/utils/bigNumber'
+
 const parseExchange = (message: Cell) => {
   const body = message.beginParse()
   body.loadUint(32) // skip log code
@@ -12,8 +14,8 @@ const parseExchange = (message: Cell) => {
   return {
     senderAddress,
     receiverAddress,
-    amountIn,
-    amountOut,
+    amountIn: bigIntToBigNumber(amountIn),
+    amountOut: bigIntToBigNumber(amountOut),
     swapForY,
   }
 }

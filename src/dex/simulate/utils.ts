@@ -1,10 +1,10 @@
 import { Token } from '@prisma/client'
-import { has } from 'lodash'
+import BigNumber from 'bignumber.js'
 
 import prisma from 'src/clients/prisma'
 import { isSameAddress } from 'src/utils/address'
 
-import { FEE_DIVIDER, LP_FEE } from './contant'
+import { FEE_DIVIDER } from './contant'
 
 export const calculatePriceImpact = ({
   amountIn,
@@ -27,42 +27,62 @@ export const calculateOutAmount = ({
   refFee,
 }: {
   hasRef: boolean
-  amountIn: number
-  reserveIn: number
-  reserveOut: number
+  amountIn: BigNumber
+  reserveIn: BigNumber
+  reserveOut: BigNumber
   lpFee: number
   protocolFee: number
   refFee: number
 }): {
-  out: number
-  protocolFeeOut: number
-  refFeeOut: number
+  out: BigNumber
+  protocolFeeOut: BigNumber
+  refFeeOut: BigNumber
 } => {
-  if (amountIn <= 0) {
+  if (amountIn.isLessThanOrEqualTo(0)) {
     return {
-      out: 0,
-      protocolFeeOut: 0,
-      refFeeOut: 0,
+      out: BigNumber(0),
+      protocolFeeOut: BigNumber(0),
+      refFeeOut: BigNumber(0),
     }
   }
 
-  const amountInWithFee = (amountIn * (FEE_DIVIDER - lpFee)) / FEE_DIVIDER
-  const baseOut = (amountInWithFee * reserveOut) / (reserveIn + amountInWithFee)
+  // const amountInWithFee = (amountIn * (FEE_DIVIDER - lpFee)) / FEE_DIVIDER
+  // const baseOut = (amountInWithFee * reserveOut) / (reserveIn + amountInWithFee)
 
+  const lpFeeNumber = new BigNumber(lpFee / FEE_DIVIDER)
+
+  const amountInWithFee = amountIn.multipliedBy(BigNumber(1).minus(lpFeeNumber))
+  const baseOut = amountInWithFee
+    .multipliedBy(reserveOut)
+    .div(reserveIn.plus(amountInWithFee))
+
+  // const protocolFeeOut = protocolFee > 0 ? Math.ceil((baseOut * protocolFee) / FEE_DIVIDER) : 0
   const protocolFeeOut =
-    protocolFee > 0 ? Math.ceil((baseOut * protocolFee) / FEE_DIVIDER) : 0
-  const refFeeOut =
-    hasRef && refFee > 0 ? Math.ceil((baseOut * refFee) / FEE_DIVIDER) : 0
+    protocolFee > 0
+      ? baseOut
+          .multipliedBy(protocolFee)
+          .div(FEE_DIVIDER)
+          .integerValue(BigNumber.ROUND_CEIL)
+      : BigNumber(0)
 
-  const finalOut = baseOut - protocolFeeOut - refFeeOut
+  const refFeeOut =
+    hasRef && refFee > 0
+      ? baseOut.multipliedBy(refFee).integerValue(BigNumber.ROUND_CEIL)
+      : BigNumber(0)
+  // const refFeeOut =
+  //   hasRef && refFee > 0 ? Math.ceil((baseOut * refFee) / FEE_DIVIDER) : 0
+
+  const finalOut = baseOut.minus(protocolFeeOut).minus(refFeeOut)
+  // const finalOut = baseOut - protocolFeeOut - refFeeOut
 
   return {
-    out: Math.floor(finalOut),
-    protocolFeeOut: Math.floor(protocolFeeOut),
-    refFeeOut: Math.floor(refFeeOut),
+    out: finalOut,
+    protocolFeeOut: protocolFeeOut,
+    refFeeOut: refFeeOut,
   }
 }
 
+// TODO: use BigNumber
 export const calculateInAmount = ({
   hasRef,
   amountOut,
@@ -85,7 +105,6 @@ export const calculateInAmount = ({
   if (amountOut <= 0) {
     return Number(Infinity)
   }
-  // amountOut should be large for protocolFee, refFee
   const fee = hasRef ? protocolFee + refFee : protocolFee
   const amountOutBeforeFee = (amountOut * FEE_DIVIDER) / (FEE_DIVIDER - fee)
 
