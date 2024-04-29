@@ -2,6 +2,7 @@ import { Token } from '@prisma/client'
 import BigNumber from 'bignumber.js'
 
 import prisma from 'src/clients/prisma'
+import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
 import { isSameAddress } from 'src/utils/address'
 
 import { FEE_DIVIDER } from './contant'
@@ -147,7 +148,7 @@ export async function calculateFeeInNanotons({
   offerToken: Token
   feePercent: number
 }): Promise<BigNumber> {
-  const tokenPrices = await prisma.tokenPrice.findMany()
+  const tokenPrices = await getLatestTokenPrices()
   const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS as string
   const isTon = isSameAddress(offerToken.id, TON_WALLET_ADDRESS)
 

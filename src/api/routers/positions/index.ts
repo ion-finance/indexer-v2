@@ -4,6 +4,7 @@ import { Router } from 'express'
 import { compact } from 'lodash'
 
 import prisma from 'src/clients/prisma'
+import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
 import { isSameAddress } from 'src/utils/address'
 import { bFormatUnits } from 'src/utils/bigNumber'
 
@@ -11,7 +12,7 @@ const router = Router()
 
 router.get('/positions/:address', async function handler(req, res) {
   const parsed = Address.parse(req.params.address).toString()
-  const tokenPrices = await prisma.tokenPrice.findMany()
+  const tokenPrices = await getLatestTokenPrices()
 
   const [tokens, pools, lpTokenWallets, deposits] = await Promise.all([
     prisma.token.findMany(),

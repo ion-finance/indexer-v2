@@ -13,6 +13,7 @@ import {
 } from 'lodash'
 
 import prisma from 'src/clients/prisma'
+import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
 import { isSameAddress } from 'src/utils/address'
 
 const getUSDPrice = (data: any) => data?.quote?.USD?.price || 0
@@ -73,7 +74,7 @@ const updateTokenPricesLogic = async (timestamp?: Date) => {
   )
 
   const tokens = (await prisma.token.findMany()) as Token[]
-  const tokenPrices = await prisma.tokenPrice.findMany()
+  const tokenPrices = await getLatestTokenPrices()
   const sortedTokenPrices = sortBy(tokenPrices, 'timestamp').reverse() // to get latest price
 
   const tonPrice = Number(

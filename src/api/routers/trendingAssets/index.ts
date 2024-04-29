@@ -2,6 +2,7 @@ import { Token } from '@prisma/client'
 import { compact, sortBy } from 'lodash'
 
 import prisma from 'src/clients/prisma'
+import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
 import { isTONAddress } from 'src/utils/address'
 import { ONE_DAY } from 'src/utils/date'
 
@@ -12,7 +13,7 @@ import router from '../pools'
 router.get('/trending-assets', async function handler(req, res) {
   const pools = await prisma.pool.findMany()
   const tokens = await prisma.token.findMany()
-  const tokenPrices = await prisma.tokenPrice.findMany()
+  const tokenPrices = await getLatestTokenPrices()
 
   const tokensMap = tokens.reduce(
     (acc, token) => {

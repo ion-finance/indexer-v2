@@ -6,6 +6,7 @@ import moment from 'moment'
 
 import prisma from 'src/clients/prisma'
 import { FEE_DIVIDER, LP_FEE } from 'src/dex/simulate/contant'
+import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
 import { isSameAddress } from 'src/utils/address'
 import { bFormatUnits } from 'src/utils/bigNumber'
 
@@ -15,7 +16,7 @@ router.get('/pools', async function handler(req, res) {
   const rawPools = await prisma.pool.findMany()
   const tokens = await prisma.token.findMany()
   const bins = await prisma.bins.findMany()
-  const tokenPrices = await prisma.tokenPrice.findMany()
+  const tokenPrices = await getLatestTokenPrices()
 
   const exchanges30d = await prisma.swap.findMany({
     where: {

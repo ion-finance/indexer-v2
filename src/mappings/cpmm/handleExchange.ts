@@ -10,6 +10,7 @@ import {
   REF_FEE,
 } from 'src/dex/simulate/contant'
 import { calculateOutAmount } from 'src/dex/simulate/utils'
+import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
 import { Trace } from 'src/types/ton-api'
 import { findTracesByOpCode, isSameAddress, parseRaw } from 'src/utils/address'
 import { bFormatUnits, bigIntToBigNumber } from 'src/utils/bigNumber'
@@ -73,7 +74,7 @@ export const handleExchange = async ({
   eventId: string
   traces: Trace
 }) => {
-  const tokenPrices = await prisma.tokenPrice.findMany()
+  const tokenPrices = await getLatestTokenPrices()
   const tokens = await prisma.token.findMany()
 
   const routerAddress = process.env.ROUTER_ADDRESS || ''
