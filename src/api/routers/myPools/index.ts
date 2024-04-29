@@ -28,7 +28,6 @@ router.get(
       ),
       (lpTokenWallet) => lpTokenWallet.poolAddress,
     )
-    console.log('poolAddresses', poolAddresses)
     const pools = await prisma.pool.findMany({
       where: {
         id: {
