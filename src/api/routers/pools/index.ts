@@ -173,21 +173,26 @@ const getVolumeUsdOfExchange = (
     return BigNumber(0)
   }
 
-  let tokenXAmount = BigNumber(0)
-  let tokenYAmount = BigNumber(0)
+  const sum = exchanges.reduce((acc, exchange) => {
+    return acc.plus(exchange.volumeUsd)
+  }, BigNumber(0))
+  return sum
 
-  exchanges.forEach((exchange) => {
-    const { amountIn, swapForY } = exchange
-    if (swapForY) {
-      tokenYAmount = tokenYAmount.plus(amountIn)
-    } else {
-      tokenXAmount = tokenXAmount.plus(amountIn)
-    }
-  })
+  // let tokenXAmount = BigNumber(0)
+  // let tokenYAmount = BigNumber(0)
 
-  return priceX
-    .multipliedBy(bFormatUnits(tokenXAmount, decimalsX))
-    .plus(priceY.multipliedBy(bFormatUnits(tokenYAmount, decimalsY)))
+  // exchanges.forEach((exchange) => {
+  //   const { amountIn, swapForY } = exchange
+  //   if (swapForY) {
+  //     tokenYAmount = tokenYAmount.plus(amountIn)
+  //   } else {
+  //     tokenXAmount = tokenXAmount.plus(amountIn)
+  //   }
+  // })
+
+  // return priceX
+  //   .multipliedBy(bFormatUnits(tokenXAmount, decimalsX))
+  //   .plus(priceY.multipliedBy(bFormatUnits(tokenYAmount, decimalsY)))
 }
 
 const getApy = (
