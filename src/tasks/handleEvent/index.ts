@@ -4,7 +4,6 @@ import {
   handleExchange,
   handlePoolCreated,
   handleRemoveLiquidity,
-  // handleRemoveLiquidity,
 } from 'src/mappings/cpmm'
 import { Trace } from 'src/types/ton-api'
 
