@@ -42,7 +42,7 @@ const getPrice = async () => {
 }
 
 // TODO: use quote historical v3 api
-export const updateBaseTokenPrices = async () => {
+export const updateBaseTokenPrices = async (timestamp?: Date) => {
   const prices = await getPrice()
   const tonPrice = String(prices.TON)
   const usdtPrice = String(prices.USDT)
@@ -53,7 +53,7 @@ export const updateBaseTokenPrices = async () => {
       id: TON_WALLET_ADDRESS,
       tokenSymbol: 'TON',
       price: tonPrice,
-      timestamp: new Date(),
+      timestamp: timestamp || new Date(),
     },
   })
   await prisma.tokenPrice.create({
@@ -61,7 +61,7 @@ export const updateBaseTokenPrices = async () => {
       id: USDT_WALLET_ADDRESS,
       tokenSymbol: 'USDT',
       price: usdtPrice,
-      timestamp: new Date(),
+      timestamp: timestamp || new Date(),
     },
   })
 }

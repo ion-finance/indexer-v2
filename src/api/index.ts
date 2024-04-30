@@ -4,7 +4,9 @@ import cron from 'node-cron'
 import swaggerJSDoc from 'swagger-jsdoc'
 import * as swaggerUI from 'swagger-ui-express'
 
-import updateQuoteTokenPrices from 'src/common/updateTokenPrices'
+import updateQuoteTokenPrices, {
+  updateBaseTokenPrices,
+} from 'src/common/updateTokenPrices'
 
 import binRouter from './routers/bins'
 import manualCPMMEventRouter from './routers/manualCPMMEvent'
@@ -70,6 +72,7 @@ cron.schedule('0 */1 * * * *', async () => {
   if (isCLMM) {
     return
   }
+  await updateBaseTokenPrices()
   await updateQuoteTokenPrices()
 })
 
