@@ -8,18 +8,20 @@ const router = Router()
 
 function getMilliseconds(range: string) {
   switch (range) {
+    case '1m':
+      return 1 * 60 * 1000 // 1m
     case '5m':
-      return 5 * 60 * 1000
-    case '30m':
-      return 30 * 60 * 1000
+      return 5 * 60 * 1000 // 5m
+    case '10m':
+      return 10 * 60 * 1000 // 10m
     case '1h':
-      return 60 * 60 * 1000
+      return 10 * 60 * 1000 // 10m
     case '1d':
-      return 24 * 60 * 60 * 1000
+      return 10 * 60 * 1000 // 10m
     case '7d':
-      return 7 * 24 * 60 * 60 * 1000
-    default:
       return 30 * 60 * 1000 // 30m
+    default:
+      return 30 * 60 * 1000 // 10m
   }
 }
 
