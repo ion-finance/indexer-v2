@@ -39,4 +39,48 @@ router.get(
   },
 )
 
+router.get(
+  '/tasks/usdt',
+  query('creator')
+    .isString()
+    .notEmpty()
+    .withMessage('Owner address is required'),
+  async (req: Request, res: Response) => {
+    const { senderAddress } = req.query as { senderAddress: string }
+
+    if (!senderAddress) {
+      return res.json({
+        status: 400,
+        data: [],
+      })
+    }
+
+    const usdtTonPoolAddress = process.env.USDT_TON_POOL_ADDRESS
+
+    const [deposit, swap] = await Promise.all([
+      prisma.deposit.findFirst({
+        where: {
+          senderAddress: senderAddress,
+          poolAddress: usdtTonPoolAddress,
+        },
+      }),
+      prisma.swap.findFirst({
+        where: {
+          senderAddress: senderAddress,
+          swapForY: false, // USDT(EQAlo0UG58M-DAliBEE0d6jWX0-nveb4YU0WU4vOAsteZLn_) is token X
+          poolAddress: usdtTonPoolAddress,
+        },
+      }),
+    ])
+
+    return res.json({
+      status: 200,
+      data: {
+        convertUsdtAt: swap?.timestamp,
+        earnUsdtAt: deposit?.timestamp,
+      },
+    })
+  },
+)
+
 export default router
