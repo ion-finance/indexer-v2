@@ -34,13 +34,13 @@ let cachedTrace = {} as { [key: string]: Trace }
 
 const checkCache = async () => {
   if (useCache) {
-    console.log('Using cache...')
+    const value = await getInput('Type cache file name to use:')
     const names = fs.readdirSync('cache/events').map((file) => {
       if (file.includes('.json')) {
         return file
       }
     })
-    const value = await getInput('Input cache file name briefly')
+    console.log(names)
     const files = filter(names, (name) => name?.includes(value))
     if (!files?.length) {
       console.log('No file found')
