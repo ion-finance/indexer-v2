@@ -16,8 +16,8 @@ export const sortByAddress = (addresses: Address[]) =>
 
 const testnet = {
   token1: {
-    id: 'EQCEyLaxdrSavRTTVFonHsEXfhwaDQCHUmKw9epamY_fNmD0',
-    jettonMinterAddress: 'kQBXkj37K2KP7i2GFNwEE_-z-yNZJfNTEhsYq2q9RDnIfoxB',
+    id: 'EQAmWnI-Tcgyr6US63TK6FtM_OVgV-jSqvj2fvCXgqNPokCh',
+    jettonMinterAddress: 'kQDauk3DRKg3Gtfk7NrZVz1rrI-8WdYt3368iOZcyMi3mief',
     name: 'TON',
     symbol: 'TON',
     image:
@@ -28,8 +28,8 @@ const testnet = {
   },
 
   token2: {
-    id: 'EQD2bKffQqv5SVT1847-0Cra9tX6zwBkIPC-r3Or5B2CUD8z',
-    jettonMinterAddress: 'EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs',
+    id: 'EQDG1-Sw9we8XgIUWqUVK-hmcObiH2OB8qYwYgBxRbh9h_wB',
+    jettonMinterAddress: 'kQBD5rI620ZgEU_0Wy-XMb-Zv56lLP2fHhSqSfxEyrs0OJtz',
     name: 'USDT',
     symbol: 'USDT',
     image:
