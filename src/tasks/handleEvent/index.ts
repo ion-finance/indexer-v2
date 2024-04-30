@@ -68,17 +68,30 @@ const handleEvent = async (params: {
     console.log(`Router Jetton Wallet deploy event: ${eventId}`)
   }
 
+  let lastUpdated = 0 // ms
+  const ONE_MINUTE = 60 * 1000
+  const updateTokenPrices = async (time: number) => {
+    if (time <= lastUpdated + ONE_MINUTE) {
+      return
+    }
+    await updateTokenPricesLogic(new Date(time))
+    lastUpdated = time
+  }
+
   if (isSwap) {
     console.log(`Exchange event: ${eventId}`)
     await handleExchange({ eventId, traces })
+
+    const utime = traces.transaction.utime
+    await updateTokenPrices(utime * 1000)
   } else if (isProvideLp) {
     console.log(`Provide Lp event: ${eventId}`)
   } else if (isProvideLpConfirmed) {
     console.log(`Provide Lp Confirmed: ${eventId}`)
     await handleAddLiquidity({ eventId, traces })
+
     const utime = traces.transaction.utime
-    const timestamp = new Date(utime * 1000)
-    await updateTokenPricesLogic(timestamp)
+    await updateTokenPrices(utime * 1000)
   } else if (isRemoveLiquidity) {
     console.log(`Remove Liquidity event: ${eventId}`)
     await handleRemoveLiquidity({ eventId, traces })
