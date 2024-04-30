@@ -1,8 +1,9 @@
-import updateTokenPricesLogic from './updateTokenPricesLogic'
+import updateQuoteTokenPrices from 'src/common/updateTokenPrices'
+
 import router from '../pools'
 
 router.get('/update-token-prices', async function handler(req, res) {
-  await updateTokenPricesLogic()
+  await updateQuoteTokenPrices()
   return res.status(200).json(true)
 })
 

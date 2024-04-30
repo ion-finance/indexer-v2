@@ -13,7 +13,7 @@ import {
 } from 'lodash'
 
 import prisma from 'src/clients/prisma'
-import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
+import getLatestTokenPrices from 'src/common/tokenPrice'
 import { isSameAddress } from 'src/utils/address'
 
 const getUSDPrice = (data: any) => data?.quote?.USD?.price || 0
@@ -65,7 +65,7 @@ export const updateBaseTokenPrices = async () => {
     },
   })
 }
-const updateTokenPricesLogic = async (timestamp?: Date) => {
+const updateQuoteTokenPrices = async (timestamp?: Date) => {
   const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS as string
   const USDT_WALLET_ADDRESS = process.env.USDT_WALLET_ADDRESS as string
   const rawPools = (await prisma.pool.findMany()) as Pool[]
@@ -238,4 +238,4 @@ async function bulkInsertTokenPrices(
   await prisma.$executeRawUnsafe(query)
 }
 
-export default updateTokenPricesLogic
+export default updateQuoteTokenPrices

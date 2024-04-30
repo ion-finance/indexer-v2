@@ -4,7 +4,7 @@ import { Router } from 'express'
 import { compact } from 'lodash'
 
 import prisma from 'src/clients/prisma'
-import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
+import getLatestTokenPrices from 'src/common/tokenPrice'
 import { isSameAddress } from 'src/utils/address'
 import { bFormatUnits } from 'src/utils/bigNumber'
 

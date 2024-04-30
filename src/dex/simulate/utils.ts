@@ -2,7 +2,7 @@ import { Token } from '@prisma/client'
 import BigNumber from 'bignumber.js'
 
 import prisma from 'src/clients/prisma'
-import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
+import getLatestTokenPrices from 'src/common/tokenPrice'
 import { isSameAddress } from 'src/utils/address'
 
 import { FEE_DIVIDER } from './contant'

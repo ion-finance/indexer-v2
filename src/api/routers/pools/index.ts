@@ -5,8 +5,8 @@ import { compact, filter, isEmpty } from 'lodash'
 import moment from 'moment'
 
 import prisma from 'src/clients/prisma'
+import getLatestTokenPrices from 'src/common/tokenPrice'
 import { FEE_DIVIDER, LP_FEE } from 'src/dex/simulate/contant'
-import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
 import { isSameAddress } from 'src/utils/address'
 import { bFormatUnits } from 'src/utils/bigNumber'
 

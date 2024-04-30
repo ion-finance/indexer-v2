@@ -2,7 +2,7 @@ import { Token } from '@prisma/client'
 import { compact, sortBy } from 'lodash'
 
 import prisma from 'src/clients/prisma'
-import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
+import getLatestTokenPrices from 'src/common/tokenPrice'
 import { isTONAddress } from 'src/utils/address'
 import { ONE_DAY } from 'src/utils/date'
 

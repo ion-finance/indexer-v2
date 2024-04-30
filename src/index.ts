@@ -8,7 +8,7 @@ import api from 'src/api'
 import prisma from 'src/clients/prisma'
 import { routerAddress } from 'src/constant/address'
 
-import { updateBaseTokenPrices } from './api/routers/updateTokenPrices/updateTokenPricesLogic'
+import { updateBaseTokenPrices } from './common/updateTokenPrices'
 import seedCLMM from './scripts/seedCLMM'
 import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'

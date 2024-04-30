@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import { find } from 'lodash'
 
 import prisma from 'src/clients/prisma'
+import getLatestTokenPrices from 'src/common/tokenPrice'
 import {
   FEE_DIVIDER,
   LP_FEE,
@@ -10,7 +11,6 @@ import {
   REF_FEE,
 } from 'src/dex/simulate/contant'
 import { calculateOutAmount } from 'src/dex/simulate/utils'
-import getLatestTokenPrices from 'src/query/getLatestTokenPrices'
 import { Trace } from 'src/types/ton-api'
 import { findTracesByOpCode, isSameAddress, parseRaw } from 'src/utils/address'
 import { bFormatUnits, bigIntToBigNumber } from 'src/utils/bigNumber'

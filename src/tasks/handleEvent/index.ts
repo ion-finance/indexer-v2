@@ -1,4 +1,4 @@
-import updateTokenPricesLogic from 'src/api/routers/updateTokenPrices/updateTokenPricesLogic'
+import updateQuoteTokenPrices from 'src/common/updateTokenPrices'
 import {
   handleAddLiquidity,
   handleExchange,
@@ -74,7 +74,8 @@ const handleEvent = async (params: {
     if (time <= lastUpdated + ONE_MINUTE) {
       return
     }
-    await updateTokenPricesLogic(new Date(time))
+    await updateQuoteTokenPrices(new Date(time))
+
     lastUpdated = time
   }
 

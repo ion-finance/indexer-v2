@@ -4,6 +4,8 @@ import cron from 'node-cron'
 import swaggerJSDoc from 'swagger-jsdoc'
 import * as swaggerUI from 'swagger-ui-express'
 
+import updateQuoteTokenPrices from 'src/common/updateTokenPrices'
+
 import binRouter from './routers/bins'
 import manualCPMMEventRouter from './routers/manualCPMMEvent'
 import myPoolsRouter from './routers/myPools'
@@ -22,7 +24,6 @@ import traceRouter from './routers/trace'
 import transactionRouter from './routers/transactions'
 import trendingAssetsRouter from './routers/trendingAssets'
 import updateTokenPrices from './routers/updateTokenPrices'
-import updateTokenPricesLogic from './routers/updateTokenPrices/updateTokenPricesLogic'
 
 const swaggerOptions = {
   definition: {
@@ -69,7 +70,7 @@ cron.schedule('0 */1 * * * *', async () => {
   if (isCLMM) {
     return
   }
-  await updateTokenPricesLogic()
+  await updateQuoteTokenPrices()
 })
 
 export default api
