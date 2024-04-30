@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 
-async function applyHypertable() {
-  const prisma = new PrismaClient()
+import prisma from 'src/clients/prisma'
 
+async function applyHypertable() {
   try {
     await prisma.$executeRaw`
       CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;

@@ -217,7 +217,6 @@ async function bulkInsertTokenPrices(
     timestamp: Date
   }[],
 ) {
-  const prisma = new PrismaClient()
   if (isEmpty(tokenPrices)) {
     return
   }
