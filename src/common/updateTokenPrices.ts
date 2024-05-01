@@ -46,7 +46,6 @@ const getPrice = async () => {
     return { TON, USDT }
   } catch (e) {
     console.warn('Error fetching price data from CoinMarketCap:')
-    console.log('e', e)
     sleep(2000)
     return {
       TON: 5,
