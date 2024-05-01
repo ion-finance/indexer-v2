@@ -15,6 +15,18 @@ import {
 import prisma from 'src/clients/prisma'
 import getLatestTokenPrices from 'src/common/tokenPrice'
 import { isSameAddress } from 'src/utils/address'
+import sleep from 'src/utils/sleep'
+
+const ONE_MINUTE = 60 * 1000
+let lastUpdated = 0
+export const updateTokenPrices = async (time: number) => {
+  if (time <= lastUpdated + ONE_MINUTE) {
+    return
+  }
+  lastUpdated = time
+  await updateBaseTokenPrices(new Date(time))
+  await updateQuoteTokenPrices(new Date(time))
+}
 
 const getUSDPrice = (data: any) => data?.quote?.USD?.price || 0
 const getPrice = async () => {
@@ -34,9 +46,11 @@ const getPrice = async () => {
     return { TON, USDT }
   } catch (e) {
     console.warn('Error fetching price data from CoinMarketCap:')
+    console.log('e', e)
+    sleep(2000)
     return {
-      TON: 0,
-      USDT: 0,
+      TON: 5,
+      USDT: 1,
     }
   }
 }

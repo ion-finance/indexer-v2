@@ -1,5 +1,6 @@
 import updateQuoteTokenPrices, {
   updateBaseTokenPrices,
+  updateTokenPrices,
 } from 'src/common/updateTokenPrices'
 import {
   handleAddLiquidity,
@@ -28,6 +29,7 @@ const handleEvent = async (params: {
   traces: Trace
 }) => {
   const { eventId, traces, routerAddress } = params
+
   // Extract paths
   const paths: Ops[][] = extractPaths(routerAddress, params.traces)
   // console.log("paths", paths);
@@ -69,17 +71,17 @@ const handleEvent = async (params: {
     console.log(`Router Jetton Wallet deploy event: ${eventId}`)
   }
 
-  let lastUpdated = 0 // ms
-  const ONE_MINUTE = 60 * 1000
-  const updateTokenPrices = async (time: number) => {
-    if (time <= lastUpdated + ONE_MINUTE) {
-      return
-    }
-    await updateBaseTokenPrices(new Date(time))
-    await updateQuoteTokenPrices(new Date(time))
-
-    lastUpdated = time
-  }
+  // const ONE_MINUTE = 60 * 1000
+  // const updateTokenPrices = async (time: number) => {
+  //   console.log('lastUpdated', lastUpdated)
+  //   console.log('time', time)
+  //   if (time <= lastUpdated + ONE_MINUTE) {
+  //     return
+  //   }
+  //   lastUpdated = time
+  //   await updateBaseTokenPrices(new Date(time))
+  //   await updateQuoteTokenPrices(new Date(time))
+  // }
 
   if (isSwap) {
     console.log(`Exchange event: ${eventId}`)
