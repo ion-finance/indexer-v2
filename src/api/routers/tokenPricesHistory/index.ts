@@ -17,12 +17,16 @@ function getMilliseconds(range: string) {
       return 5 * 60 * 1000 // 5m
     case '10m':
       return 10 * 60 * 1000 // 10m
-    case '1h':
-      return 10 * 60 * 1000 // 10m
-    case '1d':
-      return 10 * 60 * 1000 // 10m
-    case '7d':
+    case '15m':
+      return 15 * 60 * 1000 // 15m
+    case '30m':
       return 30 * 60 * 1000 // 30m
+    case '1h':
+      return 1 * 60 * 60 * 1000 // 1h
+    case '1d':
+      return 1 * 24 * 60 * 60 * 1000 // 1d
+    case '7d':
+      return 7 * 24 * 60 * 60 * 1000 // 7d
     default:
       return 30 * 60 * 1000 // 30m
   }
