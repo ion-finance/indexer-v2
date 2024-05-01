@@ -6,6 +6,9 @@ import prisma from 'src/clients/prisma'
 
 const router = Router()
 
+// timestamp consider milliseconds,
+// so set buffer 1s to consider in seconds range
+const BUFFER = 1000 // 1s
 function getMilliseconds(range: string) {
   switch (range) {
     case '1m':
@@ -21,7 +24,7 @@ function getMilliseconds(range: string) {
     case '7d':
       return 30 * 60 * 1000 // 30m
     default:
-      return 30 * 60 * 1000 // 10m
+      return 30 * 60 * 1000 // 30m
   }
 }
 
@@ -88,7 +91,10 @@ router.get(
       const tokenPrices = groupedByTokenId[tokenId]
       tokenPrices.forEach((price) => {
         const currentTimestamp = new Date(price.timestamp).getTime()
-        if (lastTime === 0 || currentTimestamp >= lastTime + interval) {
+        if (
+          lastTime === 0 ||
+          currentTimestamp + BUFFER >= lastTime + interval
+        ) {
           filteredPrices.push(price)
           lastTime = currentTimestamp
         }
