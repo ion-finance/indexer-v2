@@ -6,6 +6,7 @@ import * as swaggerUI from 'swagger-ui-express'
 
 import updateQuoteTokenPrices, {
   updateBaseTokenPrices,
+  updateTokenPrices as updateTokenPricesFunction,
 } from 'src/common/updateTokenPrices'
 
 import binRouter from './routers/bins'
@@ -66,8 +67,8 @@ api.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec))
 
 // every 1 hour
 // cron.schedule('0 */1 * * *', async () => {
-// every 1 minute
-cron.schedule('0 */1 * * * *', async () => {
+// every 5 minute
+cron.schedule('0 */5 * * * *', async () => {
   const isCLMM = process.env.IS_CLMM === 'true'
   if (isCLMM) {
     return
