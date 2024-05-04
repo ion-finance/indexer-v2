@@ -134,14 +134,17 @@ export const handleExchange = async ({
     })
     exitCodes.forEach((exitCode) => {
       if (exitCode === Number(EXIT_CODE.SWAP_REFUND_NO_LIQ)) {
-        console.log('Skip failed swap. exit code: SWAP_REFUND_NO_LIQ')
+        console.log(
+          'Skip failed swap. Empty payToNormalTrace. exit code: SWAP_REFUND_NO_LIQ',
+        )
         return
       } else if (exitCode === Number(EXIT_CODE.SWAP_REFUND_RESERVE_ERR)) {
-        console.log('Skip failed swap. exit code: SWAP_REFUND_RESERVE_ERR')
+        console.log(
+          'Skip failed swap. Empty payToNormalTrace. exit code: SWAP_REFUND_RESERVE_ERR',
+        )
         return
       }
     })
-    console.warn('Skip failed swap. no pay to with exit code SWAP_OK')
     return
   }
 

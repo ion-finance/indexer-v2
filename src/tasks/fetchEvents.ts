@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { sortBy, uniqBy } from 'lodash'
 
-import { AccountEvent, Event } from 'src/types/ton-api'
+import { AccountEvent, AccountEvents, Event } from 'src/types/ton-api'
 import { toLocaleString } from 'src/utils/date'
 
 // import * as Sentry from "@sentry/node";
@@ -26,25 +26,33 @@ const fetchEvents = async ({
         (endDate ? `&end_date=${endDate}` : '')
 
       const url = `${baseUrl}?${args}`
-      const res = await axios(url, {
+      const res = await axios<AccountEvents>(url, {
         headers: {
           Authorization: `Bearer ${process.env.TON_API_KEY}`,
         },
       })
 
-      const parsedEvents = res.data.events.filter(
-        (event: Event) => event.in_progress === false,
-      ) as AccountEvent[]
-      const sorted = sortBy(parsedEvents, (e) => e.timestamp, 'asc')
+      const accountEvents = [] as AccountEvent[]
+      res.data.events.forEach((event) => {
+        if (event.in_progress === true) {
+          console.log('Event is in progress. Skip it.', event.event_id, url)
+        } else {
+          accountEvents.push(event)
+        }
+      })
+      // const parsedEvents = res.data.events.filter(
+      //   (event: Event) => event.in_progress === false,
+      // ) as AccountEvent[]
+      const sorted = sortBy(accountEvents, (e) => e.timestamp, 'asc')
       events.push(...sorted)
 
-      if (parsedEvents.length >= 100) {
+      if (accountEvents.length >= 100) {
         // TON API limit is 100 events per request.
         // If 100 events are found, we need to fetch evetns more precisely.
         // It we don't this, we may miss some events.
         console.log('More than 100 events found.')
-        // endDate = parsedEvents[Math.floor(parsedEvents.length / 2)].timestamp;
-        endDate = parsedEvents[parsedEvents.length - 1].timestamp
+        // endDate = accountEvents[Math.floor(accountEvents.length / 2)].timestamp;
+        endDate = accountEvents[accountEvents.length - 1].timestamp
         console.log(
           'Try to fetch events endData ',
           toLocaleString(endDate),
