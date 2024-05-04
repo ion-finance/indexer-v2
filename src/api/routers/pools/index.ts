@@ -11,6 +11,9 @@ import { isSameAddress } from 'src/utils/address'
 import { bFormatUnits } from 'src/utils/bigNumber'
 
 const router = Router()
+const alreadyWarnedReserve = new Set<string>()
+const alreadyWarnedTokenX = new Set<string>()
+const alreadyWarnedTokenY = new Set<string>()
 
 router.get('/pools', async function handler(req, res) {
   const rawPools = await prisma.pool.findMany()
@@ -53,17 +56,26 @@ router.get('/pools', async function handler(req, res) {
 
     if (type === 'CPMM') {
       if (BigNumber(reserveX).isZero() || BigNumber(reserveY).isZero()) {
-        console.warn('Reserve not found', pool.id)
+        if (!alreadyWarnedReserve.has(pool.id)) {
+          console.warn('Reserve not found', pool.id)
+          alreadyWarnedReserve.add(pool.id)
+        }
         return
       }
     }
     if (!tokenX) {
-      console.warn('TokenX not found', tokenXAddress)
+      if (!alreadyWarnedTokenX.has(tokenXAddress)) {
+        console.warn('TokenX not found', tokenXAddress)
+        alreadyWarnedTokenX.add(tokenXAddress)
+      }
       return
     }
 
     if (!tokenY) {
-      console.warn('TokenY not found', tokenYAddress)
+      if (!alreadyWarnedTokenY.has(tokenYAddress)) {
+        console.warn('TokenY not found', tokenYAddress)
+        alreadyWarnedTokenY.add(tokenYAddress)
+      }
       return
     }
 

@@ -55,8 +55,17 @@ const fetchEvents = async ({
 
       break
     } catch (e) {
-      console.error('Error fetching events')
-      console.log('baseUrl', baseUrl)
+      console.error('Error fetching events in url', baseUrl)
+      if (axios.isAxiosError(e)) {
+        e.config?.url && console.error('url: ', e.config.url)
+        e.response && console.error('data: ', e.response.data)
+        e.response?.status && console.error('status: ', e.response.status)
+        e.response?.statusText &&
+          console.error('statusText: ', e.response.statusText)
+        console.error('API_KEY', process.env.TON_API_KEY)
+      } else {
+        console.error(e)
+      }
       // Sentry.captureException(e);
       break
     }
