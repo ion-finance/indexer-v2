@@ -155,14 +155,18 @@ const updateQuoteTokenPrices = async (timestamp?: Date) => {
     const quote = xIsBase ? tokenY : tokenX
     const { id, symbol } = quote
 
-    const ratio = xIsBase
-      ? Number(reserveX) / Number(reserveY)
-      : Number(reserveY) / Number(reserveX)
+    const price = calcQuoteTokenPrice({
+      baseTokenPrice: tonPrice,
+      baseTokenReserve: xIsBase ? Number(reserveX) : Number(reserveY),
+      baseTokenDecimals: xIsBase ? tokenX.decimals : tokenY.decimals,
+      quoteTokenReserve: xIsBase ? Number(reserveY) : Number(reserveX),
+      quoteTokenDecimals: xIsBase ? tokenY.decimals : tokenX.decimals,
+    })
 
     return {
       id,
       tokenSymbol: symbol,
-      price: tonPrice * ratio,
+      price,
       timestamp: timestamp || new Date(),
     }
   })
@@ -191,14 +195,23 @@ const updateQuoteTokenPrices = async (timestamp?: Date) => {
 
       const quote = tokenXIndexed ? tokenY : tokenX
       const { id, symbol } = quote
-      const ratio = tokenXIndexed
-        ? Number(pool.reserveX) / Number(pool.reserveY)
-        : Number(pool.reserveY) / Number(pool.reserveX)
+
+      const price = calcQuoteTokenPrice({
+        baseTokenPrice: indexed.price,
+        baseTokenReserve: tokenXIndexed
+          ? Number(pool.reserveX)
+          : Number(pool.reserveY),
+        baseTokenDecimals: tokenXIndexed ? tokenX.decimals : tokenY.decimals,
+        quoteTokenReserve: tokenXIndexed
+          ? Number(pool.reserveY)
+          : Number(pool.reserveX),
+        quoteTokenDecimals: tokenXIndexed ? tokenY.decimals : tokenX.decimals,
+      })
 
       const tokenPrice = {
         id,
         tokenSymbol: symbol,
-        price: indexed.price * ratio,
+        price,
         timestamp: timestamp || new Date(),
       }
       // add to reference pools
@@ -251,3 +264,25 @@ async function bulkInsertTokenPrices(
 }
 
 export default updateQuoteTokenPrices
+
+const calcQuoteTokenPrice = ({
+  baseTokenPrice,
+  baseTokenReserve,
+  quoteTokenReserve,
+  baseTokenDecimals,
+  quoteTokenDecimals,
+}: {
+  baseTokenPrice: number
+  baseTokenReserve: number
+  baseTokenDecimals: number
+  quoteTokenReserve: number
+  quoteTokenDecimals: number
+}) => {
+  if (quoteTokenReserve === 0) {
+    return 0
+  }
+  const ratio = baseTokenReserve / quoteTokenReserve
+  const decimals = quoteTokenDecimals - baseTokenDecimals
+  const quoteTokenPrice = baseTokenPrice * ratio * Math.pow(10, decimals)
+  return quoteTokenPrice
+}
