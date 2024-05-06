@@ -74,16 +74,17 @@ export const sortByAddress = (addresses: Address[]) =>
     ),
   ).reverse()
 
-export const changeNameOfProxyTon = (name: string) => {
-  if (name === 'Proxy TON') {
+export const changeNameOfProxyTon = (address: string, name: string) => {
+  const isTon = isSameAddress(address, process.env.TON_WALLET_ADDRESS)
+  if (isTon && name === 'Proxy TON') {
     return 'TON'
   }
   return name
 }
 
-export const changeSymbolOfProxyTon = (symbol: string) => {
-  if (symbol === 'pTON' || symbol === 'SCAM') {
-    console.log(`Symbol is wrong. Change to ${symbol} to TON`)
+export const changeSymbolOfProxyTon = (address: string, symbol: string) => {
+  const isTon = isSameAddress(address, process.env.TON_WALLET_ADDRESS)
+  if (isTon && (symbol === 'pTON' || symbol === 'SCAM')) {
     return 'TON'
   }
   return symbol

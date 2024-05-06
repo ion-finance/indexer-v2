@@ -93,13 +93,21 @@ export const handlePoolCreated = async ({
   ])
 
   const tokenXSymbol = changeSymbolOfProxyTon(
+    tokenXAddress,
     tokenXdata?.metadata?.symbol || '',
   )
   const tokenYSymbol = changeSymbolOfProxyTon(
+    tokenYAddress,
     tokenYdata?.metadata?.symbol || '',
   )
-  const tokenXName = changeNameOfProxyTon(tokenXdata?.metadata?.name || '')
-  const tokenYName = changeNameOfProxyTon(tokenYdata?.metadata?.name || '')
+  const tokenXName = changeNameOfProxyTon(
+    tokenXAddress,
+    tokenXdata?.metadata?.name || '',
+  )
+  const tokenYName = changeNameOfProxyTon(
+    tokenYAddress,
+    tokenYdata?.metadata?.name || '',
+  )
 
   if (tokenXdata) {
     await prisma.token.upsert({

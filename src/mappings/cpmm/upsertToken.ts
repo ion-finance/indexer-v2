@@ -5,22 +5,27 @@ import fetchTokenData from 'src/utils/fetchTokenData'
 export const upsertToken = async (tokenAddress: string, timestamp: string) => {
   const tokenData = await fetchTokenData(tokenAddress)
   if (tokenData) {
+    const name = changeNameOfProxyTon(tokenAddress, tokenData.metadata.name)
+    const symbol = changeSymbolOfProxyTon(
+      tokenAddress,
+      tokenData.metadata.symbol,
+    )
     return await prisma.token.upsert({
       where: {
         id: tokenAddress,
       },
       update: {
         jettonMinterAddress: tokenData.minter_address,
-        name: changeNameOfProxyTon(tokenData.metadata.name),
-        symbol: changeSymbolOfProxyTon(tokenData.metadata.symbol),
+        name,
+        symbol,
         decimals: parseInt(tokenData.metadata.decimals),
         image: tokenData.metadata.image,
       },
       create: {
         id: tokenAddress,
         jettonMinterAddress: tokenData.minter_address,
-        name: changeNameOfProxyTon(tokenData.metadata.name),
-        symbol: changeSymbolOfProxyTon(tokenData.metadata.symbol),
+        name,
+        symbol,
         decimals: parseInt(tokenData.metadata.decimals),
         image: tokenData.metadata.image,
         timestamp,
