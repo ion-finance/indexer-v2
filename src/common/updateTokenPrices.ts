@@ -55,28 +55,63 @@ const getPrice = async () => {
 }
 
 // TODO: use quote historical v3 api
-export const updateBaseTokenPrices = async (timestamp?: Date) => {
+export const updateBaseTokenPrices = async (ts?: Date) => {
   const prices = await getPrice()
   const tonPrice = String(prices.TON)
   const usdtPrice = String(prices.USDT)
   const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS as string
   const USDT_WALLET_ADDRESS = process.env.USDT_WALLET_ADDRESS as string
-  await prisma.tokenPrice.create({
-    data: {
+  const timestamp = ts || new Date()
+  await prisma.tokenPrice.upsert({
+    where: {
+      timestamp_id: {
+        id: TON_WALLET_ADDRESS,
+        timestamp,
+      },
+    },
+    update: {
+      price: tonPrice,
+    },
+    create: {
       id: TON_WALLET_ADDRESS,
       tokenSymbol: 'TON',
       price: tonPrice,
-      timestamp: timestamp || new Date(),
+      timestamp,
     },
   })
-  await prisma.tokenPrice.create({
-    data: {
+  await prisma.tokenPrice.upsert({
+    where: {
+      timestamp_id: {
+        id: USDT_WALLET_ADDRESS,
+        timestamp,
+      },
+    },
+    update: {
+      price: usdtPrice,
+    },
+    create: {
       id: USDT_WALLET_ADDRESS,
       tokenSymbol: 'USDT',
       price: usdtPrice,
-      timestamp: timestamp || new Date(),
+      timestamp,
     },
   })
+  // await prisma.tokenPrice.create({
+  //   data: {
+  //     id: TON_WALLET_ADDRESS,
+  //     tokenSymbol: 'TON',
+  //     price: tonPrice,
+  //     timestamp: timestamp || new Date(),
+  //   },
+  // })
+  // await prisma.tokenPrice.create({
+  //   data: {
+  //     id: USDT_WALLET_ADDRESS,
+  //     tokenSymbol: 'USDT',
+  //     price: usdtPrice,
+  //     timestamp: timestamp || new Date(),
+  //   },
+  // })
 }
 const updateQuoteTokenPrices = async (timestamp?: Date) => {
   const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS as string
