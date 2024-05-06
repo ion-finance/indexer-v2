@@ -6,7 +6,7 @@ import { OP } from 'src/tasks/handleEvent/opCode'
 import { Trace } from 'src/types/ton-api'
 import {
   findTracesByOpCode,
-  findTracesOfPool,
+  // findTracesOfPool,
   parseRaw,
 } from 'src/utils/address'
 import { bigIntToBigNumber } from 'src/utils/bigNumber'
@@ -143,7 +143,7 @@ export const handleRemoveLiquidity = async ({
   })
 
   const walletTrace = traces
-  const poolTraces = findTracesOfPool(traces, poolAddress)
+  // const poolTraces = findTracesOfPool(traces, poolAddress)
   const poolTrace = burnNotificationTrace
   const { tokenXAddress, tokenYAddress } = pool
   const { hash: poolTxHash, lt, utime: poolUtime } = poolTrace.transaction

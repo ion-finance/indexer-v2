@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { sortBy, uniqBy } from 'lodash'
 
-import { AccountEvent, AccountEvents, Event } from 'src/types/ton-api'
+import { AccountEvent, AccountEvents } from 'src/types/ton-api'
 import { toLocaleString } from 'src/utils/date'
 
 // import * as Sentry from "@sentry/node";

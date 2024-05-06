@@ -1,4 +1,3 @@
-import { Address } from '@ton/core'
 import dotenv from 'dotenv'
 
 import { isSameAddress, parseRaw } from 'src/utils/address'

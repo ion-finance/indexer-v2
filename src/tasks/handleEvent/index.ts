@@ -1,7 +1,4 @@
-import updateQuoteTokenPrices, {
-  updateBaseTokenPrices,
-  updateTokenPrices,
-} from 'src/common/updateTokenPrices'
+import { updateTokenPrices } from 'src/common/updateTokenPrices'
 import {
   handleAddLiquidity,
   handleExchange,

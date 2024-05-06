@@ -1,5 +1,3 @@
-import { PrismaClient } from '@prisma/client'
-
 import prisma from 'src/clients/prisma'
 
 async function applyHypertable() {

@@ -1,11 +1,11 @@
-import { Order, OrderHistory, Pool } from '@prisma/client'
+import { Pool } from '@prisma/client'
 
 import CLMM from 'cache/clmm'
 import prisma from 'src/clients/prisma'
 
 const seedCLMM = async () => {
   console.log('Database Seed Started ...')
-  const { pools, tokens, deposits, swaps, orderHistory, orders, bins } = CLMM
+  const { pools, tokens, deposits, swaps, bins } = CLMM
 
   try {
     await prisma.pool.createMany({
@@ -27,16 +27,6 @@ const seedCLMM = async () => {
       data: swaps,
       skipDuplicates: true,
     })
-
-    // await prisma.orderHistory.createMany({
-    //   data: orderHistory as OrderHistory[],
-    //   skipDuplicates: true,
-    // })
-
-    // await prisma.order.createMany({
-    //   data: orders as Order[],
-    //   skipDuplicates: true,
-    // })
 
     await prisma.bins.createMany({
       data: bins,

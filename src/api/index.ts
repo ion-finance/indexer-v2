@@ -6,7 +6,6 @@ import * as swaggerUI from 'swagger-ui-express'
 
 import updateQuoteTokenPrices, {
   updateBaseTokenPrices,
-  updateTokenPrices as updateTokenPricesFunction,
 } from 'src/common/updateTokenPrices'
 
 import binRouter from './routers/bins'

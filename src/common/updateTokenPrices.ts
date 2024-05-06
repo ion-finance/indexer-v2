@@ -1,4 +1,4 @@
-import { Pool, PrismaClient, Token } from '@prisma/client'
+import { Pool, Token } from '@prisma/client'
 import axios from 'axios'
 import {
   compact,
