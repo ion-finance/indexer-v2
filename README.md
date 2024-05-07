@@ -15,7 +15,7 @@ Ion Indexer is a indexer to index events of Ion contracts. It is used to provide
 Prepare database. You can use docker to run postgresql like below.
 
 ```
-docker run -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=1q2w3e4r -d postgres
+docker run -d --name timescaledb -p 5432:5432 -e POSTGRES_PASSWORD=1q2w3e4r -d timescale/timescaledb-ha:pg16
 ```
 
 Create database `ionfi` in postgresql.
@@ -27,11 +27,19 @@ yarn prisma migrate dev
 `.env` file is used to set environment variables. You can copy `.env.example` to `.env` and update the values.
 
 ```
-DATABASE_URL=postgresql://postgres:1q2w3e4r@localhost:5432/ionfi
+DATABASE_URL=
 TON_API_URL=https://testnet.tonapi.io/v2
-TON_API_KEY=1234
-ROUTER_ADDRESS=EQBIyV2NPYJ5M5UUtTLLBvTKoew7wKfIZSdReKhqSkbNBPk_
-TON_HUB_API_URL=https://sandbox.tonhubapi.com
+TON_API_KEY=
+TON_CENTER_API_URL=https://testnet.toncenter.com/api/v2/jsonRPC
+TON_CENTER_API_KEY=
+COINMARKET_CAP_API_KEY=
+
+# testnet setting
+USDT_MINTER_ADDRESS=kQBD5rI620ZgEU_0Wy-XMb-Zv56lLP2fHhSqSfxEyrs0OJtz
+USDT_WALLET_ADDRESS=EQD2bKffQqv5SVT1847-0Cra9tX6zwBkIPC-r3Or5B2CUD8z
+ROUTER_ADDRESS=EQDz8HJdCWlZXsQNq4C0K0r9CdLHoC5Ebiwdl5R495bje0Eg
+TON_WALLET_ADDRESS=EQAmWnI-Tcgyr6US63TK6FtM_OVgV-jSqvj2fvCXgqNPokCh
+TON_MINTER_ADDRESS=kQDauk3DRKg3Gtfk7NrZVz1rrI-8WdYt3368iOZcyMi3mief
 ```
 
 The end of `TON_HUB_API_URL` should not have `/` character.
@@ -45,121 +53,15 @@ yarn
 yarn local:watch
 ```
 
-## How to index new log
-
-Lets say we have a new log in ton contracts and we want to index it.
-The name of event is `NewEvent` and it has 2 arguments: `address: address` and `value: uint256`.
-
-<b>1. Add new db model to `prisma/scahma.prisma` </b>
-
-```
-model NewEvent {
-  id        String   @id
-  address   String
-  value     String
-  createdAt DateTime @default(now())
-}
-```
-
-<b>2. Run `yarn prisma:generate` </b>
-
-Prisma will generate new typescript types for you.
-
-<b>3. Implement message parser in `src/parsers/parseNewEvent` </b>
-
-logCode is like a opcode of event. It is used to identify event in logs.
-Below parser code will be used to parse `NewEvent` logs.
-
-```
-import { Cell } from "@ton/core";
-
-const parseNewEvent = (message: Cell) => {
-  const body = message.beginParse();
-  const logCode = body.loadUint(32);
-  const address = body.loadAddress().toString;
-  const value = body.loadUint(256);
-
-  return {
-    logCode,
-    address
-    value
-  };
-};
-
-export default parseNewEvent;
-
-```
-
-<b>4. Implement database mapping </b>
-
-In `src/mappings` create new file `handleNewEvent.ts` and implement mapping. Mapping is a function that takes parsed event and save to database.
-
-```
-import { Event } from "../types/events";
-import prisma from "../clients/prisma";
-import { Prisma } from "@prisma/client";
-import parseNewEvent from "../parsers/parseNewEvent";
-
-export const handleNewEvent = async (
-  event: Event
-) => {
-  const params = parseNewEvent(event.params.message);
-  console.log("NewEvent is indexed.");
-  console.log(event);
-
-  await prisma.newEvent.upsert({
-    where: {
-      id: event.transaction.hash,
-    },
-    update: {
-      address: params.address,
-      value: params.value
-    },
-    create: {
-      address: params.address,
-      value: params.value
-    },
-  })
-);
-```
-
-<b> 5. Add the mapping to `src/tasks/handleEvent.ts`</b>
-
-`handleEvent` task will be called for every event of `the router contract`. You need to add your mapping to `switch` statement.
-
-```
-const NEW_EVENT = "0x12345678"; // "new_event"c in func
-
-...
-switch (msg.op_code) {
-  case DEPOSITED_TO_BINS: {
-    await handleDepositedToBins({
-      transaction,
-      body,
-    });
-    break;
-  }
-  ...
-  case NEW_EVENT: {
-    await handleNewEvent({
-      transaction,
-      body,
-    });
-    break;
-  }
-  ...
-
-```
-
 ## How to reset database
 
-If you add new event to index or update router contrat address, you need to reset database to reindex all events.
+Because we use 'timescaledb' for high
+We are using timescaledb to store time series data.
+So after initializing the data in the table, some instruction needed for applying timescaledb to specific column.
 
-`yarn prisma migrate reset`
-
-If you want to reset remote database, you need to update `DATABASE_URL` environment variable.
-
-In case of new schema, you need to run `yarn prisma migrate dev` to create new table. It is recommended to remove all `prisma/migrations` files before running the command in test or development environment.
+```
+yarn restart
+```
 
 ## Testing
 
