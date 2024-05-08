@@ -15,6 +15,7 @@ import { Trace } from 'src/types/ton-api'
 import { findTracesByOpCode, isSameAddress, parseRaw } from 'src/utils/address'
 import { bFormatUnits, bigIntToBigNumber } from 'src/utils/bigNumber'
 import { toISOString } from 'src/utils/date'
+import { warn } from 'src/utils/log'
 
 import { EXIT_CODE, OP } from '../../tasks/handleEvent/opCode'
 
@@ -84,17 +85,17 @@ export const handleExchange = async ({
   const swapTrace = findTracesByOpCode(traces, OP.SWAP)?.[0]
   const payToTraces = findTracesByOpCode(traces, OP.PAY_TO)
   if (!swapTrace) {
-    console.warn('Empty swapTrace')
+    warn('Empty swapTrace')
     return
   }
   if (!payToTraces) {
-    console.warn('Empty payToTraces')
+    warn('Empty payToTraces')
     return
   }
 
   const swapTraceRawBody = swapTrace.transaction.in_msg?.raw_body || ''
   if (!swapTraceRawBody) {
-    console.warn('Empty raw_body swapTrace')
+    warn('Empty raw_body swapTrace')
     return null
   }
 
@@ -134,12 +135,12 @@ export const handleExchange = async ({
     })
     exitCodes.forEach((exitCode) => {
       if (exitCode === Number(EXIT_CODE.SWAP_REFUND_NO_LIQ)) {
-        console.log(
+        warn(
           'Skip failed swap. Empty payToNormalTrace. exit code: SWAP_REFUND_NO_LIQ',
         )
         return
       } else if (exitCode === Number(EXIT_CODE.SWAP_REFUND_RESERVE_ERR)) {
-        console.log(
+        warn(
           'Skip failed swap. Empty payToNormalTrace. exit code: SWAP_REFUND_RESERVE_ERR',
         )
         return
@@ -149,7 +150,7 @@ export const handleExchange = async ({
   }
 
   if (hasRef && !payToRefTrace) {
-    console.warn("Empty payToRefTrace given 'hasRef'")
+    warn("Empty payToRefTrace given 'hasRef'")
     return
   }
 
@@ -179,7 +180,7 @@ export const handleExchange = async ({
   })
 
   if (!pool) {
-    console.log('Pool not found.')
+    warn('Pool not found.')
     return
   }
 
@@ -201,7 +202,7 @@ export const handleExchange = async ({
   })
 
   if (swap) {
-    console.log('Swap already exists.')
+    warn('Swap already exists.')
     return
   }
 

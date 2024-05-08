@@ -13,6 +13,7 @@ import {
 } from 'src/utils/address'
 import { bigIntToBigNumber } from 'src/utils/bigNumber'
 import { toISOString } from 'src/utils/date'
+import { warn } from 'src/utils/log'
 
 import { upsertToken } from './upsertToken'
 
@@ -68,18 +69,18 @@ export const handleAddLiquidity = async ({
     OP.CB_ADD_LIQUIDITY,
   )?.[0]
   if (!cbAddLiquidityTrace) {
-    console.warn('Empty cbAddLiquidityTrace')
+    warn('Empty cbAddLiquidityTrace')
     return
   }
 
   const { raw_body: cbAddLiquidityBody, destination } =
     cbAddLiquidityTrace?.transaction.in_msg || {}
   if (!cbAddLiquidityBody) {
-    console.warn('Empty raw_body cbAddLiquidityTrace')
+    warn('Empty raw_body cbAddLiquidityTrace')
     return
   }
   if (!destination) {
-    console.warn('Empty destination cbAddLiquidityTrace')
+    warn('Empty destination cbAddLiquidityTrace')
     return
   }
   const poolAddress = parseRaw(destination.address)
@@ -91,7 +92,7 @@ export const handleAddLiquidity = async ({
     OP.INTERNAL_TRANSFER,
   )
   if (!internalTransferTraces) {
-    console.warn('Empty internalTransferTraces')
+    warn('Empty internalTransferTraces')
     return
   }
 
@@ -102,13 +103,13 @@ export const handleAddLiquidity = async ({
 
   const { raw_body: mintRawBody } = mintTrace?.transaction.in_msg || {}
   if (!mintRawBody) {
-    console.warn('Empty raw_body mintTrace')
+    warn('Empty raw_body mintTrace')
     return
   }
 
   const { amount: minted, to } = parseMint(mintRawBody)
   // if (!to) {
-  //   console.warn("Initial Liquidity found. Skip this event.");
+  //   warn("Initial Liquidity found. Skip this event.");
   //   return;
   // }
 
@@ -119,7 +120,7 @@ export const handleAddLiquidity = async ({
   })
 
   if (!pool) {
-    console.log('Pool not found.')
+    warn('Pool not found.')
     return
   }
 
@@ -132,7 +133,7 @@ export const handleAddLiquidity = async ({
   })
 
   if (deposit) {
-    console.log('deposit already exists.')
+    warn('deposit already exists.')
     return
   }
 

@@ -1,6 +1,8 @@
 import { Address, Cell } from '@ton/core'
 import axios from 'axios'
 
+import { warn } from 'src/utils/log'
+
 import {
   handleDepositedToBins,
   handleInitialized,
@@ -133,7 +135,7 @@ const handleEventCLMM = async (event_id: string) => {
           break
         }
         default:
-          console.log('UNKNOWN OP_CODE:', msg.op_code)
+          warn('UNKNOWN OP_CODE: ' + msg.op_code)
           break
       }
     }

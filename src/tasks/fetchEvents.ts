@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { error } from 'console'
 import { sortBy, uniqBy } from 'lodash'
 
 import { AccountEvent, AccountEvents } from 'src/types/ton-api'
@@ -64,7 +65,7 @@ const fetchEvents = async ({
 
       break
     } catch (e) {
-      console.error('Error fetching events in url', baseUrl)
+      error('Error fetching events in url', baseUrl)
       logError(e)
       // Sentry.captureException(e);
       break

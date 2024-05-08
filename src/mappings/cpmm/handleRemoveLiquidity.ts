@@ -11,6 +11,7 @@ import {
 } from 'src/utils/address'
 import { bigIntToBigNumber } from 'src/utils/bigNumber'
 import { toISOString } from 'src/utils/date'
+import { warn } from 'src/utils/log'
 
 const parseBurnNotification = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
@@ -74,22 +75,22 @@ export const handleRemoveLiquidity = async ({
     OP.BURN_NOTIFICATION,
   )?.[0]
   if (!payToTrace) {
-    console.warn('Empty payToTrace')
+    warn('Empty payToTrace')
     return
   }
   if (!burnNotificationTrace) {
-    console.warn('Empty burnNotificationTrace')
+    warn('Empty burnNotificationTrace')
     return
   }
   const payToRawBody = payToTrace.transaction.in_msg?.raw_body || ''
   const burnNotificationRawBody =
     burnNotificationTrace.transaction.in_msg?.raw_body || ''
   if (!payToRawBody) {
-    console.warn('Empty raw_body payTo')
+    warn('Empty raw_body payTo')
     return null
   }
   if (!burnNotificationRawBody) {
-    console.warn('Empty raw_body burnNotificationRawBody')
+    warn('Empty raw_body burnNotificationRawBody')
     return null
   }
   const { toAddress, amount0Out, amount1Out } = parsePayTo(payToRawBody)

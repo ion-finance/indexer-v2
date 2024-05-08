@@ -8,6 +8,7 @@ import { fetchTrace } from 'src/fetch'
 import fetchEvents from 'src/tasks/fetchEvents'
 import { Trace } from 'src/types/ton-api'
 import { toLocaleString } from 'src/utils/date'
+import { error } from 'src/utils/log'
 
 // TODO: implement append cache
 // get the last timestamp of last cache file
@@ -47,7 +48,7 @@ const generate = async () => {
         }
         traces.push(traceMap)
       } catch (e) {
-        console.log(`Error when handling event ${eventId}`)
+        error(`Error when handling event ${eventId}`)
         return
       }
     }

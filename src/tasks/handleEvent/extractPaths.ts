@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 
 import { Trace } from 'src/types/ton-api'
 import { isSameAddress, parseRaw } from 'src/utils/address'
+import { warn } from 'src/utils/log'
 
 import { CustomOP, OP, Ops } from './opCode'
 dotenv.config()
@@ -59,7 +60,7 @@ function extractPaths(routerAddress: string, node: Trace): Ops[][] {
         if (opCode === OP.INTERNAL_TRANSFER) {
           return CustomOP.ROUTER_JETTON_WALLET_DEPLOYED
         }
-        console.warn('Unknown deploy case', transaction.hash)
+        warn('Unknown deploy case ' + transaction.hash)
       }
       return ''
     })()
@@ -73,9 +74,7 @@ function extractPaths(routerAddress: string, node: Trace): Ops[][] {
     }
 
     if (!opKey && !customOp && !isBlackListed) {
-      console.warn(
-        `Unknown opCode: ${opCode}, txHash: ${currentNode.transaction.hash}`,
-      )
+      warn(`Unknown opCode: ${opCode}, txHash: ${currentNode.transaction.hash}`)
     }
     // If currentNode does not have children, it is a leaf.
     if (!currentNode.children || currentNode.children.length === 0) {

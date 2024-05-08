@@ -53,30 +53,30 @@ const handleEvent = async (params: {
 
   // deploy cases can be overlapped
   if (isRouterDeployed) {
-    console.log(`${eventCount}. Router deploy event: ${eventId}`)
+    console.log(`${eventCount}. Router deployed: ${eventId}`)
   }
   if (isPoolDeployed) {
-    console.log(`${eventCount}. Pool deploy event: ${eventId}`)
+    console.log(`${eventCount}. Pool deployed: ${eventId}`)
     await handlePoolCreated({ eventId, traces })
   }
   if (isLpWalletDeployed) {
-    console.log(`${eventCount}. LpWallet deploy event: ${eventId}`)
+    console.log(`${eventCount}. LpWallet deployed: ${eventId}`)
   }
   if (isLpAccountDeployed) {
-    console.log(`${eventCount}. LpAccount deploy event: ${eventId}`)
+    console.log(`${eventCount}. LpAccount deployed: ${eventId}`)
   }
   if (isRouterJettonWalletDeployed) {
-    console.log(`${eventCount}. Router Jetton Wallet deploy event: ${eventId}`)
+    console.log(`${eventCount}. Router Jetton Wallet deployed: ${eventId}`)
   }
 
   if (isSwap) {
-    console.log(`${eventCount}. Exchange event: ${eventId}`)
+    console.log(`${eventCount}. Exchange: ${eventId}`)
     await handleExchange({ eventId, traces })
 
     const utime = traces.transaction.utime
     await updateTokenPrices(utime * 1000)
   } else if (isProvideLp) {
-    console.log(`${eventCount}. Provide Lp event: ${eventId}`)
+    console.log(`${eventCount}. Provide Lp: ${eventId}`)
   } else if (isProvideLpConfirmed) {
     console.log(`${eventCount}. Provide Lp Confirmed: ${eventId}`)
     await handleAddLiquidity({ eventId, traces })
@@ -84,7 +84,7 @@ const handleEvent = async (params: {
     const utime = traces.transaction.utime
     await updateTokenPrices(utime * 1000)
   } else if (isRemoveLiquidity) {
-    console.log(`${eventCount}. Remove Liquidity event: ${eventId}`)
+    console.log(`${eventCount}. Remove Liquidity: ${eventId}`)
     await handleRemoveLiquidity({ eventId, traces })
   }
 

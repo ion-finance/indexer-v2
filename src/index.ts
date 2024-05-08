@@ -14,7 +14,7 @@ import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'
 import { Trace } from './types/ton-api'
 import { toLocaleString } from './utils/date'
-import { logError } from './utils/log'
+import { logError, warn } from './utils/log'
 import sleep from './utils/sleep'
 
 dotenv.config()
@@ -85,7 +85,7 @@ const eventPooling = async () => {
       })
     } catch (e) {
       error = true
-      console.error(`Error when handling event ${eventId}`)
+      warn(`Error when handling event ${eventId}`)
       logError(e)
 
       lastIndex = i

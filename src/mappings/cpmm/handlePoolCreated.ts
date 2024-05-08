@@ -13,6 +13,7 @@ import {
 import { bigIntToBigNumber } from 'src/utils/bigNumber'
 import { toISOString } from 'src/utils/date'
 import fetchTokenData from 'src/utils/fetchTokenData'
+import { warn } from 'src/utils/log'
 
 import { Trace } from '../../types/ton-api'
 
@@ -54,11 +55,11 @@ export const handlePoolCreated = async ({
     OP.TRANSFER_NOTIFICATION,
   )?.[0]
   if (!provideLpTrace) {
-    console.warn('Empty provideLpTrace')
+    warn('Empty provideLpTrace')
     return
   }
   if (!transferNotificationTrace) {
-    console.warn('Empty transferNotificationTrace')
+    warn('Empty transferNotificationTrace')
     return
   }
 
@@ -69,11 +70,11 @@ export const handlePoolCreated = async ({
   const { raw_body, source } =
     transferNotificationTrace.transaction.in_msg || {}
   if (!raw_body) {
-    console.warn('Empty raw_body')
+    warn('Empty raw_body')
     return null
   }
   if (!source) {
-    console.warn('Empty source')
+    warn('Empty source')
     return null
   }
 
