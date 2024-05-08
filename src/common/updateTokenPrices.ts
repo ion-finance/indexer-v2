@@ -15,6 +15,7 @@ import {
 import prisma from 'src/clients/prisma'
 import getLatestTokenPrices from 'src/common/tokenPrice'
 import { isSameAddress } from 'src/utils/address'
+import { logError } from 'src/utils/log'
 import sleep from 'src/utils/sleep'
 
 const ONE_MINUTE = 60 * 1000
@@ -46,6 +47,7 @@ const getPrice = async () => {
     return { TON, USDT }
   } catch (e) {
     console.warn('Error fetching price data from CoinMarketCap:')
+    logError(e)
     sleep(2000)
     return {
       TON: 5,
@@ -96,22 +98,6 @@ export const updateBaseTokenPrices = async (ts?: Date) => {
       timestamp,
     },
   })
-  // await prisma.tokenPrice.create({
-  //   data: {
-  //     id: TON_WALLET_ADDRESS,
-  //     tokenSymbol: 'TON',
-  //     price: tonPrice,
-  //     timestamp: timestamp || new Date(),
-  //   },
-  // })
-  // await prisma.tokenPrice.create({
-  //   data: {
-  //     id: USDT_WALLET_ADDRESS,
-  //     tokenSymbol: 'USDT',
-  //     price: usdtPrice,
-  //     timestamp: timestamp || new Date(),
-  //   },
-  // })
 }
 const updateQuoteTokenPrices = async (timestamp?: Date) => {
   const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS as string

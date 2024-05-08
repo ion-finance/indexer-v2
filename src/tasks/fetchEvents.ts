@@ -3,6 +3,7 @@ import { sortBy, uniqBy } from 'lodash'
 
 import { AccountEvent, AccountEvents } from 'src/types/ton-api'
 import { toLocaleString } from 'src/utils/date'
+import { logError } from 'src/utils/log'
 
 // import * as Sentry from "@sentry/node";
 
@@ -64,16 +65,7 @@ const fetchEvents = async ({
       break
     } catch (e) {
       console.error('Error fetching events in url', baseUrl)
-      if (axios.isAxiosError(e)) {
-        e.config?.url && console.error('url: ', e.config.url)
-        e.response && console.error('data: ', e.response.data)
-        e.response?.status && console.error('status: ', e.response.status)
-        e.response?.statusText &&
-          console.error('statusText: ', e.response.statusText)
-        console.error('API_KEY', process.env.TON_API_KEY)
-      } else {
-        console.error(e)
-      }
+      logError(e)
       // Sentry.captureException(e);
       break
     }

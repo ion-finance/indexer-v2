@@ -20,6 +20,7 @@ export const checkPathHasOp = (paths: Ops[][], op: string) =>
 
 // Info
 // * This method can throw an error if the event is processing
+let eventCount = 1
 const handleEvent = async (params: {
   routerAddress: string
   eventId: string
@@ -52,50 +53,38 @@ const handleEvent = async (params: {
 
   // deploy cases can be overlapped
   if (isRouterDeployed) {
-    console.log(`Router deploy event: ${eventId}`)
+    console.log(`${eventCount}. Router deploy event: ${eventId}`)
   }
   if (isPoolDeployed) {
-    console.log(`Pool deploy event: ${eventId}`)
+    console.log(`${eventCount}. Pool deploy event: ${eventId}`)
     await handlePoolCreated({ eventId, traces })
   }
   if (isLpWalletDeployed) {
-    console.log(`LpWallet deploy event: ${eventId}`)
+    console.log(`${eventCount}. LpWallet deploy event: ${eventId}`)
   }
   if (isLpAccountDeployed) {
-    console.log(`LpAccount deploy event: ${eventId}`)
+    console.log(`${eventCount}. LpAccount deploy event: ${eventId}`)
   }
   if (isRouterJettonWalletDeployed) {
-    console.log(`Router Jetton Wallet deploy event: ${eventId}`)
+    console.log(`${eventCount}. Router Jetton Wallet deploy event: ${eventId}`)
   }
 
-  // const ONE_MINUTE = 60 * 1000
-  // const updateTokenPrices = async (time: number) => {
-  //   console.log('lastUpdated', lastUpdated)
-  //   console.log('time', time)
-  //   if (time <= lastUpdated + ONE_MINUTE) {
-  //     return
-  //   }
-  //   lastUpdated = time
-  //   await updateBaseTokenPrices(new Date(time))
-  //   await updateQuoteTokenPrices(new Date(time))
-  // }
-
   if (isSwap) {
-    console.log(`Exchange event: ${eventId}`)
+    console.log(`${eventCount}. Exchange event: ${eventId}`)
     await handleExchange({ eventId, traces })
 
     const utime = traces.transaction.utime
     await updateTokenPrices(utime * 1000)
   } else if (isProvideLp) {
-    console.log(`Provide Lp event: ${eventId}`)
+    console.log(`${eventCount}. Provide Lp event: ${eventId}`)
   } else if (isProvideLpConfirmed) {
-    console.log(`Provide Lp Confirmed: ${eventId}`)
+    console.log(`${eventCount}. Provide Lp Confirmed: ${eventId}`)
     await handleAddLiquidity({ eventId, traces })
 
     const utime = traces.transaction.utime
     await updateTokenPrices(utime * 1000)
   } else if (isRemoveLiquidity) {
-    console.log(`Remove Liquidity event: ${eventId}`)
+    console.log(`${eventCount}. Remove Liquidity event: ${eventId}`)
     await handleRemoveLiquidity({ eventId, traces })
   }
 
@@ -110,9 +99,10 @@ const handleEvent = async (params: {
     !isProvideLpConfirmed &&
     !isRemoveLiquidity
   ) {
-    console.log(`Unknown event: ${eventId}`)
+    console.log(`${eventCount}. Unknown event: ${eventId}`)
     console.log('paths', paths)
   }
+  eventCount++
 }
 
 export default handleEvent

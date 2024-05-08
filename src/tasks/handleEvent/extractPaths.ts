@@ -1,9 +1,9 @@
 import dotenv from 'dotenv'
 
+import { Trace } from 'src/types/ton-api'
 import { isSameAddress, parseRaw } from 'src/utils/address'
 
 import { CustomOP, OP, Ops } from './opCode'
-import { Trace } from '../../types/ton-api'
 dotenv.config()
 
 // custom wallet op, that can be ignored

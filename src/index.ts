@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/node'
-import axios from 'axios'
 import dotenv from 'dotenv'
 import fs from 'fs'
 
@@ -53,19 +52,19 @@ const loadCache = async () => {
   }
 }
 
-let totalEvents = 0
+let totalEventsLength = 0
 const eventPooling = async () => {
   const timestamp = await prisma.indexerState.getLastTimestamp()
   const events = await fetchEvents({ routerAddress, timestamp })
-  totalEvents += events.length
+  totalEventsLength += events.length
 
   if (events.length === 0) {
-    // console.debug(`No events found. Sleep for ${MIN_POOL / 1000}s.`);
     sleep(MIN_POOL)
     return
   }
 
   console.log(`${events.length} events found.`)
+
   let error = false
   let lastIndex = 0
   for (let i = 0; i < events.length; i++) {
@@ -95,16 +94,8 @@ const eventPooling = async () => {
     } catch (e) {
       error = true
       console.error(`Error when handling event ${eventId}`)
-      if (axios.isAxiosError(e)) {
-        e.config?.url && console.error('url: ', e.config.url)
-        e.response && console.error('data: ', e.response.data)
-        e.response?.status && console.error('status: ', e.response.status)
-        e.response?.statusText &&
-          console.error('statusText: ', e.response.statusText)
-        console.error('API_KEY', process.env.TON_API_KEY)
-      } else {
-        console.error(e)
-      }
+      logError(e)
+
       lastIndex = i
       // Sentry.captureException(e);
       break
@@ -119,16 +110,16 @@ const eventPooling = async () => {
     return
   }
 
+  const from = events[0].timestamp
+  const to = events[events.length - 1].timestamp
   console.log(`${events.length} events are indexed.`)
-  console.log('totalEvents length: ', totalEvents)
   console.log(
-    `from ${toLocaleString(events[0].timestamp)} to ${toLocaleString(events[events.length - 1].timestamp)}`,
+    `${toLocaleString(from)} ~ ${toLocaleString(to)} / ${from} ~ ${to}`,
   )
+  console.log('Total length of events: ', totalEventsLength)
 
   if (events.length > 0) {
-    await prisma.indexerState.setLastTimestamp(
-      events[events.length - 1].timestamp,
-    )
+    await prisma.indexerState.setLastTimestamp(to)
   }
 }
 
