@@ -7,30 +7,26 @@ import prisma from 'src/clients/prisma'
 import { routerAddress } from 'src/constant/address'
 
 import { updateBaseTokenPrices } from './common/updateTokenPrices'
+import { MIN_POOL, PORT, isCLMM, isMainnet } from './constant'
+import { fetchTrace } from './fetch'
 import seedCLMM from './scripts/seedCLMM'
 import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'
-// import handleEventCLMM from './tasks/handleEventCLMM'
 import { Trace } from './types/ton-api'
 import { toLocaleString } from './utils/date'
+import { logError } from './utils/log'
 import sleep from './utils/sleep'
 
 dotenv.config()
-
-const PORT = process.env.PORT || 3000
-const MIN_POOL = 2000 // 2s
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
 })
 
-const isCLMM = process.env.IS_CLMM === 'true'
-const useCache = process.env.USE_CACHE === 'true'
+// !NOTE: use cache as default
+const useCache = true
 
-const MAINNET_TON_WALLET_ADDRESS =
-  'EQCpTiANFaLwWiLphbo_FD7VXsfMf-aNjSpALJ4vQHbFiZm5'
-const isMainnet = process.env.TON_WALLET_ADDRESS === MAINNET_TON_WALLET_ADDRESS
-
+// TODO: this can overflow, use redis
 let cachedTrace = {} as { [key: string]: Trace }
 
 const loadCache = async () => {
@@ -73,17 +69,13 @@ const eventPooling = async () => {
     try {
       const trace = await (async function () {
         if (useCache) {
-          return cachedTrace[eventId]
+          const trace = cachedTrace[eventId]
+          if (trace) {
+            return trace
+          }
         }
-        const res = await axios(
-          `${process.env.TON_API_URL}/traces/${eventId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.TON_API_KEY}`,
-            },
-          },
-        )
-        return res.data as Trace
+        const res = await fetchTrace(eventId)
+        return res.data
       })()
 
       await handleEvent({
