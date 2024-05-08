@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/node'
 import axios from 'axios'
 import dotenv from 'dotenv'
 import fs from 'fs'
-import { filter } from 'lodash'
 
 import api from 'src/api'
 import prisma from 'src/clients/prisma'
@@ -16,7 +15,6 @@ import handleEvent from './tasks/handleEvent'
 import { Trace } from './types/ton-api'
 import { toLocaleString } from './utils/date'
 import sleep from './utils/sleep'
-import { getInput } from './utils/userInput'
 
 dotenv.config()
 
@@ -30,26 +28,27 @@ Sentry.init({
 const isCLMM = process.env.IS_CLMM === 'true'
 const useCache = process.env.USE_CACHE === 'true'
 
+const MAINNET_TON_WALLET_ADDRESS =
+  'EQCpTiANFaLwWiLphbo_FD7VXsfMf-aNjSpALJ4vQHbFiZm5'
+const isMainnet = process.env.TON_WALLET_ADDRESS === MAINNET_TON_WALLET_ADDRESS
+
 let cachedTrace = {} as { [key: string]: Trace }
 
-const checkCache = async () => {
+const loadCache = async () => {
   if (useCache) {
-    const value = await getInput('Type cache file name to use:')
-    const names = fs.readdirSync('cache/events').map((file) => {
+    const path = isMainnet ? 'cache/events/mainnet' : 'cache/events/testnet'
+    const names = fs.readdirSync(path).map((file) => {
       if (file.includes('.json')) {
         return file
       }
     })
-    console.log(names)
-    const files = filter(names, (name) => name?.includes(value))
-    if (!files?.length) {
-      console.log('No file found')
-      return
-    }
-    const file = files[files.length - 1]
-    console.log('file', file)
-    const data = fs.readFileSync(`cache/events/${file}`, 'utf-8')
-    cachedTrace = JSON.parse(data)
+    names.forEach((name) => {
+      console.log('Read cache file: ', name)
+      const data = fs.readFileSync(`${path}/${name}`, 'utf-8')
+      const traces = JSON.parse(data)
+      cachedTrace = { ...cachedTrace, ...traces }
+    })
+    console.log(`Loaded ${Object.keys(cachedTrace).length} traces.`)
     return
   }
 }
@@ -135,7 +134,7 @@ const eventPooling = async () => {
 
 const main = async () => {
   console.log('Event pooling is started. ')
-  await checkCache()
+  await loadCache()
   await updateBaseTokenPrices()
   if (isCLMM) {
     await seedCLMM()

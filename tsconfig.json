@@ -118,7 +118,7 @@
   "include": [
     "src",
     "package.json",
-    "cache/generateTraceCache.ts",
+    "cache/**/*.ts",
     "test/integrations/scenarios/generateTestScenario.ts"
   ],
   "exclude": ["src/**/*.spec.ts"]
