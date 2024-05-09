@@ -216,9 +216,12 @@ const getApy = (
   if (volumeUsd.isZero() || tvl.isZero() || timestampForYear === 0) {
     return 0
   }
-  return volumeUsd
-    .div(tvl)
-    .multipliedBy(1 - LP_FEE / FEE_DIVIDER)
-    .multipliedBy(timestampForYear)
-    .toNumber()
+  return (
+    volumeUsd
+      .div(tvl)
+      // .multipliedBy(1 - LP_FEE / FEE_DIVIDER)
+      .multipliedBy(LP_FEE / FEE_DIVIDER)
+      .multipliedBy(timestampForYear)
+      .toNumber()
+  )
 }
