@@ -222,6 +222,7 @@ const getApy = (
       // .multipliedBy(1 - LP_FEE / FEE_DIVIDER)
       .multipliedBy(LP_FEE / FEE_DIVIDER)
       .multipliedBy(timestampForYear)
+      .div(100)
       .toNumber()
   )
 }
