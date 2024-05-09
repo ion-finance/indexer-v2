@@ -1,19 +1,12 @@
 import { TokenPrice } from '@prisma/client'
-import { NextFunction, Request, Response, Router } from 'express'
-import { query, validationResult } from 'express-validator'
+import { Request, Response, Router } from 'express'
+import { query } from 'express-validator'
 import { filter, isEmpty } from 'lodash'
 
 import prisma from 'src/clients/prisma'
+import { validate } from 'src/common/expressValidator'
 
 const router = Router()
-
-const validate = (req: Request, res: Response, next: NextFunction) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ message: errors.array()[0].msg })
-  }
-  next()
-}
 
 const operationValidationRules = [
   query('tokenIds')

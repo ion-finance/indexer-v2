@@ -2,15 +2,20 @@ import { Request, Response, Router } from 'express'
 import { query } from 'express-validator'
 
 import prisma from 'src/clients/prisma'
+import { validate } from 'src/common/expressValidator'
 
 const router = Router()
-
-router.get(
-  '/tasks/pool-creation',
+const operationValidationRules = [
   query('creator')
     .isString()
     .notEmpty()
     .withMessage('Owner address is required'),
+  validate,
+]
+
+router.get(
+  '/tasks/pool-creation',
+  operationValidationRules,
   async (req: Request, res: Response) => {
     const { creator } = req.query as { creator: string }
 
@@ -39,12 +44,17 @@ router.get(
   },
 )
 
-router.get(
-  '/tasks/usdt',
-  query('creator')
+const operationValidationRules2 = [
+  query('senderAddress')
     .isString()
     .notEmpty()
-    .withMessage('Owner address is required'),
+    .withMessage('senderAddress is required'),
+  validate,
+]
+
+router.get(
+  '/tasks/usdt',
+  operationValidationRules2,
   async (req: Request, res: Response) => {
     const { senderAddress } = req.query as { senderAddress: string }
 

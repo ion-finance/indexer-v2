@@ -4,14 +4,20 @@ import { query } from 'express-validator'
 import { filter, map } from 'lodash'
 
 import prisma from 'src/clients/prisma'
+import { validate } from 'src/common/expressValidator'
 
 const router = Router()
 
-router.get(
-  '/my-pools',
+const operationValidationRules = [
   query('ownerAddress')
     .isString()
     .withMessage('Owner address must be a string.'),
+  validate,
+]
+
+router.get(
+  '/my-pools',
+  operationValidationRules,
   async (req: Request, res: Response) => {
     const { ownerAddress } = req.query
     if (!ownerAddress) {
