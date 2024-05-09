@@ -8,6 +8,7 @@ import { logError } from 'src/utils/log'
 
 // import * as Sentry from "@sentry/node";
 
+const UTIME_PADDING = 300 // 300ms
 const fetchEvents = async ({
   routerAddress,
   timestamp = 0,
@@ -27,6 +28,7 @@ const fetchEvents = async ({
 
       const url = `${baseUrl}?${args}`
       // res data is ordered by timestamp desc
+      console.log('fetch with start_date, end_date', timestamp, endDate)
       const res = await axios<AccountEvents>(url, {
         headers: {
           Authorization: `Bearer ${process.env.TON_API_KEY}`,
@@ -45,8 +47,9 @@ const fetchEvents = async ({
         // If 100 events are found, we need to fetch evetns more precisely.
         // It we don't this, we may miss some events.
         console.log('More than 100 events found.')
-        // endDate = accountEvents[Math.floor(accountEvents.length / 2)].timestamp;
-        endDate = accountEvents[0].timestamp
+        // there should be padding. because endDate is exclusive.
+        // not excatly exclusive, but it needs padding. (300ms is empirical value)
+        endDate = accountEvents[0].timestamp + UTIME_PADDING
         console.log(
           'Try to fetch events endData ',
           toLocaleString(endDate),
