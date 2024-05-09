@@ -28,7 +28,6 @@ const fetchEvents = async ({
 
       const url = `${baseUrl}?${args}`
       // res data is ordered by timestamp desc
-      console.log('fetch with start_date, end_date', timestamp, endDate)
       const res = await axios<AccountEvents>(url, {
         headers: {
           Authorization: `Bearer ${process.env.TON_API_KEY}`,
@@ -43,6 +42,7 @@ const fetchEvents = async ({
       events.push(...accountEvents)
 
       if (accountEvents.length >= 100) {
+        console.log('fetched with start_date, end_date', timestamp, endDate)
         // TON API limit is 100 events per request.
         // If 100 events are found, we need to fetch evetns more precisely.
         // It we don't this, we may miss some events.
