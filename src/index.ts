@@ -13,7 +13,7 @@ import { fetchTrace } from './fetch'
 import seedCLMM from './scripts/seedCLMM'
 import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'
-import { AccountEvent, Trace } from './types/ton-api'
+import { Trace } from './types/ton-api'
 import { toLocaleString } from './utils/date'
 import { logError, warn } from './utils/log'
 import sleep from './utils/sleep'
@@ -49,14 +49,9 @@ const loadCache = async () => {
   }
 }
 
-// TODO: change as table
-let totalEventsLength = 0
-let lastEvent: AccountEvent | undefined
 const eventPooling = async () => {
-  const timestamp = await prisma.indexerState.getLastTimestamp()
+  const { timestamp, lastEventId } = await prisma.indexerState.getLastState()
   const fetchedEvents = await fetchEvents({ routerAddress, timestamp })
-
-  const lastEventId = lastEvent?.event_id
 
   // because we fetch events from last timestamp inclusive,
   // 1 event may be duplicated, remove it.
@@ -64,7 +59,7 @@ const eventPooling = async () => {
     !!lastEventId && fetchedEvents[0]?.event_id === lastEventId
   const events = drop(fetchedEvents, hasDuplicated ? 1 : 0)
 
-  totalEventsLength += events.length
+  const totalEventsCount = await prisma.indexerState.getTotalEventsCount()
 
   if (events.length === 0) {
     await sleep(MIN_POOL)
@@ -120,12 +115,15 @@ const eventPooling = async () => {
   console.log(
     `${toLocaleString(from)} ~ ${toLocaleString(to)} / ${from} ~ ${to}`,
   )
-  console.log('Total length of events: ', totalEventsLength)
 
   if (events.length > 0) {
-    await prisma.indexerState.setLastTimestamp(to)
-    lastEvent = events[events.length - 1]
+    await prisma.indexerState.setLastState({
+      timestamp: to,
+      totalEventsCount: totalEventsCount + events.length,
+      lastEventId: events[events.length - 1].event_id,
+    })
   }
+  console.log('Total length of events: ', totalEventsCount + events.length)
 }
 
 const main = async () => {

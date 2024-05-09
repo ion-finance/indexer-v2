@@ -15,6 +15,7 @@ enum PoolType {
   CLMM
 }
 
+
 model Pool {
   id            String   @id // pool address
   createdAt     DateTime @default(now())
@@ -214,4 +215,6 @@ model Operation {
 model IndexerState {
   key   String @id
   value String
+  totalEventsCount Int @default(0)
+  lastEventId String @default("0x")
 }
