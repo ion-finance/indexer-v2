@@ -8,7 +8,6 @@ import { logError } from 'src/utils/log'
 
 // import * as Sentry from "@sentry/node";
 
-let lastEvent: AccountEvent
 const fetchEvents = async ({
   routerAddress,
   timestamp = 0,
@@ -16,7 +15,6 @@ const fetchEvents = async ({
   routerAddress: string
   timestamp?: number
 }) => {
-  // do not fetch the last event
   let endDate = 0
   const events: AccountEvent[] = []
 
@@ -28,25 +26,19 @@ const fetchEvents = async ({
         (endDate ? `&end_date=${endDate}` : '')
 
       const url = `${baseUrl}?${args}`
+      // res data is ordered by timestamp desc
       const res = await axios<AccountEvents>(url, {
         headers: {
           Authorization: `Bearer ${process.env.TON_API_KEY}`,
         },
       })
 
-      const accountEvents = [] as AccountEvent[]
-      res.data.events.forEach((event) => {
-        if (event.in_progress === true) {
-          console.log('Event is in progress. Skip it.', event.event_id, url)
-        } else {
-          accountEvents.push(event)
-        }
-      })
-      // const parsedEvents = res.data.events.filter(
-      //   (event: Event) => event.in_progress === false,
-      // ) as AccountEvent[]
-      const sorted = sortBy(accountEvents, (e) => e.timestamp, 'asc')
-      events.push(...sorted)
+      const accountEvents = sortBy(
+        res.data.events.filter((e) => !e.in_progress),
+        (e) => e.timestamp,
+        'asc',
+      )
+      events.push(...accountEvents)
 
       if (accountEvents.length >= 100) {
         // TON API limit is 100 events per request.
@@ -54,7 +46,7 @@ const fetchEvents = async ({
         // It we don't this, we may miss some events.
         console.log('More than 100 events found.')
         // endDate = accountEvents[Math.floor(accountEvents.length / 2)].timestamp;
-        endDate = accountEvents[accountEvents.length - 1].timestamp
+        endDate = accountEvents[0].timestamp
         console.log(
           'Try to fetch events endData ',
           toLocaleString(endDate),
@@ -71,21 +63,13 @@ const fetchEvents = async ({
       break
     }
   }
-  // event
-  if (events.length === 1 && events[0].event_id === lastEvent?.event_id) {
-    return []
-  }
+
   if (events.length === 0) {
     return []
   }
 
   const orderedEvents = sortBy(events, (e) => e.timestamp, 'asc')
-  // !NOTE: events can be duplicated, remove duplicated events
-  // when fetch with start_date 1711630630, 1711630633 can be
   const uniqEvents = uniqBy(orderedEvents, (e) => e.event_id)
-
-  lastEvent = uniqEvents[uniqEvents.length - 1]
-
   return uniqEvents
 }
 

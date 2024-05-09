@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/node'
 import dotenv from 'dotenv'
 import fs from 'fs'
+import { drop } from 'lodash'
 
 import api from 'src/api'
 import prisma from 'src/clients/prisma'
@@ -12,7 +13,7 @@ import { fetchTrace } from './fetch'
 import seedCLMM from './scripts/seedCLMM'
 import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'
-import { Trace } from './types/ton-api'
+import { AccountEvent, Trace } from './types/ton-api'
 import { toLocaleString } from './utils/date'
 import { logError, warn } from './utils/log'
 import sleep from './utils/sleep'
@@ -48,18 +49,29 @@ const loadCache = async () => {
   }
 }
 
+// TODO: change as table
 let totalEventsLength = 0
+let lastEvent: AccountEvent | undefined
 const eventPooling = async () => {
   const timestamp = await prisma.indexerState.getLastTimestamp()
-  const events = await fetchEvents({ routerAddress, timestamp })
+  const fetchedEvents = await fetchEvents({ routerAddress, timestamp })
+
+  const lastEventId = lastEvent?.event_id
+
+  // because we fetch events from last timestamp inclusive,
+  // 1 event may be duplicated, remove it.
+  const hasDuplicated =
+    !!lastEventId && fetchedEvents[0]?.event_id === lastEventId
+  const events = drop(fetchedEvents, hasDuplicated ? 1 : 0)
+
   totalEventsLength += events.length
 
   if (events.length === 0) {
-    sleep(MIN_POOL)
+    await sleep(MIN_POOL)
     return
   }
 
-  console.log(`${events.length} events found.`)
+  console.log(`Try to index ${events.length} events.`)
 
   let error = false
   let lastIndex = 0
@@ -112,6 +124,7 @@ const eventPooling = async () => {
 
   if (events.length > 0) {
     await prisma.indexerState.setLastTimestamp(to)
+    lastEvent = events[events.length - 1]
   }
 }
 
