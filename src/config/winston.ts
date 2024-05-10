@@ -30,7 +30,7 @@ const ptTransport = new winston.transports.Papertrail({
 })
 
 const logger = new winston.Logger({
-  transports: [ptTransport, consoleLogger],
+  transports: isProd ? [ptTransport, consoleLogger] : [consoleLogger],
 })
 
 export { logger }
