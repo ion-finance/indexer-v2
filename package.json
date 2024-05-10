@@ -93,6 +93,8 @@
     "prisma": "^5.0.0",
     "readline": "^1.3.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0",
+    "winston": "2.4.7",
+    "winston-papertrail": "^1.0.5"
   }
 }
