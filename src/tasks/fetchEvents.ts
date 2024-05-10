@@ -1,10 +1,9 @@
 import axios from 'axios'
-import { error } from 'console'
 import { sortBy, uniqBy } from 'lodash'
 
 import { AccountEvent, AccountEvents } from 'src/types/ton-api'
 import { toLocaleString } from 'src/utils/date'
-import { logError } from 'src/utils/log'
+import { error, info, logError } from 'src/utils/log'
 
 // import * as Sentry from "@sentry/node";
 
@@ -42,25 +41,23 @@ const fetchEvents = async ({
       events.push(...accountEvents)
 
       if (accountEvents.length >= 100) {
-        console.log('fetched with start_date, end_date', timestamp, endDate)
+        info(`fetched with start_date, end_date, ${timestamp} ${endDate}`)
         // TON API limit is 100 events per request.
         // If 100 events are found, we need to fetch evetns more precisely.
         // It we don't this, we may miss some events.
-        console.log('More than 100 events found.')
+        info('More than 100 events found.')
         // there should be padding. because endDate is exclusive.
         // not excatly exclusive, but it needs padding. (300ms is empirical value)
         endDate = accountEvents[0].timestamp + UTIME_PADDING
-        console.log(
-          'Try to fetch events endData ',
-          toLocaleString(endDate),
-          endDate,
+        info(
+          `Try to fetch events endData, ${toLocaleString(endDate)}, ${endDate}`,
         )
         continue
       }
 
       break
     } catch (e) {
-      error('Error fetching events in url', baseUrl)
+      error(`Error fetching events in url, ${baseUrl}`)
       logError(e)
       // Sentry.captureException(e);
       break

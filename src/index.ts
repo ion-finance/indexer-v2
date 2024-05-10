@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node'
 import dotenv from 'dotenv'
 import fs from 'fs'
-import { drop } from 'lodash'
+import { drop, set } from 'lodash'
 
 import api from 'src/api'
 import prisma from 'src/clients/prisma'
@@ -15,7 +15,7 @@ import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'
 import { Trace } from './types/ton-api'
 import { toLocaleString } from './utils/date'
-import { logError, warn } from './utils/log'
+import { info, logError, warn } from './utils/log'
 import sleep from './utils/sleep'
 
 dotenv.config()
@@ -39,12 +39,12 @@ const loadCache = async () => {
       }
     })
     names.forEach((name) => {
-      console.log('Read cache file: ', name)
+      info('Read cache file: ' + name)
       const data = fs.readFileSync(`${path}/${name}`, 'utf-8')
       const traces = JSON.parse(data)
       cachedTrace = { ...cachedTrace, ...traces }
     })
-    console.log(`Loaded ${Object.keys(cachedTrace).length} traces.`)
+    info(`Loaded ${Object.keys(cachedTrace).length} traces.`)
     return
   }
 }
@@ -66,7 +66,7 @@ const eventPooling = async () => {
     return
   }
 
-  console.log(`Try to index ${events.length} events.`)
+  info(`Try to index ${events.length} events.`)
 
   let error = false
   let lastIndex = 0
@@ -111,10 +111,8 @@ const eventPooling = async () => {
 
   const from = events[0].timestamp
   const to = events[events.length - 1].timestamp
-  console.log(`${events.length} events are indexed.`)
-  console.log(
-    `${toLocaleString(from)} ~ ${toLocaleString(to)} / ${from} ~ ${to}`,
-  )
+  info(`${events.length} events are indexed.`)
+  info(`${toLocaleString(from)} ~ ${toLocaleString(to)} / ${from} ~ ${to}`)
 
   if (events.length > 0) {
     await prisma.indexerState.setLastState({
@@ -123,11 +121,11 @@ const eventPooling = async () => {
       lastEventId: events[events.length - 1].event_id,
     })
   }
-  console.log('Total length of events: ', totalEventsCount + events.length)
+  info('Total length of events: ' + (totalEventsCount + events.length))
 }
 
 const main = async () => {
-  console.log('Event pooling is started. ')
+  info('Event pooling is started. ')
   await loadCache()
   await updateBaseTokenPrices()
   if (isCLMM) {
@@ -142,5 +140,5 @@ const main = async () => {
 main()
 
 api.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`)
+  info(`Server listening on port ${PORT}`)
 })

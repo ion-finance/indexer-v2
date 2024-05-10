@@ -109,7 +109,7 @@ export const handleRemoveLiquidity = async ({
   })
 
   if (!pool) {
-    console.log('Pool not found.')
+    warn('Pool not found.')
     return
   }
 
@@ -118,7 +118,7 @@ export const handleRemoveLiquidity = async ({
   })
 
   if (withdraw) {
-    console.log('withdraw already exists.')
+    warn('withdraw already exists.')
     return
   }
 

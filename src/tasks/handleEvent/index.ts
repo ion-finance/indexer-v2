@@ -6,6 +6,7 @@ import {
   handleRemoveLiquidity,
 } from 'src/mappings/cpmm'
 import { Trace } from 'src/types/ton-api'
+import { info } from 'src/utils/log'
 
 import extractPaths from './extractPaths'
 import { CustomOP, OP } from './opCode'
@@ -30,7 +31,7 @@ const handleEvent = async (params: {
 
   // Extract paths
   const paths: Ops[][] = extractPaths(routerAddress, params.traces)
-  // console.log("paths", paths);
+  // info("paths", paths);
   const isRouterDeployed = checkPathHasOp(paths, CustomOP.ROUTER_DEPLOYED)
   const isPoolDeployed = checkPathHasOp(paths, CustomOP.POOL_DEPLOYED)
   const isLpWalletDeployed = checkPathHasOp(paths, CustomOP.LP_WALLET_DEPLOYED)
@@ -53,38 +54,38 @@ const handleEvent = async (params: {
 
   // deploy cases can be overlapped
   if (isRouterDeployed) {
-    console.log(`${eventCount}. Router deployed: ${eventId}`)
+    info(`${eventCount}. Router deployed: ${eventId}`)
   }
   if (isPoolDeployed) {
-    console.log(`${eventCount}. Pool deployed: ${eventId}`)
+    info(`${eventCount}. Pool deployed: ${eventId}`)
     await handlePoolCreated({ eventId, traces })
   }
   if (isLpWalletDeployed) {
-    console.log(`${eventCount}. LpWallet deployed: ${eventId}`)
+    info(`${eventCount}. LpWallet deployed: ${eventId}`)
   }
   if (isLpAccountDeployed) {
-    console.log(`${eventCount}. LpAccount deployed: ${eventId}`)
+    info(`${eventCount}. LpAccount deployed: ${eventId}`)
   }
   if (isRouterJettonWalletDeployed) {
-    console.log(`${eventCount}. Router Jetton Wallet deployed: ${eventId}`)
+    info(`${eventCount}. Router Jetton Wallet deployed: ${eventId}`)
   }
 
   if (isSwap) {
-    console.log(`${eventCount}. Exchange: ${eventId}`)
+    info(`${eventCount}. Exchange: ${eventId}`)
     await handleExchange({ eventId, traces })
 
     const utime = traces.transaction.utime
     await updateTokenPrices(utime * 1000)
   } else if (isProvideLp) {
-    console.log(`${eventCount}. Provide Lp: ${eventId}`)
+    info(`${eventCount}. Provide Lp: ${eventId}`)
   } else if (isProvideLpConfirmed) {
-    console.log(`${eventCount}. Provide Lp Confirmed: ${eventId}`)
+    info(`${eventCount}. Provide Lp Confirmed: ${eventId}`)
     await handleAddLiquidity({ eventId, traces })
 
     const utime = traces.transaction.utime
     await updateTokenPrices(utime * 1000)
   } else if (isRemoveLiquidity) {
-    console.log(`${eventCount}. Remove Liquidity: ${eventId}`)
+    info(`${eventCount}. Remove Liquidity: ${eventId}`)
     await handleRemoveLiquidity({ eventId, traces })
   }
 
@@ -99,8 +100,8 @@ const handleEvent = async (params: {
     !isProvideLpConfirmed &&
     !isRemoveLiquidity
   ) {
-    console.log(`${eventCount}. Unknown event: ${eventId}`)
-    console.log('paths', paths)
+    info(`${eventCount}. Unknown event: ${eventId}`)
+    info(`paths ${paths}`)
   }
   eventCount++
 }
