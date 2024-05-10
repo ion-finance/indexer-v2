@@ -19,13 +19,16 @@ const PORT = 22305
 const consoleLogger = new winston.transports.Console({
   level: 'debug',
   colorize: true,
+  formatter: function (options: any) {
+    return `[${options.level}]:${options.message}`
+  },
 })
 const ptTransport = new winston.transports.Papertrail({
   host: HOST,
   port: PORT,
   hostname: hostname + ':' + new Date().getTime(),
   logFormat: function (level: any, message: any) {
-    return '[' + level + '] ' + message
+    return `[${level}]: ${message}`
   },
 })
 

@@ -101,7 +101,7 @@ const handleEvent = async (params: {
     !isRemoveLiquidity
   ) {
     info(`${eventCount}. Unknown event: ${eventId}`)
-    info(`paths ${paths}`)
+    info('paths', paths)
   }
   eventCount++
 }
