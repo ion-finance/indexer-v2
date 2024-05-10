@@ -1,15 +1,10 @@
 import axios from 'axios'
-import chalk from 'chalk'
 
-const CHALK = {
-  error: chalk.bold.red,
-  warn: chalk.yellow,
-  info: chalk.green,
-}
+import { logger } from 'src/config/winston'
 
-export const error = (msg: string) => console.log(CHALK.error(msg))
-export const warn = (msg: string) => console.log(CHALK.warn(msg))
-export const info = (msg: string) => console.log(CHALK.info(msg))
+export const error = (msg: string) => logger.error(msg)
+export const warn = (msg: string) => logger.warn(msg)
+export const info = (msg: string) => logger.info(msg)
 
 export const logError = (e: unknown) => {
   if (axios.isAxiosError(e)) {
