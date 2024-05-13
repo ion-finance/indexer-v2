@@ -7,6 +7,7 @@
     "build": "npm-run-all format lint clean && tsc",
     "start": "ts-node -r tsconfig-paths/register build/src",
     "ts-node": "ts-node -r tsconfig-paths/register",
+    "test-transactions": "ts-node -r tsconfig-paths/register src/scripts/testTransaction.ts",
     "generate-test": "ts-node -r tsconfig-paths/register ./test/integrations/scenarios/generateTestScenario.ts",
     "generate-trace-cache": "ts-node -r tsconfig-paths/register ./cache/generateTraceCache.ts",
     "reset-cache-run": "yarn prisma migrate reset; USE_CACHE=true yarn local",
