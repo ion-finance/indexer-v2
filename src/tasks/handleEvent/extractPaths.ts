@@ -7,9 +7,6 @@ import { warn } from 'src/utils/log'
 import { CustomOP, OP, Ops } from './opCode'
 dotenv.config()
 
-// custom wallet op, that can be ignored
-const blackList = ['0xb8abad10']
-
 const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS || ''
 function extractPaths(routerAddress: string, node: Trace): Ops[][] {
   // This function recursively extracts the paths using the spread operator.
@@ -65,15 +62,9 @@ function extractPaths(routerAddress: string, node: Trace): Ops[][] {
       return ''
     })()
 
-    const isBlackListed = blackList.includes(opCode)
     const opKey = OP[opCode]
 
-    if (isBlackListed) {
-      console.log(`Ignoring txHash: ${transaction.hash}, opCode: ${opCode}`)
-      return
-    }
-
-    if (!opKey && !customOp && !isBlackListed) {
+    if (!opKey && !customOp) {
       warn(`Unknown opCode: ${opCode}, txHash: ${currentNode.transaction.hash}`)
     }
     // If currentNode does not have children, it is a leaf.
