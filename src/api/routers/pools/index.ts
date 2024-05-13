@@ -15,6 +15,19 @@ const alreadyWarnedReserve = new Set<string>()
 const alreadyWarnedTokenX = new Set<string>()
 const alreadyWarnedTokenY = new Set<string>()
 
+// !NOTE
+// these pools only have one reserve by mistake.
+// we'll not provide the way to fix this.
+// just ignore them by hardcoding
+const misIndexedPoolIds = [
+  'EQCJ2mpHWEbu6ZMnWmkmdT-eWtrNm2Azo9Ecz7Ll_hR1z_FQ',
+  'EQA-fCMn2bej12BzhWR9Y9GbzwQ4YYLrLqazYhxI7MfcshNf',
+  'EQDIx53YTk59Nl-amPuNaFwUjmo5k2YvBI8OpC4H6QfnnN69',
+  'EQDTeSMqHgouJcnNF9iqhpxwi-fw-mYG-YG_5c-ZdrEJhClH',
+  'EQA51NdwasYs4tM-0bQ6Oyo7sI0tsdQxr9b4etP4V6eNli_x',
+  'EQC-j6zOT6pJRxq7ngeeIhd4r9E1k_iAsi8xfj5ZYkcr4sKS',
+]
+
 router.get('/pools', async function handler(req, res) {
   const rawPools = await prisma.pool.findMany()
   const tokens = await prisma.token.findMany()
@@ -56,6 +69,10 @@ router.get('/pools', async function handler(req, res) {
 
     if (type === 'CPMM') {
       if (BigNumber(reserveX).isZero() || BigNumber(reserveY).isZero()) {
+        if (misIndexedPoolIds.includes(pool.id)) {
+          return
+        }
+
         if (!alreadyWarnedReserve.has(pool.id)) {
           console.warn('Reserve not found', pool.id)
           alreadyWarnedReserve.add(pool.id)
