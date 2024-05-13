@@ -66,6 +66,9 @@ enum RAW_OP {
   BURN = '0x595f07bc',
   BURN_NOTIFICATION = '0x7bdd97de',
 
+  // from nft
+  NFT_TRANSFER = '0x05138d91',
+
   REFUND_ME = '0x0bf3f447',
   CB_REFUND_ME = '0x89446a42',
 
@@ -109,6 +112,7 @@ function createBiDirectionalEnum<E extends { [index: string]: string }>(
   }
 }
 
+// for simulating stonfi mainnet
 const isStonfi = process.env.IS_STONFI === 'true'
 const op = isStonfi ? RAW_OP_STONFI : RAW_OP
 const exitCode = isStonfi ? RAW_EXIT_CODE_STONFI : RAW_EXIT_CODE

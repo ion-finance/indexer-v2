@@ -57,16 +57,16 @@ function extractPaths(routerAddress: string, node: Trace): Ops[][] {
         if (opCode === OP.INTERNAL_TRANSFER) {
           return CustomOP.ROUTER_JETTON_WALLET_DEPLOYED
         }
-        warn('Unknown deploy case ' + transaction.hash)
+        // warn('Unknown deploy case ' + transaction.hash)
       }
       return ''
     })()
 
     const opKey = OP[opCode]
 
-    if (!opKey && !customOp) {
-      warn(`Unknown opCode: ${opCode}, txHash: ${currentNode.transaction.hash}`)
-    }
+    // if (!opKey && !customOp) {
+    //   warn(`Unknown opCode: ${opCode}, txHash: ${currentNode.transaction.hash}`)
+    // }
     // If currentNode does not have children, it is a leaf.
     if (!currentNode.children || currentNode.children.length === 0) {
       paths.push([

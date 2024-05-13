@@ -6,7 +6,7 @@ import {
   handleRemoveLiquidity,
 } from 'src/mappings/cpmm'
 import { Trace } from 'src/types/ton-api'
-import { info } from 'src/utils/log'
+import { info, warn } from 'src/utils/log'
 
 import extractPaths from './extractPaths'
 import { CustomOP, OP } from './opCode'
@@ -100,10 +100,39 @@ const handleEvent = async (params: {
     !isProvideLpConfirmed &&
     !isRemoveLiquidity
   ) {
-    info(`${eventCount}. Unknown event: ${eventId}`)
-    info('paths', paths)
+    handleUnknownEvent(eventCount, eventId, paths)
   }
   eventCount++
 }
 
 export default handleEvent
+
+const alreadyCheckedEvents = [
+  '5084cd2797b2416b39f623b93934e219272e529abeca49cc12a7146ff996a026',
+  'e053a3459b2205466ae24f5aa46eb035eb9b907b6d86b520aee598e371750171',
+  'c61587696903627bc99d05b05a8837ebf134969814c0270fe7eb11fc206c364e',
+]
+const handleUnknownEvent = (
+  eventCount: number,
+  eventId: string,
+  paths: Ops[][],
+) => {
+  const isAlreadyChecked = alreadyCheckedEvents.includes(eventId)
+  if (isAlreadyChecked) {
+    info(`${eventCount}. Already checked event: ${eventId}`)
+    return
+  }
+  const hasNFTTransfer = checkPathHasOp(paths, OP.NFT_TRANSFER)
+  if (hasNFTTransfer) {
+    info(`${eventCount}. NFT Transfer event: ${eventId}`)
+    return
+  }
+  const hasTextComment = checkPathHasOp(paths, OP.TEXT_COMMENT)
+  if (hasTextComment) {
+    info(`${eventCount}. Text Comment event: ${eventId}`)
+    return
+  }
+
+  info(`${eventCount}. Unknown event: ${eventId}`)
+  info('paths', paths)
+}
