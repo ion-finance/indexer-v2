@@ -15,7 +15,7 @@ import {
 import prisma from 'src/clients/prisma'
 import getLatestTokenPrices from 'src/common/tokenPrice'
 import { isSameAddress } from 'src/utils/address'
-import { logError, warn } from 'src/utils/log'
+import { error, logError } from 'src/utils/log'
 import sleep from 'src/utils/sleep'
 
 const ONE_MINUTE = 60 * 1000
@@ -46,7 +46,7 @@ const getPrice = async () => {
 
     return { TON, USDT }
   } catch (e) {
-    warn('Error fetching price data from CoinMarketCap:')
+    error('Error fetching price data from CoinMarketCap:')
     logError(e)
     sleep(2000)
     return {
