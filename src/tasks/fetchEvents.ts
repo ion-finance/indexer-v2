@@ -2,12 +2,10 @@ import axios from 'axios'
 import { sortBy, uniqBy } from 'lodash'
 
 import { AccountEvent, AccountEvents } from 'src/types/ton-api'
-import { toLocaleString } from 'src/utils/date'
 import { error, info, logError } from 'src/utils/log'
 
 // import * as Sentry from "@sentry/node";
-
-const UTIME_PADDING = 300 // 300ms
+const LOGICAL_TIME_PADDING = 30
 const fetchEvents = async ({
   routerAddress,
   timestamp = 0,
@@ -15,7 +13,7 @@ const fetchEvents = async ({
   routerAddress: string
   timestamp?: number
 }) => {
-  let endDate = 0
+  let beforeLt = 0
   const events: AccountEvent[] = []
 
   for (;;) {
@@ -23,7 +21,7 @@ const fetchEvents = async ({
     try {
       const args =
         `start_date=${timestamp}&limit=100` +
-        (endDate ? `&end_date=${endDate}` : '')
+        (beforeLt ? `&before_lt=${beforeLt}` : '')
 
       const url = `${baseUrl}?${args}`
       // res data is ordered by timestamp desc
@@ -39,19 +37,17 @@ const fetchEvents = async ({
         'asc',
       )
       events.push(...accountEvents)
+      const nextFrom = res.data.next_from
 
       if (accountEvents.length >= 100) {
-        info(`fetched with start_date, end_date, ${timestamp} ${endDate}`)
+        info(`fetched with start_date, before_lt, ${timestamp} ${beforeLt}`)
         // TON API limit is 100 events per request.
         // If 100 events are found, we need to fetch evetns more precisely.
         // It we don't this, we may miss some events.
         info('More than 100 events found.')
-        // there should be padding. because endDate is exclusive.
-        // not excatly exclusive, but it needs padding. (300ms is empirical value)
-        endDate = accountEvents[0].timestamp + UTIME_PADDING
-        info(
-          `Try to fetch events endData, ${toLocaleString(endDate)}, ${endDate}`,
-        )
+        // there should be padding. because 'before_lt' is exclusive with padding. (30 is empirical value)
+        beforeLt = nextFrom + LOGICAL_TIME_PADDING
+        info(`Try to fetch events beforeLt, ${beforeLt}`)
         continue
       }
 

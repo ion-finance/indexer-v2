@@ -51,6 +51,7 @@ const loadCache = async () => {
 
 const eventPooling = async () => {
   const { timestamp, lastEventId } = await prisma.indexerState.getLastState()
+  // fetch all events from timestamp
   const fetchedEvents = await fetchEvents({ routerAddress, timestamp })
 
   // because we fetch events from last timestamp inclusive,
