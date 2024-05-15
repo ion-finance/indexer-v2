@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node'
 import dotenv from 'dotenv'
 import fs from 'fs'
-import { drop, map } from 'lodash'
+import { drop } from 'lodash'
 
 import api from 'src/api'
 import prisma from 'src/clients/prisma'
@@ -10,11 +10,12 @@ import { routerAddress } from 'src/constant/address'
 import { updateBaseTokenPrices } from './common/updateTokenPrices'
 import { MIN_POOL, PORT, isCLMM, isMainnet } from './constant'
 import { fetchTrace } from './fetch'
-import getRedisClient from './redisClient'
+import { getEventSummary, getTrace } from './redisClient'
 import seedCLMM from './scripts/seedCLMM'
 import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'
-import { AccountEvent, Trace } from './types/ton-api'
+import { CachedEvent } from './types/events'
+import { AccountEvent } from './types/ton-api'
 import { toLocaleString } from './utils/date'
 import { info, logError, warn } from './utils/log'
 import sleep from './utils/sleep'
@@ -50,41 +51,17 @@ const loadCache = async () => {
   }
 }
 
-const redisClient = getRedisClient()
-
-type CachedEvent = {
-  event_id: string
-  timestamp: number
-  lt: number
-}
-
 let cacheUsed = false
 const eventPooling = async () => {
   const { timestamp, lastEventId } = await prisma.indexerState.getLastState()
   const totalEventsCount = await prisma.indexerState.getTotalEventsCount()
   const loadCachedEvents = async () => {
     if (cacheUsed) {
-      return { cachedEvents: [], timestampOfCached: 0 }
+      return []
     }
-    console.log('Load Cached Events')
     // get last event id from redis
-    const cachedEventsSummary = await redisClient.zRange('eventIds', 0, -1)
-    const lastEventSummary = cachedEventsSummary
-      ? cachedEventsSummary[cachedEventsSummary.length - 1]
-      : null
-    console.log('lastEventSummary', lastEventSummary)
-    const cachedEvents = map(
-      cachedEventsSummary,
-      (summary) =>
-        JSON.parse(summary) as {
-          event_id: string
-          timestamp: number
-          lt: number
-        },
-    )
-    // cacheUsed = true
-
-    return { cachedEvents }
+    const cachedEvents = await getEventSummary(0, -1)
+    return cachedEvents
   }
 
   const handleEvents = async (events: CachedEvent[] | AccountEvent[]) => {
@@ -101,9 +78,11 @@ const eventPooling = async () => {
       const eventId = event.event_id
       try {
         const trace = await (async function () {
-          const trace = await redisClient.get(eventId)
+          // TODO: fetch all the traces of the cache by one request
+          const trace = await getTrace(eventId)
           if (trace) {
-            return JSON.parse(trace) as Trace
+            info('Use cached trace.')
+            return trace
           }
           const res = await fetchTrace(eventId)
           return res.data
@@ -149,7 +128,9 @@ const eventPooling = async () => {
   }
 
   if (!cacheUsed) {
-    const { cachedEvents } = await loadCachedEvents()
+    console.log('Load cached events.')
+    const cachedEvents = await loadCachedEvents()
+    console.log('cachedEvents.length', cachedEvents.length)
     await handleEvents(cachedEvents)
     cacheUsed = true
   } else {

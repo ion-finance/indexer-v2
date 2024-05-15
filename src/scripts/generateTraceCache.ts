@@ -2,7 +2,11 @@ import dotenv from 'dotenv'
 
 import { routerAddress } from 'src/constant/address'
 import { fetchTrace } from 'src/fetch'
-import getRedisClient from 'src/redisClient'
+import getRedisClient, {
+  getEventSummary,
+  saveEventSummary,
+  saveTrace,
+} from 'src/redisClient'
 import fetchEvents from 'src/tasks/fetchEvents'
 import { toLocaleString } from 'src/utils/date'
 import { error } from 'src/utils/log'
@@ -17,7 +21,6 @@ dotenv.config()
 let totalEvents = 0
 
 const generate = async () => {
-  const redisClient = getRedisClient()
   const events = await fetchEvents({ routerAddress, timestamp: 0 })
   totalEvents += events.length
   console.log(`${events.length} events found.`)
@@ -30,16 +33,13 @@ const generate = async () => {
     try {
       const res = await fetchTrace(eventId)
       const trace = res.data
-      await redisClient.set(eventId, JSON.stringify(trace))
+      await saveTrace(eventId, trace)
       const summary = {
         event_id: eventId,
         timestamp: event.timestamp,
         lt: event.lt,
       }
-      await redisClient.zAdd('eventIds', {
-        score: event.lt,
-        value: JSON.stringify(summary),
-      })
+      await saveEventSummary(summary)
     } catch (e) {
       error(`Error when handling event ${eventId}`)
       return
@@ -59,9 +59,8 @@ const generate = async () => {
 
 generate().then(async () => {
   const redisClient = getRedisClient()
-
-  const eventIds = await redisClient.zRange('eventIds', 0, -1)
-  console.log('eventIds', eventIds)
+  const events = await getEventSummary(0, -1)
+  console.log('events', events)
 
   const keys = await redisClient.keys('*')
   console.log('keys', keys)

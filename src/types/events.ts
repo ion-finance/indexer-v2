@@ -11,3 +11,9 @@ export interface Event {
   transaction: Transaction
   body: Cell
 }
+
+export interface CachedEvent {
+  event_id: string
+  timestamp: number
+  lt: number
+}

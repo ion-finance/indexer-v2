@@ -10,9 +10,12 @@ const railwayProjectName = process.env.RAILWAY_PROJECT_NAME
 const railwayEnvironmentName = process.env.RAILWAY_ENVIRONMENT_NAME
 const isProd = process.env.NODE_ENV === 'production'
 
-const hostname = isProd
+const envName = isProd
   ? `${railwayProjectName}-${railwayEnvironmentName}`
   : 'localhost'
+const timestamp = new Date().getTime()
+const hostname = `${envName}:${timestamp}`
+console.log('[paper tail hostname]: ', hostname)
 
 const HOST = 'logs5.papertrailapp.com'
 const PORT = 22305
@@ -23,10 +26,11 @@ const consoleLogger = new winston.transports.Console({
     return `[${options.level}]:${options.message}`
   },
 })
+
 const ptTransport = new winston.transports.Papertrail({
   host: HOST,
   port: PORT,
-  hostname: hostname + ':' + new Date().getTime(),
+  hostname,
   logFormat: function (level: any, message: any) {
     return `[${level}]: ${message}`
   },
