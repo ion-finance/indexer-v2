@@ -1,8 +1,7 @@
 import * as Sentry from '@sentry/node'
-import { clear } from 'console'
 import dotenv from 'dotenv'
 import fs from 'fs'
-import { drop, map, set, uniqBy } from 'lodash'
+import { drop, map } from 'lodash'
 
 import api from 'src/api'
 import prisma from 'src/clients/prisma'
@@ -89,12 +88,11 @@ const eventPooling = async () => {
   }
 
   const handleEvents = async (events: CachedEvent[] | AccountEvent[]) => {
-    info(`Try to index ${events.length} events.`)
-
     if (events.length === 0) {
       await sleep(MIN_POOL)
       return
     }
+    info(`Try to index ${events.length} events.`)
 
     let error = false
     let lastIndex = 0
@@ -103,11 +101,9 @@ const eventPooling = async () => {
       const eventId = event.event_id
       try {
         const trace = await (async function () {
-          if (useCache) {
-            const trace = cachedTrace[eventId]
-            if (trace) {
-              return trace
-            }
+          const trace = await redisClient.get(eventId)
+          if (trace) {
+            return JSON.parse(trace) as Trace
           }
           const res = await fetchTrace(eventId)
           return res.data
