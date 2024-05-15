@@ -1,7 +1,8 @@
 import * as Sentry from '@sentry/node'
+import { clear } from 'console'
 import dotenv from 'dotenv'
 import fs from 'fs'
-import { drop, set } from 'lodash'
+import { drop, map, set, uniqBy } from 'lodash'
 
 import api from 'src/api'
 import prisma from 'src/clients/prisma'
@@ -10,10 +11,11 @@ import { routerAddress } from 'src/constant/address'
 import { updateBaseTokenPrices } from './common/updateTokenPrices'
 import { MIN_POOL, PORT, isCLMM, isMainnet } from './constant'
 import { fetchTrace } from './fetch'
+import getRedisClient from './redisClient'
 import seedCLMM from './scripts/seedCLMM'
 import fetchEvents from './tasks/fetchEvents'
 import handleEvent from './tasks/handleEvent'
-import { Trace } from './types/ton-api'
+import { AccountEvent, Trace } from './types/ton-api'
 import { toLocaleString } from './utils/date'
 import { info, logError, warn } from './utils/log'
 import sleep from './utils/sleep'
@@ -49,80 +51,122 @@ const loadCache = async () => {
   }
 }
 
+const redisClient = getRedisClient()
+
+type CachedEvent = {
+  event_id: string
+  timestamp: number
+  lt: number
+}
+
+let cacheUsed = false
 const eventPooling = async () => {
   const { timestamp, lastEventId } = await prisma.indexerState.getLastState()
-  // fetch all events from timestamp
-  const fetchedEvents = await fetchEvents({ routerAddress, timestamp })
-
-  // because we fetch events from last timestamp inclusive,
-  // 1 event may be duplicated, remove it.
-  const hasDuplicated =
-    !!lastEventId && fetchedEvents[0]?.event_id === lastEventId
-  const events = drop(fetchedEvents, hasDuplicated ? 1 : 0)
-
   const totalEventsCount = await prisma.indexerState.getTotalEventsCount()
+  const loadCachedEvents = async () => {
+    if (cacheUsed) {
+      return { cachedEvents: [], timestampOfCached: 0 }
+    }
+    console.log('Load Cached Events')
+    // get last event id from redis
+    const cachedEventsSummary = await redisClient.zRange('eventIds', 0, -1)
+    const lastEventSummary = cachedEventsSummary
+      ? cachedEventsSummary[cachedEventsSummary.length - 1]
+      : null
+    console.log('lastEventSummary', lastEventSummary)
+    const cachedEvents = map(
+      cachedEventsSummary,
+      (summary) =>
+        JSON.parse(summary) as {
+          event_id: string
+          timestamp: number
+          lt: number
+        },
+    )
+    // cacheUsed = true
 
-  if (events.length === 0) {
-    await sleep(MIN_POOL)
-    return
+    return { cachedEvents }
   }
 
-  info(`Try to index ${events.length} events.`)
+  const handleEvents = async (events: CachedEvent[] | AccountEvent[]) => {
+    info(`Try to index ${events.length} events.`)
 
-  let error = false
-  let lastIndex = 0
-  for (let i = 0; i < events.length; i++) {
-    const event = events[i]
-    const eventId = event.event_id
-    try {
-      const trace = await (async function () {
-        if (useCache) {
-          const trace = cachedTrace[eventId]
-          if (trace) {
-            return trace
+    if (events.length === 0) {
+      await sleep(MIN_POOL)
+      return
+    }
+
+    let error = false
+    let lastIndex = 0
+    for (let i = 0; i < events.length; i++) {
+      const event = events[i]
+      const eventId = event.event_id
+      try {
+        const trace = await (async function () {
+          if (useCache) {
+            const trace = cachedTrace[eventId]
+            if (trace) {
+              return trace
+            }
           }
-        }
-        const res = await fetchTrace(eventId)
-        return res.data
-      })()
+          const res = await fetchTrace(eventId)
+          return res.data
+        })()
 
-      await handleEvent({
-        routerAddress,
-        eventId,
-        traces: trace,
+        await handleEvent({
+          routerAddress,
+          eventId,
+          traces: trace,
+        })
+      } catch (e) {
+        error = true
+        warn(`Error when handling event ${eventId}`)
+        logError(e)
+
+        lastIndex = i
+        // Sentry.captureException(e);
+        break
+      }
+    }
+
+    if (error) {
+      if (lastIndex <= events.length - 1) {
+        await prisma.indexerState.setLastTimestamp(events[lastIndex].timestamp)
+      }
+      sleep(MIN_POOL)
+      return
+    }
+
+    const from = events[0].timestamp
+    const to = events[events.length - 1].timestamp
+    info(`${events.length} events are indexed.`)
+    info(`${toLocaleString(from)} ~ ${toLocaleString(to)} / ${from} ~ ${to}`)
+
+    if (events.length > 0) {
+      await prisma.indexerState.setLastState({
+        timestamp: to,
+        totalEventsCount: totalEventsCount + events.length,
+        lastEventId: events[events.length - 1].event_id,
       })
-    } catch (e) {
-      error = true
-      warn(`Error when handling event ${eventId}`)
-      logError(e)
-
-      lastIndex = i
-      // Sentry.captureException(e);
-      break
     }
+    info('Total length of events: ' + (totalEventsCount + events.length))
   }
 
-  if (error) {
-    if (lastIndex <= events.length - 1) {
-      await prisma.indexerState.setLastTimestamp(events[lastIndex].timestamp)
-    }
-    sleep(MIN_POOL)
-    return
-  }
+  if (!cacheUsed) {
+    const { cachedEvents } = await loadCachedEvents()
+    await handleEvents(cachedEvents)
+    cacheUsed = true
+  } else {
+    // because we fetch events from last timestamp inclusive,
+    // 1 event may be duplicated, remove it.
+    const allEvents = await fetchEvents({ routerAddress, timestamp })
 
-  const from = events[0].timestamp
-  const to = events[events.length - 1].timestamp
-  info(`${events.length} events are indexed.`)
-  info(`${toLocaleString(from)} ~ ${toLocaleString(to)} / ${from} ~ ${to}`)
+    const hasDuplicated =
+      !!lastEventId && allEvents[0]?.event_id === lastEventId
+    const events = drop(allEvents, hasDuplicated ? 1 : 0)
 
-  if (events.length > 0) {
-    await prisma.indexerState.setLastState({
-      timestamp: to,
-      totalEventsCount: totalEventsCount + events.length,
-      lastEventId: events[events.length - 1].event_id,
-    })
+    await handleEvents(events)
   }
-  info('Total length of events: ' + (totalEventsCount + events.length))
 }
 
 const main = async () => {
