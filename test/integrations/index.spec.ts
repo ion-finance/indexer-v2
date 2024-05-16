@@ -54,7 +54,7 @@ describe('ScenarioTest', () => {
         await handleEvent({
           routerAddress: scenario.routerAddress,
           eventId: event.eventId,
-          traces: event.trace,
+          trace: event.trace,
         })
       }
 

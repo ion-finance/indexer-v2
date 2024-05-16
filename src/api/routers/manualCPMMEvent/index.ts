@@ -26,7 +26,7 @@ router.get(
     await handleEvent({
       routerAddress: process.env.ROUTER_ADDRESS || '',
       eventId,
-      traces: res.data as Trace,
+      trace: res.data as Trace,
     })
     return response.status(200).json(true)
   },

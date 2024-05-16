@@ -61,17 +61,17 @@ const parsePayTo = (raw_body: string) => {
 
 export const handleRemoveLiquidity = async ({
   eventId,
-  traces,
+  trace,
 }: {
   eventId: string
-  traces: Trace
+  trace: Trace
 }) => {
   const routerAddress = process.env.ROUTER_ADDRESS || ''
-  const { hash, utime } = traces.transaction
+  const { hash, utime } = trace.transaction
   const timestamp = toISOString(utime)
-  const payToTrace = findTracesByOpCode(traces, OP.PAY_TO)?.[0]
+  const payToTrace = findTracesByOpCode(trace, OP.PAY_TO)?.[0]
   const burnNotificationTrace = findTracesByOpCode(
-    traces,
+    trace,
     OP.BURN_NOTIFICATION,
   )?.[0]
   if (!payToTrace) {
@@ -143,8 +143,8 @@ export const handleRemoveLiquidity = async ({
     },
   })
 
-  const walletTrace = traces
-  // const poolTraces = findTracesOfPool(traces, poolAddress)
+  const walletTrace = trace
+  // const poolTraces = findTracesOfPool(trace, poolAddress)
   const poolTrace = burnNotificationTrace
   const { tokenXAddress, tokenYAddress } = pool
   const { hash: poolTxHash, lt, utime: poolUtime } = poolTrace.transaction

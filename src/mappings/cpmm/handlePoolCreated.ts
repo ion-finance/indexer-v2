@@ -43,15 +43,15 @@ const parseTransferNotification = (raw_body: string) => {
 
 export const handlePoolCreated = async ({
   eventId,
-  traces,
+  trace,
 }: {
   eventId: string
-  traces: Trace
+  trace: Trace
 }) => {
-  const creator = parseRaw(traces.transaction.account.address)
-  const provideLpTrace = findTracesByOpCode(traces, OP.PROVIDE_LP)?.[0]
+  const creator = parseRaw(trace.transaction.account.address)
+  const provideLpTrace = findTracesByOpCode(trace, OP.PROVIDE_LP)?.[0]
   const transferNotificationTrace = findTracesByOpCode(
-    traces,
+    trace,
     OP.TRANSFER_NOTIFICATION,
   )?.[0]
   if (!provideLpTrace) {

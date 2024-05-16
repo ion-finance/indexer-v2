@@ -58,14 +58,14 @@ const parseCbAddLiquidity = (raw_body: string) => {
 
 export const handleAddLiquidity = async ({
   eventId,
-  traces,
+  trace,
 }: {
   eventId: string
-  traces: Trace
+  trace: Trace
 }) => {
   const routerAddress = process.env.ROUTER_ADDRESS || ''
   const cbAddLiquidityTrace = findTracesByOpCode(
-    traces,
+    trace,
     OP.CB_ADD_LIQUIDITY,
   )?.[0]
   if (!cbAddLiquidityTrace) {
@@ -87,10 +87,7 @@ export const handleAddLiquidity = async ({
   const { amount0, amount1, userAddress } =
     parseCbAddLiquidity(cbAddLiquidityBody)
 
-  const internalTransferTraces = findTracesByOpCode(
-    traces,
-    OP.INTERNAL_TRANSFER,
-  )
+  const internalTransferTraces = findTracesByOpCode(trace, OP.INTERNAL_TRANSFER)
   if (!internalTransferTraces) {
     warn('Empty internalTransferTraces')
     return
@@ -124,8 +121,8 @@ export const handleAddLiquidity = async ({
     return
   }
 
-  const hash = traces.transaction.hash
-  const utime = traces.transaction.utime
+  const hash = trace.transaction.hash
+  const utime = trace.transaction.utime
   const timestamp = toISOString(utime)
 
   const deposit = await prisma.deposit.findFirst({
@@ -221,8 +218,8 @@ export const handleAddLiquidity = async ({
     })
   }
 
-  const poolTraces = findTracesOfPool(traces, poolAddress)
-  const walletTrace = traces
+  const poolTraces = findTracesOfPool(trace, poolAddress)
+  const walletTrace = trace
 
   await Promise.all(
     map(poolTraces, async (trace) => {

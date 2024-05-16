@@ -70,20 +70,20 @@ const parsePayTo = (raw_body: string) => {
 
 export const handleExchange = async ({
   eventId,
-  traces,
+  trace,
 }: {
   eventId: string
-  traces: Trace
+  trace: Trace
 }) => {
   const tokenPrices = await getLatestTokenPrices()
   const tokens = await prisma.token.findMany()
 
   const routerAddress = process.env.ROUTER_ADDRESS || ''
-  const { hash, utime } = traces.transaction
+  const { hash, utime } = trace.transaction
   const timestamp = toISOString(utime)
 
-  const swapTrace = findTracesByOpCode(traces, OP.SWAP)?.[0]
-  const payToTraces = findTracesByOpCode(traces, OP.PAY_TO)
+  const swapTrace = findTracesByOpCode(trace, OP.SWAP)?.[0]
+  const payToTraces = findTracesByOpCode(trace, OP.PAY_TO)
   if (!swapTrace) {
     warn('Empty swapTrace')
     return
@@ -206,7 +206,7 @@ export const handleExchange = async ({
     return
   }
 
-  const walletTrace = traces
+  const walletTrace = trace
   const senderAddress = parseRaw(walletTrace.transaction.account.address)
 
   const volumeUsd = swapForY

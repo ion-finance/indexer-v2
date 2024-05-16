@@ -65,7 +65,7 @@ const eventPooling = async () => {
         await handleEvent({
           routerAddress,
           eventId,
-          traces: trace,
+          trace,
         })
       } catch (e) {
         error = true

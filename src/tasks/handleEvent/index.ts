@@ -25,12 +25,12 @@ let eventCount = 1
 const handleEvent = async (params: {
   routerAddress: string
   eventId: string
-  traces: Trace
+  trace: Trace
 }) => {
-  const { eventId, traces, routerAddress } = params
+  const { eventId, trace, routerAddress } = params
 
   // Extract paths
-  const paths: Ops[][] = extractPaths(routerAddress, params.traces)
+  const paths: Ops[][] = extractPaths(routerAddress, params.trace)
   // info("paths", paths);
   const isRouterDeployed = checkPathHasOp(paths, CustomOP.ROUTER_DEPLOYED)
   const isPoolDeployed = checkPathHasOp(paths, CustomOP.POOL_DEPLOYED)
@@ -58,7 +58,7 @@ const handleEvent = async (params: {
   }
   if (isPoolDeployed) {
     info(`${eventCount}. Pool deployed: ${eventId}`)
-    await handlePoolCreated({ eventId, traces })
+    await handlePoolCreated({ eventId, trace })
   }
   if (isLpWalletDeployed) {
     info(`${eventCount}. LpWallet deployed: ${eventId}`)
@@ -72,21 +72,21 @@ const handleEvent = async (params: {
 
   if (isSwap) {
     info(`${eventCount}. Exchange: ${eventId}`)
-    await handleExchange({ eventId, traces })
+    await handleExchange({ eventId, trace })
 
-    const utime = traces.transaction.utime
+    const utime = trace.transaction.utime
     await updateTokenPrices(utime * 1000)
   } else if (isProvideLp) {
     info(`${eventCount}. Provide Lp: ${eventId}`)
   } else if (isProvideLpConfirmed) {
     info(`${eventCount}. Provide Lp Confirmed: ${eventId}`)
-    await handleAddLiquidity({ eventId, traces })
+    await handleAddLiquidity({ eventId, trace })
 
-    const utime = traces.transaction.utime
+    const utime = trace.transaction.utime
     await updateTokenPrices(utime * 1000)
   } else if (isRemoveLiquidity) {
     info(`${eventCount}. Remove Liquidity: ${eventId}`)
-    await handleRemoveLiquidity({ eventId, traces })
+    await handleRemoveLiquidity({ eventId, trace })
   }
 
   if (
