@@ -51,21 +51,21 @@ const eventPooling = async () => {
       const event = events[i]
       const eventId = event.event_id
       try {
-        const trace = await (async function () {
+        const { trace, cached } = await (async function () {
           // TODO: fetch all the traces of the cache by one request
           const trace = await getTrace(eventId)
           if (trace) {
-            info('Use cached trace.')
-            return trace
+            return { trace, cached: true }
           }
           const res = await fetchTrace(eventId)
-          return res.data
+          return { trace: res.data, cached: false }
         })()
 
         await handleEvent({
           routerAddress,
           eventId,
           trace,
+          cached,
         })
       } catch (e) {
         error = true
@@ -102,9 +102,9 @@ const eventPooling = async () => {
   }
 
   if (!cacheUsed) {
-    console.log('Load cached events.')
+    info('Load cached events.')
     const cachedEvents = await loadCachedEvents()
-    console.log('cachedEvents.length', cachedEvents.length)
+    info('cachedEvents.length', cachedEvents.length)
     await handleEvents(cachedEvents)
     cacheUsed = true
   } else {

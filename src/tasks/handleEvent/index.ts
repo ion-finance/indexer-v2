@@ -6,7 +6,7 @@ import {
   handleRemoveLiquidity,
 } from 'src/mappings/cpmm'
 import { Trace } from 'src/types/ton-api'
-import { info, warn } from 'src/utils/log'
+import { info } from 'src/utils/log'
 
 import extractPaths from './extractPaths'
 import { CustomOP, OP } from './opCode'
@@ -26,8 +26,9 @@ const handleEvent = async (params: {
   routerAddress: string
   eventId: string
   trace: Trace
+  cached?: boolean
 }) => {
-  const { eventId, trace, routerAddress } = params
+  const { eventId, trace, routerAddress, cached } = params
 
   // Extract paths
   const paths: Ops[][] = extractPaths(routerAddress, params.trace)
@@ -52,40 +53,42 @@ const handleEvent = async (params: {
 
   const isRemoveLiquidity = checkPathHasOp(paths, OP.BURN_NOTIFICATION)
 
+  const baseLog = `${eventCount}. ${cached ? '<cached>' : ''}`
+
   // deploy cases can be overlapped
   if (isRouterDeployed) {
-    info(`${eventCount}. Router deployed: ${eventId}`)
+    info(`${baseLog} Router deployed: ${eventId}`)
   }
   if (isPoolDeployed) {
-    info(`${eventCount}. Pool deployed: ${eventId}`)
+    info(`${baseLog} Pool deployed: ${eventId}`)
     await handlePoolCreated({ eventId, trace })
   }
   if (isLpWalletDeployed) {
-    info(`${eventCount}. LpWallet deployed: ${eventId}`)
+    info(`${baseLog} LpWallet deployed: ${eventId}`)
   }
   if (isLpAccountDeployed) {
-    info(`${eventCount}. LpAccount deployed: ${eventId}`)
+    info(`${baseLog} LpAccount deployed: ${eventId}`)
   }
   if (isRouterJettonWalletDeployed) {
-    info(`${eventCount}. Router Jetton Wallet deployed: ${eventId}`)
+    info(`${baseLog} Router Jetton Wallet deployed: ${eventId}`)
   }
 
   if (isSwap) {
-    info(`${eventCount}. Exchange: ${eventId}`)
+    info(`${baseLog} Exchange: ${eventId}`)
     await handleExchange({ eventId, trace })
 
     const utime = trace.transaction.utime
     await updateTokenPrices(utime * 1000)
   } else if (isProvideLp) {
-    info(`${eventCount}. Provide Lp: ${eventId}`)
+    info(`${baseLog} Provide Lp: ${eventId}`)
   } else if (isProvideLpConfirmed) {
-    info(`${eventCount}. Provide Lp Confirmed: ${eventId}`)
+    info(`${baseLog} Provide Lp Confirmed: ${eventId}`)
     await handleAddLiquidity({ eventId, trace })
 
     const utime = trace.transaction.utime
     await updateTokenPrices(utime * 1000)
   } else if (isRemoveLiquidity) {
-    info(`${eventCount}. Remove Liquidity: ${eventId}`)
+    info(`${baseLog} Remove Liquidity: ${eventId}`)
     await handleRemoveLiquidity({ eventId, trace })
   }
 
@@ -100,7 +103,7 @@ const handleEvent = async (params: {
     !isProvideLpConfirmed &&
     !isRemoveLiquidity
   ) {
-    handleUnknownEvent(eventCount, eventId, paths)
+    handleUnknownEvent(eventId, paths, baseLog)
   }
   eventCount++
 }
@@ -113,26 +116,26 @@ const alreadyCheckedEvents = [
   'c61587696903627bc99d05b05a8837ebf134969814c0270fe7eb11fc206c364e',
 ]
 const handleUnknownEvent = (
-  eventCount: number,
   eventId: string,
   paths: Ops[][],
+  baseLog: string,
 ) => {
   const isAlreadyChecked = alreadyCheckedEvents.includes(eventId)
   if (isAlreadyChecked) {
-    info(`${eventCount}. Already checked event: ${eventId}`)
+    info(`${baseLog}. Already checked event: ${eventId}`)
     return
   }
   const hasNFTTransfer = checkPathHasOp(paths, OP.NFT_TRANSFER)
   if (hasNFTTransfer) {
-    info(`${eventCount}. NFT Transfer event: ${eventId}`)
+    info(`${baseLog}. NFT Transfer event: ${eventId}`)
     return
   }
   const hasTextComment = checkPathHasOp(paths, OP.TEXT_COMMENT)
   if (hasTextComment) {
-    info(`${eventCount}. Text Comment event: ${eventId}`)
+    info(`${baseLog}. Text Comment event: ${eventId}`)
     return
   }
 
-  info(`${eventCount}. Unknown event: ${eventId}`)
+  info(`${baseLog}. Unknown event: ${eventId}`)
   info('paths', paths)
 }

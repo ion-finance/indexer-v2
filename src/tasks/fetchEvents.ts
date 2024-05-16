@@ -38,26 +38,34 @@ const fetchEvents = async ({
 
   for (;;) {
     try {
-      info(`Try to fetch events timestamp, beforeLt, ${timestamp}, ${beforeLt}`)
       const res = await fetch(timestamp, beforeLt)
       const accountEvents = sortBy(
         res.data.events.filter((e) => !e.in_progress),
         (e) => e.timestamp,
         'asc',
       )
+      // because last event is fetched everytime
+      if (accountEvents.length > 1) {
+        info(
+          `Try to fetch events timestamp, beforeLt, ${timestamp}, ${beforeLt}`,
+        )
+        if (accountEvents.length >= 100) {
+          info(`${accountEvents.length} events found. Fetch more.`)
+        } else {
+          info(`${accountEvents.length} events found.`)
+        }
+      }
       events.push(...accountEvents)
       const nextFrom = res.data.next_from
 
+      // TON API limit is 100 events per request.
+      // If 100 events are found, we need to fetch evetns more precisely.
+      // It we don't this, we may miss some events.
       if (accountEvents.length >= 100) {
-        // TON API limit is 100 events per request.
-        // If 100 events are found, we need to fetch evetns more precisely.
-        // It we don't this, we may miss some events.
-        info(`${accountEvents.length} events found. Fetch more.`)
         // there should be padding. because 'before_lt' is exclusive with padding. (30 is empirical value)
         beforeLt = nextFrom + LOGICAL_TIME_PADDING
         continue
       }
-      info(`${accountEvents.length} events found.`)
       break
     } catch (e: any) {
       // TODO: remove, this code is awful. It is because of misbehavior of ton api.

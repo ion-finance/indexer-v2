@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import { logger } from 'src/config/winston'
 
-type MsgElement = string | number | object | unknown[]
+type MsgElement = string | number | object | unknown
 // JSON.stringify(paths, null, 3)
 
 const parseMsg = (msgs: MsgElement[]) => {
