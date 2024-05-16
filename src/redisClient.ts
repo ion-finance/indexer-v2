@@ -3,6 +3,7 @@ import { createClient, RedisClientType } from 'redis'
 
 import { CachedEvent } from './types/events'
 import { JettonInfo, Trace } from './types/ton-api'
+import { error, info } from './utils/log'
 
 dotenv.config()
 
@@ -11,13 +12,15 @@ let redisClient: RedisClientType | null = null
 const REDIS_HOST = process.env.REDIS_HOST
 const host = (function () {
   if (REDIS_HOST) {
-    const host0 = REDIS_HOST.split(':')[0]
-    const host1 = REDIS_HOST.split(':')[1]
-    return `${host0}:${host1}`
+    if (REDIS_HOST.includes('localhost')) {
+      return 'localhost'
+    }
+    const host = REDIS_HOST.split('@')[1]
+    return host
   }
   return ''
 })()
-console.log('REDIS_HOST: ', host)
+info('REDIS_HOST: ', host)
 
 const getRedisClient = () => {
   if (!redisClient) {
@@ -25,7 +28,7 @@ const getRedisClient = () => {
       url: process.env.REDIS_HOST,
     })
     redisClient.connect().catch((err) => {
-      console.error('Redis Client Error', err)
+      error('Redis Client Error', err)
     })
   }
   return redisClient
@@ -36,7 +39,7 @@ export const saveData = async (key: string, value: any) => {
   try {
     await redisClient?.set(key, JSON.stringify(value))
   } catch (err) {
-    console.error('Redis set error:', err)
+    error('Redis set error:', err)
   }
 }
 
@@ -47,7 +50,7 @@ export const getData = async <T>(key: string) => {
     const data = await redisClient.get(key)
     return data ? (JSON.parse(data) as T) : null
   } catch (err) {
-    console.error('Redis get error:', err)
+    error('Redis get error:', err)
     return null
   }
 }
@@ -58,7 +61,22 @@ export const saveTrace = async (eventId: string, trace: Trace) => {
 }
 export const getTrace = async (eventId: string) => {
   const key = `trace:${eventId}`
-  return getData<Trace>(key)
+  return await getData<Trace>(key)
+}
+
+export const saveTokenData = async (
+  walletAddress: string,
+  tokenData: JettonInfo & { minter_address: string },
+) => {
+  const key = `tokenData:${walletAddress}`
+  await saveData(key, tokenData)
+}
+
+export const getTokenData = async (walletAddress: string) => {
+  const key = `tokenData:${walletAddress}`
+
+  const result = await getData<JettonInfo & { minter_address: string }>(key)
+  return result
 }
 
 export const saveEventSummary = async (event: CachedEvent) => {
@@ -70,7 +88,7 @@ export const saveEventSummary = async (event: CachedEvent) => {
       value: JSON.stringify(event),
     })
   } catch (err) {
-    console.error('Redis zAdd error:', err)
+    error('Redis zAdd error:', err)
   }
 }
 
@@ -86,7 +104,7 @@ export const getEventSummary = async (from: number, to: number) => {
     const result = data.map((summary) => JSON.parse(summary) as CachedEvent)
     return result
   } catch (err) {
-    console.error('Redis get error:', err)
+    error('Redis get error:', err)
     return []
   }
 }
