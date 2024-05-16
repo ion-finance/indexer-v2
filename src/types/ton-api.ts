@@ -207,6 +207,27 @@ interface ActionSimplePreview {
   accounts: AccountAddress[]
 }
 
+export interface JettonInfo {
+  mintable: boolean
+  total_supply: string
+  admin?: AccountAddress
+  metadata: JettonMetadata
+  verification: JettonVerificationType
+  holders_count: number
+}
+
+interface JettonMetadata {
+  address: string
+  name: string
+  symbol: string
+  decimals: string
+  image?: string
+  description?: string
+  social?: string[]
+  website?: string[]
+  catalog?: string[]
+}
+
 export enum ActionType {
   TON_TRANSFER = 'TonTransfer',
   JETTON_TRANSFER = 'JettonTransfer',

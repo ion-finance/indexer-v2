@@ -15,7 +15,7 @@ import { toISOString } from 'src/utils/date'
 import fetchTokenData from 'src/utils/fetchTokenData'
 import { warn } from 'src/utils/log'
 
-import { Trace } from '../../types/ton-api'
+import { JettonInfo, Trace } from '../../types/ton-api'
 
 const parseTransferNotification = (raw_body: string) => {
   const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
@@ -128,7 +128,7 @@ export const handlePoolCreated = async ({
         name: tokenXName,
         symbol: tokenXSymbol,
         decimals: parseInt(tokenXdata.metadata.decimals),
-        image: tokenXdata.metadata.image,
+        image: tokenXdata.metadata.image || '',
         timestamp,
       },
     })
@@ -152,7 +152,7 @@ export const handlePoolCreated = async ({
         name: tokenYName,
         symbol: tokenYSymbol,
         decimals: parseInt(tokenYdata.metadata.decimals),
-        image: tokenYdata.metadata.image,
+        image: tokenYdata.metadata.image || '',
         timestamp,
       },
     })

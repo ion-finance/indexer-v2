@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import { createClient, RedisClientType } from 'redis'
 
 import { CachedEvent } from './types/events'
-import { Trace } from './types/ton-api'
+import { JettonInfo, Trace } from './types/ton-api'
 
 dotenv.config()
 

@@ -19,7 +19,7 @@ export const upsertToken = async (tokenAddress: string, timestamp: string) => {
         name,
         symbol,
         decimals: parseInt(tokenData.metadata.decimals),
-        image: tokenData.metadata.image,
+        image: tokenData.metadata.image || '',
       },
       create: {
         id: tokenAddress,
@@ -27,7 +27,7 @@ export const upsertToken = async (tokenAddress: string, timestamp: string) => {
         name,
         symbol,
         decimals: parseInt(tokenData.metadata.decimals),
-        image: tokenData.metadata.image,
+        image: tokenData.metadata.image || '',
         timestamp,
       },
     })

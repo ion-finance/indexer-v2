@@ -32,7 +32,7 @@ const handleInitialized = async (event: Event) => {
         name: tokenXdata.metadata.name,
         symbol: tokenXdata.metadata.symbol,
         decimals: parseInt(tokenXdata.metadata.decimals),
-        image: tokenXdata.metadata.image,
+        image: tokenXdata.metadata.image || '',
         timestamp: new Date(event.transaction.timestamp),
       },
     })
@@ -55,7 +55,7 @@ const handleInitialized = async (event: Event) => {
         name: tokenYdata.metadata.name,
         symbol: tokenYdata.metadata.symbol,
         decimals: parseInt(tokenYdata.metadata.decimals),
-        image: tokenYdata.metadata.image,
+        image: tokenYdata.metadata.image || '',
         timestamp: new Date(event.transaction.timestamp),
       },
     })
