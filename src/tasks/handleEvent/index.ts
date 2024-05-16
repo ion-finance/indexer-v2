@@ -104,8 +104,9 @@ const handleEvent = async (params: {
     !isRemoveLiquidity
   ) {
     handleUnknownEvent(eventId, paths, baseLog)
+  } else {
+    eventCount++
   }
-  eventCount++
 }
 
 export default handleEvent
@@ -122,20 +123,20 @@ const handleUnknownEvent = (
 ) => {
   const isAlreadyChecked = alreadyCheckedEvents.includes(eventId)
   if (isAlreadyChecked) {
-    info(`${baseLog}. Already checked event: ${eventId}`)
+    info(`Invalid Event - Already checked: ${eventId}`)
     return
   }
   const hasNFTTransfer = checkPathHasOp(paths, OP.NFT_TRANSFER)
   if (hasNFTTransfer) {
-    info(`${baseLog}. NFT Transfer event: ${eventId}`)
+    info(`Invalid Event - NFT Transfer: ${eventId}`)
     return
   }
   const hasTextComment = checkPathHasOp(paths, OP.TEXT_COMMENT)
   if (hasTextComment) {
-    info(`${baseLog}. Text Comment event: ${eventId}`)
+    info(`Invalid Event - Text Comment: ${eventId}`)
     return
   }
 
-  info(`${baseLog}. Unknown event: ${eventId}`)
+  info(`Invalid Event - Unknown: ${eventId}`)
   info('paths', paths)
 }
