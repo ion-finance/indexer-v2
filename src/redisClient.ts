@@ -34,7 +34,7 @@ const getRedisClient = () => {
 export const saveData = async (key: string, value: any) => {
   const redisClient = getRedisClient()
   try {
-    await redisClient.set(key, JSON.stringify(value))
+    await redisClient?.set(key, JSON.stringify(value))
   } catch (err) {
     console.error('Redis set error:', err)
   }
@@ -42,6 +42,7 @@ export const saveData = async (key: string, value: any) => {
 
 export const getData = async <T>(key: string) => {
   const redisClient = getRedisClient()
+  if (!redisClient) return null
   try {
     const data = await redisClient.get(key)
     return data ? (JSON.parse(data) as T) : null
@@ -62,6 +63,7 @@ export const getTrace = async (eventId: string) => {
 
 export const saveEventSummary = async (event: CachedEvent) => {
   const redisClient = getRedisClient()
+  if (!redisClient) return
   try {
     await redisClient.zAdd('eventIds', {
       score: event.lt,
@@ -75,6 +77,7 @@ export const saveEventSummary = async (event: CachedEvent) => {
 // for whole data, from = 0, to = -1
 export const getEventSummary = async (from: number, to: number) => {
   const redisClient = getRedisClient()
+  if (!redisClient) return []
   try {
     const data = await redisClient.zRange('eventIds', from, to)
     if (!data) {

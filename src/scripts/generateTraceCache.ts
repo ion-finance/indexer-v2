@@ -59,6 +59,10 @@ const generate = async () => {
 
 generate().then(async () => {
   const redisClient = getRedisClient()
+  if (!redisClient) {
+    console.error('Empty redis client')
+    return null
+  }
   const events = await getEventSummary(0, -1)
   console.log('events', events)
 

@@ -2,6 +2,10 @@ import getRedisClient, { getEventSummary } from 'src/redisClient'
 
 const showCache = async () => {
   const redisClient = getRedisClient()
+  if (!redisClient) {
+    console.error('Empty redis client')
+    return null
+  }
   const events = await getEventSummary(0, -1)
   console.log('events', events)
 
