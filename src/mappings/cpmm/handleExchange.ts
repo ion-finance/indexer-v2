@@ -1,4 +1,3 @@
-import { Cell } from '@ton/core'
 import BigNumber from 'bignumber.js'
 import { find } from 'lodash'
 
@@ -11,62 +10,15 @@ import {
   REF_FEE,
 } from 'src/dex/simulate/contant'
 import { calculateOutAmount } from 'src/dex/simulate/utils'
+import { parsePayTo } from 'src/parsers/cpmm/parsePayTo'
+import { parseSwap } from 'src/parsers/cpmm/parseSwap'
 import { Trace } from 'src/types/ton-api'
 import { findTracesByOpCode, isSameAddress, parseRaw } from 'src/utils/address'
-import { bFormatUnits, bigIntToBigNumber } from 'src/utils/bigNumber'
+import { bFormatUnits } from 'src/utils/bigNumber'
 import { toISOString } from 'src/utils/date'
 import { warn } from 'src/utils/log'
 
 import { EXIT_CODE, OP } from '../../tasks/handleEvent/opCode'
-
-const parseSwap = (raw_body: string) => {
-  const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
-  const body = message.beginParse()
-  const op = body.loadUint(32)
-  const queryId = body.loadUint(64)
-  const toAddress = body.loadAddress().toString() //  == pay_to's to_address -> wallet v4
-  const senderAddress = body.loadAddress().toString() // router jetton wallet
-  const jettonAmount = body.loadCoins()
-  const minOut = body.loadCoins()
-  const hasRef = body.loadUint(1)
-
-  return {
-    op,
-    queryId,
-    toAddress,
-    senderAddress,
-    jettonAmount: bigIntToBigNumber(jettonAmount),
-    minOut: bigIntToBigNumber(minOut),
-    hasRef,
-  }
-}
-
-const parsePayTo = (raw_body: string) => {
-  const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
-  const body = message.beginParse()
-  const op = body.loadUint(32)
-  const queryId = body.loadUint(64)
-  const toAddress = body.loadAddress().toString() // == swap's to_address -> wallet v4
-  const exitCode = body.loadUint(32)
-  const hasMore = body.loadUint(0)
-  const ref = body.loadRef().beginParse()
-  const amount0Out = ref.loadCoins()
-  const token0Address = ref.loadAddress().toString() // router jetton wallet
-  const amount1Out = ref.loadCoins()
-  const token1Address = ref.loadAddress().toString()
-
-  return {
-    op,
-    queryId,
-    toAddress,
-    exitCode,
-    hasMore,
-    amount0Out: bigIntToBigNumber(amount0Out),
-    token0Address,
-    amount1Out: bigIntToBigNumber(amount1Out),
-    token1Address,
-  }
-}
 
 export const handleExchange = async ({
   eventId,

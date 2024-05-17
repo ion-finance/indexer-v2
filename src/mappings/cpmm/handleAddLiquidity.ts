@@ -1,8 +1,9 @@
-import { Cell } from '@ton/core'
 import BigNumber from 'bignumber.js'
 import { map } from 'lodash'
 
 import prisma from 'src/clients/prisma'
+import { parseCbAddLiquidity } from 'src/parsers/cpmm/parseCbAddLiquidity'
+import { parseMint } from 'src/parsers/cpmm/parseMint'
 import { OP } from 'src/tasks/handleEvent/opCode'
 import { Trace } from 'src/types/ton-api'
 import {
@@ -11,50 +12,10 @@ import {
   isSameAddress,
   parseRaw,
 } from 'src/utils/address'
-import { bigIntToBigNumber } from 'src/utils/bigNumber'
 import { toISOString } from 'src/utils/date'
 import { warn } from 'src/utils/log'
 
 import { upsertToken } from './upsertToken'
-
-const parseMint = (raw_body: string) => {
-  const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
-  const body = message.beginParse()
-  const op = body.loadUint(32)
-  const queryId = body.loadUint(64)
-  const amount = body.loadCoins()
-  const poolAddress = body.loadAddress().toString()
-  const to = body.loadMaybeAddress()
-
-  return {
-    op,
-    queryId,
-    amount: bigIntToBigNumber(amount),
-    poolAddress,
-    to,
-  }
-}
-
-const parseCbAddLiquidity = (raw_body: string) => {
-  const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
-  const body = message.beginParse()
-  const op = body.loadUint(32)
-  const queryId = body.loadUint(64)
-
-  const amount0 = body.loadCoins()
-  const amount1 = body.loadCoins()
-  const userAddress = body.loadAddress().toString()
-  const minLpOut = body.loadCoins()
-
-  return {
-    op,
-    queryId,
-    amount0: bigIntToBigNumber(amount0),
-    amount1: bigIntToBigNumber(amount1),
-    userAddress,
-    minLpOut: bigIntToBigNumber(minLpOut),
-  }
-}
 
 export const handleAddLiquidity = async ({
   eventId,
