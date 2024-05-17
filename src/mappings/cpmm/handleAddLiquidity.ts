@@ -12,6 +12,7 @@ import {
   isSameAddress,
   parseRaw,
 } from 'src/utils/address'
+import { bodyToCell } from 'src/utils/cell'
 import { toISOString } from 'src/utils/date'
 import { warn } from 'src/utils/log'
 
@@ -45,8 +46,9 @@ export const handleAddLiquidity = async ({
     return
   }
   const poolAddress = parseRaw(destination.address)
-  const { amount0, amount1, userAddress } =
-    parseCbAddLiquidity(cbAddLiquidityBody)
+  const { amount0, amount1, userAddress } = parseCbAddLiquidity(
+    bodyToCell(cbAddLiquidityBody),
+  )
 
   const internalTransferTraces = findTracesByOpCode(trace, OP.INTERNAL_TRANSFER)
   if (!internalTransferTraces) {
@@ -65,7 +67,7 @@ export const handleAddLiquidity = async ({
     return
   }
 
-  const { amount: minted, to } = parseMint(mintRawBody)
+  const { amount: minted, to } = parseMint(bodyToCell(mintRawBody))
   // if (!to) {
   //   warn("Initial Liquidity found. Skip this event.");
   //   return;

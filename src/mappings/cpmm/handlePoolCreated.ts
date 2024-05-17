@@ -11,6 +11,7 @@ import {
   parseRaw,
   sortByAddress,
 } from 'src/utils/address'
+import { bodyToCell } from 'src/utils/cell'
 import { toISOString } from 'src/utils/date'
 import fetchTokenData from 'src/utils/fetchTokenData'
 import { warn } from 'src/utils/log'
@@ -58,7 +59,7 @@ export const handlePoolCreated = async ({
   const timestamp = toISOString(utime)
 
   // router jetton wallets
-  const { tokenWallet1 } = parseTransferNotification(raw_body)
+  const { tokenWallet1 } = parseTransferNotification(bodyToCell(raw_body))
   const sourceAddress = parseRaw(source.address)
   const sorted = sortByAddress([address(tokenWallet1), address(sourceAddress)])
   const tokenXAddress = sorted[0].toString()
