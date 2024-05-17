@@ -1,7 +1,8 @@
 import { PoolType } from '@prisma/client'
-import { Cell, address } from '@ton/core'
+import { address } from '@ton/core'
 
 import prisma from 'src/clients/prisma'
+import { parseTransferNotification } from 'src/parsers/cpmm/parseTransferNotification'
 import { OP } from 'src/tasks/handleEvent/opCode'
 import {
   changeNameOfProxyTon,
@@ -10,36 +11,11 @@ import {
   parseRaw,
   sortByAddress,
 } from 'src/utils/address'
-import { bigIntToBigNumber } from 'src/utils/bigNumber'
 import { toISOString } from 'src/utils/date'
 import fetchTokenData from 'src/utils/fetchTokenData'
 import { warn } from 'src/utils/log'
 
 import { JettonInfo, Trace } from '../../types/ton-api'
-
-const parseTransferNotification = (raw_body: string) => {
-  const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
-  const body = message.beginParse()
-  const op = body.loadUint(32)
-  const queryId = body.loadUint(64)
-  const jettonAmount = body.loadCoins()
-  const fromUser = body.loadAddress().toString()
-  const c = body.loadRef()
-  const cs = c.beginParse()
-  const transferredOp = cs.loadUint(32)
-  const tokenWallet1 = cs.loadAddress().toString() // router jetton wallet
-  const minLpOut = cs.loadCoins()
-
-  return {
-    op,
-    queryId,
-    jettonAmount: bigIntToBigNumber(jettonAmount),
-    fromUser,
-    transferredOp,
-    tokenWallet1,
-    minLpOut: bigIntToBigNumber(minLpOut),
-  }
-}
 
 export const handlePoolCreated = async ({
   eventId,

@@ -1,7 +1,8 @@
-import { Cell } from '@ton/core'
 import BigNumber from 'bignumber.js'
 
 import prisma from 'src/clients/prisma'
+import { parseBurnNotification } from 'src/parsers/cpmm/parseBurnNotification'
+import { parsePayTo } from 'src/parsers/cpmm/parsePayTo'
 import { OP } from 'src/tasks/handleEvent/opCode'
 import { Trace } from 'src/types/ton-api'
 import {
@@ -9,55 +10,8 @@ import {
   // findTracesOfPool,
   parseRaw,
 } from 'src/utils/address'
-import { bigIntToBigNumber } from 'src/utils/bigNumber'
 import { toISOString } from 'src/utils/date'
 import { warn } from 'src/utils/log'
-
-const parseBurnNotification = (raw_body: string) => {
-  const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
-  const body = message.beginParse()
-  const op = body.loadUint(32)
-  const queryId = body.loadUint(64)
-
-  const jettonAmount = body.loadCoins()
-  const fromAddress = body.loadAddress().toString()
-  const responseAddress = body.loadAddress().toString()
-
-  return {
-    op,
-    queryId,
-    jettonAmount: bigIntToBigNumber(jettonAmount),
-    fromAddress,
-    responseAddress,
-  }
-}
-
-const parsePayTo = (raw_body: string) => {
-  const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
-  const body = message.beginParse()
-  const op = body.loadUint(32)
-  const queryId = body.loadUint(64)
-  const toAddress = body.loadAddress().toString()
-  const exitCode = body.loadUint(32)
-  const hasMore = body.loadUint(0)
-  const ref = body.loadRef().beginParse()
-  const amount0Out = ref.loadCoins()
-  const token0Address = ref.loadAddress().toString()
-  const amount1Out = ref.loadCoins()
-  const token1Address = ref.loadAddress().toString()
-
-  return {
-    op,
-    queryId,
-    toAddress,
-    exitCode,
-    hasMore,
-    amount0Out: bigIntToBigNumber(amount0Out),
-    token0Address,
-    amount1Out: bigIntToBigNumber(amount1Out),
-    token1Address,
-  }
-}
 
 export const handleRemoveLiquidity = async ({
   eventId,
