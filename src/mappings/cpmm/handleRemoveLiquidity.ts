@@ -10,6 +10,7 @@ import {
   // findTracesOfPool,
   parseRaw,
 } from 'src/utils/address'
+import { bodyToCell } from 'src/utils/cell'
 import { toISOString } from 'src/utils/date'
 import { warn } from 'src/utils/log'
 
@@ -47,10 +48,12 @@ export const handleRemoveLiquidity = async ({
     warn('Empty raw_body burnNotificationRawBody')
     return null
   }
-  const { toAddress, amount0Out, amount1Out } = parsePayTo(payToRawBody)
+  const { toAddress, amount0Out, amount1Out } = parsePayTo(
+    bodyToCell(payToRawBody),
+  )
 
   const { jettonAmount: burned, fromAddress } = parseBurnNotification(
-    burnNotificationRawBody,
+    bodyToCell(burnNotificationRawBody),
   )
   const poolAddress = parseRaw(
     payToTrace.transaction.in_msg?.source?.address.toString(),

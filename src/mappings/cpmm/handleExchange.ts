@@ -15,6 +15,7 @@ import { parseSwap } from 'src/parsers/cpmm/parseSwap'
 import { Trace } from 'src/types/ton-api'
 import { findTracesByOpCode, isSameAddress, parseRaw } from 'src/utils/address'
 import { bFormatUnits } from 'src/utils/bigNumber'
+import { bodyToCell } from 'src/utils/cell'
 import { toISOString } from 'src/utils/date'
 import { warn } from 'src/utils/log'
 
@@ -56,14 +57,14 @@ export const handleExchange = async ({
     jettonAmount,
     hasRef,
     toAddress: receiverAddress,
-  } = parseSwap(swapTraceRawBody)
+  } = parseSwap(bodyToCell(swapTraceRawBody))
 
   const payToNormalTrace = find(payToTraces, (payToTrace) => {
     const rawBody = payToTrace.transaction.in_msg?.raw_body || ''
     if (!rawBody) {
       return false
     }
-    const { exitCode } = parsePayTo(rawBody)
+    const { exitCode } = parsePayTo(bodyToCell(rawBody))
     return exitCode === Number(EXIT_CODE.SWAP_OK)
   })
 
@@ -72,7 +73,7 @@ export const handleExchange = async ({
     if (!rawBody) {
       return false
     }
-    const { exitCode } = parsePayTo(rawBody)
+    const { exitCode } = parsePayTo(bodyToCell(rawBody))
     return exitCode === Number(EXIT_CODE.SWAP_OK_REF)
   })
 
@@ -82,7 +83,7 @@ export const handleExchange = async ({
       if (!rawBody) {
         return null
       }
-      const { exitCode } = parsePayTo(rawBody)
+      const { exitCode } = parsePayTo(bodyToCell(rawBody))
       return exitCode
     })
     exitCodes.forEach((exitCode) => {
@@ -107,11 +108,11 @@ export const handleExchange = async ({
   }
 
   const payToNormal = parsePayTo(
-    payToNormalTrace?.transaction.in_msg?.raw_body || '',
+    bodyToCell(payToNormalTrace?.transaction.in_msg?.raw_body || ''),
   )
   const payToRef =
     payToRefTrace &&
-    parsePayTo(payToRefTrace?.transaction.in_msg?.raw_body || '')
+    parsePayTo(bodyToCell(payToRefTrace?.transaction.in_msg?.raw_body || ''))
 
   const { amount0Out, amount1Out } = payToNormal
   const poolAddress = parseRaw(swapTrace?.transaction.account.address)

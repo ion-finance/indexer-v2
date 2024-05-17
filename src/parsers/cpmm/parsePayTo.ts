@@ -2,9 +2,8 @@ import { Cell } from '@ton/core'
 
 import { bigIntToBigNumber } from 'src/utils/bigNumber'
 
-export const parsePayTo = (raw_body: string) => {
-  const message = Cell.fromBoc(Buffer.from(raw_body, 'hex'))[0]
-  const body = message.beginParse()
+export const parsePayTo = (cell: Cell) => {
+  const body = cell.beginParse()
   const op = body.loadUint(32)
   const queryId = body.loadUint(64)
   const toAddress = body.loadAddress().toString() // == swap's to_address -> wallet v4
