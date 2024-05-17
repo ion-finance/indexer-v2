@@ -14,6 +14,7 @@ import {
 
 import prisma from 'src/clients/prisma'
 import getLatestTokenPrices from 'src/common/tokenPrice'
+import { getTokenPrice, saveTokenPrice } from 'src/tokenPriceRedisClient'
 import { isSameAddress } from 'src/utils/address'
 import { error, logError } from 'src/utils/log'
 import sleep from 'src/utils/sleep'
@@ -30,10 +31,21 @@ export const updateTokenPrices = async (time: number) => {
 }
 
 const getUSDPrice = (data: any) => data?.quote?.USD?.price || 0
-const getPrice = async () => {
+const getPrice = async (time?: number) => {
+  const cmcTonId = '11419'
+  const cmcUsdtId = '825'
+
+  if (time) {
+    const TON = await getTokenPrice('ton', time)
+    const USDT = await getTokenPrice('usdt', time)
+
+    if (TON && USDT) {
+      return { TON, USDT }
+    }
+  }
   try {
     const response = await axios.get(
-      'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=TON,USDT',
+      `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${cmcTonId},${cmcUsdtId}`,
       {
         headers: {
           'X-CMC_PRO_API_KEY': process.env.COINMARKET_CAP_API_KEY,
@@ -41,8 +53,11 @@ const getPrice = async () => {
       },
     )
     const { data } = response.data
-    const TON = getUSDPrice(data.TON)
-    const USDT = getUSDPrice(data.USDT)
+    const TON = getUSDPrice(data[cmcTonId])
+    const USDT = getUSDPrice(data[cmcUsdtId])
+
+    await saveTokenPrice('ton', time || new Date().getTime(), TON)
+    await saveTokenPrice('usdt', time || new Date().getTime(), USDT)
 
     return { TON, USDT }
   } catch (e) {
@@ -58,7 +73,7 @@ const getPrice = async () => {
 
 // TODO: use quote historical v3 api
 export const updateBaseTokenPrices = async (ts?: Date) => {
-  const prices = await getPrice()
+  const prices = await getPrice(ts?.getTime())
   const tonPrice = String(prices.TON)
   const usdtPrice = String(prices.USDT)
   const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS as string
