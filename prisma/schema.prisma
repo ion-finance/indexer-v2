@@ -214,7 +214,6 @@ model Operation {
 // heath check
 model IndexerState {
   key   String @id
-  value String
-  totalEventsCount Int @default(0)
-  lastEventId String @default("0x")
+  toLt String
+  totalTransactionsCount Int @default(0)
 }

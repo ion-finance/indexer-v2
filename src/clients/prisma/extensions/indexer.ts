@@ -6,57 +6,52 @@ const IndexerStateExtenstions = Prisma.defineExtension({
   name: `IndexerStateExtensions`,
   model: {
     indexerState: {
-      async getLastTimestamp(): Promise<number> {
-        const lastTimestamp = await prisma.indexerState.findFirst({
-          where: { key: 'last_timestamp' },
+      async getLastToLt(): Promise<string> {
+        const last = await prisma.indexerState.findFirst({
+          where: { key: 'last_to_lt' },
         })
-        return lastTimestamp ? Number(lastTimestamp.value) : 0
+        return last ? last.toLt : ''
       },
-      async setLastTimestamp(timestamp: number): Promise<void> {
+      async setLastToLt(toLt: string): Promise<void> {
         await prisma.indexerState.upsert({
-          where: { key: 'last_timestamp' },
-          update: { value: timestamp.toString() },
-          create: { key: 'last_timestamp', value: timestamp.toString() },
+          where: { key: 'last_to_lt' },
+          update: { toLt: toLt.toString() },
+          create: { key: 'last_to_lt', toLt: toLt.toString() },
         })
       },
       async getTotalEventsCount(): Promise<number> {
-        const lastTimestamp = await prisma.indexerState.findFirst({
-          where: { key: 'last_timestamp' },
+        const lastLt = await prisma.indexerState.findFirst({
+          where: { key: 'last_to_lt' },
         })
-        return lastTimestamp ? Number(lastTimestamp.totalEventsCount) : 0
+        return lastLt ? Number(lastLt.totalEventsCount) : 0
       },
 
       async getLastState() {
         const state = await prisma.indexerState.findFirst({
-          where: { key: 'last_timestamp' },
+          where: { key: 'last_to_lt' },
         })
-        const timestamp = state ? Number(state.value) : 0
         const totalEventsCount = state ? Number(state.totalEventsCount) : 0
-        const lastEventId = state ? state.lastEventId : ''
-        return { timestamp, totalEventsCount, lastEventId }
+        const toLt = state ? state.toLt : undefined
+        return { toLt, totalEventsCount }
       },
 
       async setLastState({
-        timestamp,
+        toLt,
         totalEventsCount,
-        lastEventId,
       }: {
-        timestamp: number
+        toLt?: string
         totalEventsCount: number
-        lastEventId: string
       }) {
         await prisma.indexerState.upsert({
-          where: { key: 'last_timestamp' },
+          where: { key: 'last_to_lt' },
           update: {
-            value: timestamp.toString(),
+            toLt: toLt ? toLt.toString() : '',
             totalEventsCount,
-            lastEventId,
           },
           create: {
-            key: 'last_timestamp',
-            value: timestamp.toString(),
+            key: 'last_to_lt',
+            toLt: toLt ? toLt.toString() : '',
             totalEventsCount,
-            lastEventId,
           },
         })
       },
