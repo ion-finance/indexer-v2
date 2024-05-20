@@ -1,8 +1,8 @@
 import dotenv from 'dotenv'
 import { createClient, RedisClientType } from 'redis'
 
-import { CachedEvent } from './types/events'
 import { JettonInfo, Trace } from './types/ton-api'
+import { TxCache } from './types/ton-center'
 import { error, info } from './utils/log'
 
 dotenv.config()
@@ -55,12 +55,12 @@ export const getData = async <T>(key: string) => {
   }
 }
 
-export const saveTrace = async (eventId: string, trace: Trace) => {
-  const key = `trace:${eventId}`
+export const saveTrace = async (hashHex: string, trace: Trace) => {
+  const key = `trace:${hashHex}`
   await saveData(key, trace)
 }
-export const getTrace = async (eventId: string) => {
-  const key = `trace:${eventId}`
+export const getTrace = async (hashHex: string) => {
+  const key = `trace:${hashHex}`
   return await getData<Trace>(key)
 }
 
@@ -79,13 +79,13 @@ export const getTokenData = async (walletAddress: string) => {
   return result
 }
 
-export const saveEventSummary = async (event: CachedEvent) => {
+export const saveTxsSummary = async (tx: TxCache) => {
   const redisClient = getRedisClient()
   if (!redisClient) return
   try {
-    await redisClient.zAdd('eventIds', {
-      score: event.lt,
-      value: JSON.stringify(event),
+    await redisClient.zAdd('txs', {
+      score: tx.lt,
+      value: JSON.stringify(tx),
     })
   } catch (err) {
     error('Redis zAdd error:', err)
@@ -93,15 +93,15 @@ export const saveEventSummary = async (event: CachedEvent) => {
 }
 
 // for whole data, from = 0, to = -1
-export const getEventSummary = async (from: number, to: number) => {
+export const getTxsSummary = async (from: number, to: number) => {
   const redisClient = getRedisClient()
   if (!redisClient) return []
   try {
-    const data = await redisClient.zRange('eventIds', from, to)
+    const data = await redisClient.zRange('txs', from, to)
     if (!data) {
       return []
     }
-    const result = data.map((summary) => JSON.parse(summary) as CachedEvent)
+    const result = data.map((summary) => JSON.parse(summary) as TxCache)
     return result
   } catch (err) {
     error('Redis get error:', err)
