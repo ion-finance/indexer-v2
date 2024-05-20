@@ -83,7 +83,6 @@ const fetchTransactions = async ({
       })
       transactions.push(...txs)
 
-      // last tx is fetched everytime, so skip log if txs.length == 1
       if (txs.length > 1) {
         info(`Fetched transactions (toLt: ${toLt} ~ lt: ${lt}]`)
         if (txs.length >= FETCH_LENGTH) {

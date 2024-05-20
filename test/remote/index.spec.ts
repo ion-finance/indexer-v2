@@ -28,13 +28,14 @@ type ContractPool = {
 let serverPools: ServerPool[] = []
 let contractPools: ContractPool[] = []
 
+// const endpoint = 'https://api.app.ionfi.xyz/pools'
+const endpoint = 'localhost:3000/pools'
+
 describe('Reserve Compare', () => {
   beforeAll(async () => {
     try {
       // Fetching data from the server API
-      const { data: serverData } = await axios.get<ServerPool[]>(
-        `https://api.app.ionfi.xyz/pools`,
-      )
+      const { data: serverData } = await axios.get<ServerPool[]>(endpoint)
       serverPools = serverData.map((p) => ({
         id: p.id,
         name: p.name,

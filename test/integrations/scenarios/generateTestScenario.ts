@@ -5,7 +5,7 @@ import fs from 'fs'
 import moment from 'moment'
 import TonWeb from 'tonweb'
 
-import fetchEvents from '../../../src/tasks/fetchEvents'
+import fetchEvents from '../../../src/tasks/fetchTransactions'
 import { Trace } from '../../../src/types/ton-api'
 
 dotenv.config()
