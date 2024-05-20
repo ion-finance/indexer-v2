@@ -3,58 +3,68 @@ import dotenv from 'dotenv'
 import { routerAddress } from 'src/constant/address'
 import { fetchTrace } from 'src/fetch'
 import getRedisClient, {
-  getEventSummary,
-  saveEventSummary,
+  getTxsSummary,
   saveTrace,
+  saveTxsSummary,
 } from 'src/redisClient'
-import fetchEvents from 'src/tasks/fetchEvents'
-import { toLocaleString } from 'src/utils/date'
-import { error } from 'src/utils/log'
+import fetchTransactions from 'src/tasks/fetchTransactions'
+import { TransactionWithHash } from 'src/types/ton-center'
+import { warn } from 'src/utils/log'
 
 // TODO: implement append cache
-// get the last timestamp of last cache file
-// and set timestamp as last cached one
-// fetch and make file
-
 dotenv.config()
 
-let totalEvents = 0
+let totalCount = 0
 
+// TODO: rename this file as 'generateTxAndTraceCache.ts'
 const generate = async () => {
-  const events = await fetchEvents({ routerAddress, timestamp: 0 })
-  totalEvents += events.length
-  console.log(`${events.length} events found.`)
+  const transactions = await fetchTransactions({ routerAddress })
+  totalCount += transactions.length
+  console.log(`${transactions.length} transactions found.`)
 
-  for (let i = 0; i < events.length; i++) {
-    const event = events[i]
-    const eventId = event.event_id
-
-    console.log(`${i + 1}. ${eventId}`)
-    try {
-      const res = await fetchTrace(eventId)
-      const trace = res.data
-      await saveTrace(eventId, trace)
-      const summary = {
-        event_id: eventId,
-        timestamp: event.timestamp,
-        lt: event.lt,
+  let errorCount = 0
+  const run = async (originTxs: TransactionWithHash[]) => {
+    const txs = [...originTxs]
+    let i = 1
+    while (txs.length > 0) {
+      const tx = txs.shift()
+      if (!tx) {
+        return { error: false, txsLeft: null }
       }
-      await saveEventSummary(summary)
-    } catch (e) {
-      error(`Error when handling event ${eventId}`)
-      return
+      const { hash, hashHex, lt } = tx
+      console.log(`${i++}. hashHex: ${hashHex}, hash: ${hash}, lt: ${lt}`)
+      try {
+        const res = await fetchTrace(hashHex)
+        const trace = res.data
+        await saveTrace(hashHex, trace)
+        const summary = {
+          hash,
+          hashHex,
+          lt: Number(tx.lt),
+        }
+        await saveTxsSummary(summary)
+      } catch (e) {
+        if (errorCount > 5) {
+          continue // skip this tx
+        }
+        txs.unshift(tx)
+        i--
+        errorCount++
+        warn(`Error when handling tx, hash:${hash}, hashHex: ${hashHex}`)
+      }
     }
+    return { error: false, txsLeft: null }
   }
 
-  console.log(`${events.length} events are indexed.`)
-  const from = events[0].timestamp
-  const to = events[events.length - 1].timestamp
+  await run(transactions)
 
-  console.log(
-    `${toLocaleString(from)} ~ ${toLocaleString(to)} / ${from} ~ ${to}`,
-  )
+  console.log(`${transactions.length} transactions are indexed.`)
+  const from = transactions[0].lt
+  const to = transactions[transactions.length - 1].lt
 
-  console.log('totalEvents length: ', totalEvents)
+  console.log(`${from} ~ ${to}`)
+
+  console.log('totalCount length: ', totalCount)
 }
 
 generate().then(async () => {
@@ -63,8 +73,8 @@ generate().then(async () => {
     console.error('Empty redis client')
     return null
   }
-  const events = await getEventSummary(0, -1)
-  console.log('events', events)
+  const transactions = await getTxsSummary(0, -1)
+  console.log('transactions', transactions)
 
   const keys = await redisClient.keys('*')
   console.log('keys', keys)
