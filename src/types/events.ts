@@ -1,5 +1,6 @@
 import { Cell } from '@ton/core'
 
+// only for clmm
 export interface Transaction {
   source: string // pool address
   hash: string // transaction hash
