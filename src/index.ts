@@ -1,3 +1,4 @@
+import { raw } from '@prisma/client/runtime/library'
 import * as Sentry from '@sentry/node'
 import dotenv from 'dotenv'
 import { drop } from 'lodash'
@@ -11,10 +12,11 @@ import { MIN_POOL, PORT, isCLMM } from './constant'
 import { fetchTrace } from './fetch'
 import { getEventSummary, getTrace } from './redisClient'
 import seedCLMM from './scripts/seedCLMM'
-import fetchEvents from './tasks/fetchEvents'
+import fetchTransactions from './tasks/fetchTransactions'
 import handleEvent from './tasks/handleEvent'
 import { CachedEvent } from './types/events'
 import { AccountEvent } from './types/ton-api'
+import { TransactionWithHash } from './types/ton-center'
 import { toLocaleString } from './utils/date'
 import { info, logError, warn } from './utils/log'
 import sleep from './utils/sleep'
@@ -25,10 +27,12 @@ Sentry.init({
   dsn: process.env.SENTRY_DSN,
 })
 
-let cacheUsed = false
+// const cacheUsed = false
+const cacheUsed = true
+
 const eventPooling = async () => {
-  const { timestamp, lastEventId } = await prisma.indexerState.getLastState()
-  const totalEventsCount = await prisma.indexerState.getTotalEventsCount()
+  const { toLt, totalEventsCount } = await prisma.indexerState.getLastState()
+
   const loadCachedEvents = async () => {
     if (cacheUsed) {
       return []
@@ -38,85 +42,101 @@ const eventPooling = async () => {
     return cachedEvents
   }
 
-  const handleEvents = async (events: CachedEvent[] | AccountEvent[]) => {
-    if (events.length === 0) {
+  const handleTxs = async (txs: TransactionWithHash[]) => {
+    if (txs.length === 0) {
       await sleep(MIN_POOL)
       return
     }
-    info(`Try to index ${events.length} events.`)
+    info(`Try to index ${txs.length} txs.`)
 
-    let error = false
-    let lastIndex = 0
-    for (let i = 0; i < events.length; i++) {
-      const event = events[i]
-      const eventId = event.event_id
-      try {
-        const { trace, cached } = await (async function () {
-          // TODO: fetch all the traces of the cache by one request
-          const trace = await getTrace(eventId)
-          if (trace) {
-            return { trace, cached: true }
+    let errorCount = 0
+    const run = async (originTxs: TransactionWithHash[]) => {
+      const txs = [...originTxs]
+      while (txs.length > 0) {
+        const tx = txs.shift()
+        if (!tx) {
+          return { error: false, txsLeft: null }
+        }
+        const { hash, hashHex } = tx
+        try {
+          const { trace, cached, eventId } = await (async function () {
+            // TODO: fetch all the traces of the cache by one request
+            // const trace = await getTrace(eventId)
+            // if (trace) {
+            //   return { trace, cached: true }
+            // }
+            const res = await fetchTrace(hashHex)
+            const eventId = res.data.transaction.hash
+            return { trace: res.data, cached: false, eventId }
+          })()
+
+          await handleEvent({
+            routerAddress,
+            eventId,
+            trace,
+            cached,
+          })
+          errorCount = 0
+        } catch (e) {
+          txs.unshift(tx)
+          // if error occurs for 5 times for same tx, fetch transactions again
+          if (errorCount > 5) {
+            return { error: true, txsLeft: txs }
           }
-          const res = await fetchTrace(eventId)
-          return { trace: res.data, cached: false }
-        })()
+          errorCount += 1
+          warn(`Error when handling tx, hash:${hash}, hashHex: ${hashHex}`)
+          logError(e)
 
-        await handleEvent({
-          routerAddress,
-          eventId,
-          trace,
-          cached,
-        })
-      } catch (e) {
-        error = true
-        warn(`Error when handling event ${eventId}`)
-        logError(e)
-
-        lastIndex = i
-        // Sentry.captureException(e);
-        break
+          // Sentry.captureException(e);
+        }
       }
+      return { error: false, txsLeft: null }
     }
 
+    const { error, txsLeft } = await run(txs)
+
+    // error case
     if (error) {
-      if (lastIndex <= events.length - 1) {
-        await prisma.indexerState.setLastTimestamp(events[lastIndex].timestamp)
+      if (!txsLeft || txsLeft.length === 0) {
+        warn('TxsLeft is empty, this should not be happened.')
+        return
       }
+      // minus 1, toLt is exclusive
+      const toLt = (txsLeft[0].lt - 1n).toString()
+      console.log('set toLt', toLt)
+      await prisma.indexerState.setLastState({
+        toLt,
+        totalEventsCount,
+      })
       sleep(MIN_POOL)
       return
     }
 
-    const from = events[0].timestamp
-    const to = events[events.length - 1].timestamp
-    info(`${events.length} events are indexed.`)
-    info(`${toLocaleString(from)} ~ ${toLocaleString(to)} / ${from} ~ ${to}`)
+    // success case
+    const from = txs[0].lt.toString()
+    const to = txs[txs.length - 1].lt.toString()
+    info(`${txs.length} txs are indexed.`)
+    info(`${from} ~ ${to}`)
 
-    if (events.length > 0) {
+    if (txs.length > 0) {
+      info(`Set lastState, toLt: ${to}`)
       await prisma.indexerState.setLastState({
-        timestamp: to,
-        totalEventsCount: totalEventsCount + events.length,
-        lastEventId: events[events.length - 1].event_id,
+        toLt: to,
+        totalEventsCount: totalEventsCount + txs.length,
       })
     }
-    info('Total length of events: ' + (totalEventsCount + events.length))
+    info('Total length of events: ' + (totalEventsCount + txs.length))
   }
 
   if (!cacheUsed) {
-    info('Load cached events.')
-    const cachedEvents = await loadCachedEvents()
-    info('cachedEvents.length', cachedEvents.length)
-    await handleEvents(cachedEvents)
-    cacheUsed = true
+    // info('Load cached events.')
+    // const cachedEvents = await loadCachedEvents()
+    // info('cachedEvents.length', cachedEvents.length)
+    // await handleTxs(cachedEvents)
+    // cacheUsed = true
   } else {
-    // because we fetch events from last timestamp inclusive,
-    // 1 event may be duplicated, remove it.
-    const allEvents = await fetchEvents({ routerAddress, timestamp })
-
-    const hasDuplicated =
-      !!lastEventId && allEvents[0]?.event_id === lastEventId
-    const events = drop(allEvents, hasDuplicated ? 1 : 0)
-
-    await handleEvents(events)
+    const txs = await fetchTransactions({ routerAddress, toLt })
+    await handleTxs(txs)
   }
 }
 
