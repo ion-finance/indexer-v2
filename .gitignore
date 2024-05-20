@@ -27,3 +27,6 @@ node_modules
 .env*
 
 src/helpers/*
+
+# DS_store
+.DS_Store
