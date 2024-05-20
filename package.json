@@ -7,6 +7,7 @@
     "build": "npm-run-all format lint clean && tsc",
     "start": "ts-node -r tsconfig-paths/register build/src",
     "ts-node": "ts-node -r tsconfig-paths/register",
+    "run-transactions-api": "ts-node -r tsconfig-paths/register src/scripts/runTransactionsAPI.ts",
     "test-transactions": "ts-node -r tsconfig-paths/register src/scripts/testTransaction.ts",
     "parse-body": "ts-node -r tsconfig-paths/register src/scripts/parseBody.ts",
     "generate-test": "ts-node -r tsconfig-paths/register ./test/integrations/scenarios/generateTestScenario.ts",
