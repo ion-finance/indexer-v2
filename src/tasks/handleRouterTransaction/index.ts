@@ -22,10 +22,7 @@ const findBurnNotificationTxs = async ({
 }: {
   routerTx: ParsedTransaction
 }) => {
-  const {
-    inMessage: routerInMessage,
-    firstOutMessage: routerFirstOutMessages,
-  } = routerTx
+  const { inMessage: routerInMessage } = routerTx
   const poolAddress = routerInMessage?.info?.src?.toString()
   if (!poolAddress) {
     warn('Empty poolAddress in pay to')
@@ -285,7 +282,7 @@ const handleRouterTransaction = async ({
 
     if (burnNotificationTx) {
       console.log(
-        `${txsCount}. Handle Remove Liquidity, burnNotificationTx: ${burnNotificationTx.hashHex}`,
+        `${txsCount}. Handle Remove Liquidity, burnNotificationTx: ${burnNotificationTx.hashHex}, poolTx: ${poolTx?.hashHex}`,
       )
       await handleRemoveLiquidity({
         burnNotificationTx,
@@ -314,7 +311,18 @@ const handleRouterTransaction = async ({
 }
 
 // TODO: fill
-const alreadyCheckedTxs = [] as string[]
+const alreadyCheckedTxs = [
+  '438f3d8122c3b96a035fc68a9fa9e720afae0811d9e339b76bba4c77abd74fee', //router init
+  'b1fe8b5a5fbaa9274ac0510849040e8e5fb87d9bf2bd1cabcb35648c9b27ca7a', // exit code 87
+  'a9f1dc95e4f352ddd8671e220eb17cb022cb390735865a204c824d21aff0a6f2', //multisend
+  '6a044aef1a76514fb67c3bb0a12124b3229ce677b920e9343f64b53fb2ca710b', // exit code 87
+  'd60edec3cc9b6d1d0cae614013f7d541c494d01fe60817776724093b908ef54b', // exit code 9
+  '0bf58db87a2eac5287df6624deb2a059b65a09f551472adcdf67941b044b687d', // exit code 9
+  '4ed90de2cdc544dea283889c6fd5134506e0e8924ec9d8c910be9f4980d498f2', // exit code 9
+  '2c67c938e360c9149fbb24eb5c36c46867ff64df957e57a98503f6dca3d656d7', // exit code 65535
+  '32f95a8f52345a71c789bcb50ce9142761094d6b4218f3ac165d80fd4a920d91', // exit code 9
+  '8d500b78be2a7a6ea51e6eaf16219f515d1906c990decddd710c22fec776af66', // multisend
+] as string[]
 const logUnknownTransaction = (tx: ParsedTransaction) => {
   const isAlreadyChecked = alreadyCheckedTxs.includes(tx.hashHex)
   const hasNFTTransfer = tx.inMessage?.opHex === OP.NFT_TRANSFER
@@ -327,7 +335,7 @@ const logUnknownTransaction = (tx: ParsedTransaction) => {
     console.log(`Text Comment, tx: ${tx.hashHex}`)
   } else {
     console.log(
-      `Unkown Transaction \ntx.hashHex: ${tx.hashHex}, tx.lt: ${tx.lt}, tx.inMessage?.opHex: ${tx.inMessage?.opHex}, tx.outMessages?.[0]?.opHex: ${tx.outMessages?.[0]?.opHex}`,
+      `Unknown Transaction \ntx.hashHex: ${tx.hashHex}, tx.lt: ${tx.lt}, tx.inMessage?.opHex: ${tx.inMessage?.opHex}, tx.outMessages?.[0]?.opHex: ${tx.outMessages?.[0]?.opHex}`,
     )
   }
 }

@@ -69,8 +69,8 @@ enum RAW_OP {
   // from nft
   NFT_TRANSFER = '0x05138d91',
 
-  REFUND_ME = '0x0bf3f447',
-  CB_REFUND_ME = '0x89446a42',
+  REFUND_ME = '0x7b93e55f', // ion_refund_me
+  CB_REFUND_ME = '0x851adab2', // ion_cb_refund_me
 
   BOUNCE = '0xffffffff',
   TEXT_COMMENT = '0x00000000',
