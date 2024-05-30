@@ -28,7 +28,8 @@ const handleWithdrawnFromBins = async (event: Event) => {
     },
     create: {
       id: event.transaction.hash,
-      eventId: event.transaction.eventId,
+      // eventId: event.transaction.eventId,
+      hash: event.transaction.eventId,
       timestamp: new Date(event.transaction.timestamp),
       poolAddress: event.transaction.source,
       senderAddress: params.senderAddress,

@@ -63,37 +63,24 @@ router.get(
       ...swap.map((t) => ({ ...t, type: 'swap' })),
     ]
 
-    return res.json({
-      // TODO
-      // 1. pagenation
-      data: _.orderBy(
-        _.values(_.groupBy(transactions, 'eventId')).map((txs) => {
-          const first = _.orderBy(txs, 'timestamp', 'asc')[0]
+    const data = _.orderBy(transactions, 'timestamp', 'desc')
 
-          return {
-            ...first,
-            children: txs.filter((tx) => tx.id !== first.id),
-          }
-        }),
-        'timestamp',
-        'desc',
-      ),
-    })
+    return res.json({ data })
   },
 )
 
 const operationValidationRules2 = [
-  param('event_id').isString().withMessage('event_id must be an string'),
+  param('id').isString().withMessage('id must be an string'),
   validate,
 ]
 
 router.get(
-  '/transactions/:event_id',
+  '/transactions/:id',
   operationValidationRules2,
   async (req: Request, res: Response) => {
-    const event_id = req.params?.event_id
+    const id = req.params?.id
 
-    if (!event_id) {
+    if (!id) {
       return res.json({
         status: 400,
         data: [],
@@ -101,7 +88,7 @@ router.get(
     }
 
     const query = {
-      eventId: event_id as string,
+      id: id as string,
     }
 
     const [deposit, withdraw, swap] = await Promise.all([
@@ -125,14 +112,7 @@ router.get(
 
     return res.json({
       status: 200,
-      data: transactions[0]
-        ? [
-            {
-              ...transactions[0],
-              children: transactions.slice(1),
-            },
-          ]
-        : [],
+      data: transactions[0],
     })
   },
 )
