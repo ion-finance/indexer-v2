@@ -9,7 +9,6 @@ import updateQuoteTokenPrices, {
 } from 'src/common/updateTokenPrices'
 
 import binRouter from './routers/bins'
-import manualCPMMEventRouter from './routers/manualCPMMEvent'
 import myPoolsRouter from './routers/myPools'
 import operationsRouter from './routers/operations'
 import orderRouter from './routers/orders'
@@ -58,7 +57,6 @@ api.use(tokenPricesHistoryRouter)
 api.use(trendingAssetsRouter)
 api.use(updateTokenPrices)
 api.use(traceRouter)
-api.use(manualCPMMEventRouter)
 api.use(operationsRouter)
 api.use(simulateSwapRouter)
 api.use(simulateSwapReverseRouter)
