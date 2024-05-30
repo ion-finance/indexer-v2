@@ -3,64 +3,49 @@ import { address } from '@ton/core'
 
 import prisma from 'src/clients/prisma'
 import { parseTransferNotification } from 'src/parsers/cpmm/parseTransferNotification'
-import { OP } from 'src/tasks/handleEvent/opCode'
+import { ParsedTransaction } from 'src/types/ton-center'
 import {
   changeNameOfProxyTon,
   changeSymbolOfProxyTon,
-  findTracesByOpCode,
   parseRaw,
   sortByAddress,
 } from 'src/utils/address'
-import { bodyToCell } from 'src/utils/cell'
+import { msgToCell } from 'src/utils/cell'
 import { toISOString } from 'src/utils/date'
 import fetchTokenData from 'src/utils/fetchTokenData'
 import { warn } from 'src/utils/log'
 
-import { JettonInfo, Trace } from '../../types/ton-api'
-
 export const handlePoolCreated = async ({
-  eventId,
-  trace,
+  transferNotificationTx,
+  provideLpTx,
+  addLiquidityTx,
 }: {
-  eventId: string
-  trace: Trace
+  transferNotificationTx: ParsedTransaction
+  provideLpTx: ParsedTransaction
+  addLiquidityTx: ParsedTransaction
 }) => {
-  const creator = parseRaw(trace.transaction.account.address)
-  const provideLpTrace = findTracesByOpCode(trace, OP.PROVIDE_LP)?.[0]
-  const transferNotificationTrace = findTracesByOpCode(
-    trace,
-    OP.TRANSFER_NOTIFICATION,
-  )?.[0]
-  if (!provideLpTrace) {
-    warn('Empty provideLpTrace')
-    return
-  }
-  if (!transferNotificationTrace) {
-    warn('Empty transferNotificationTrace')
-    return
-  }
+  const poolAddress = provideLpTx.inMessage?.info?.dest?.toString()
 
-  const poolAddress = parseRaw(
-    provideLpTrace.transaction?.in_msg?.destination?.address,
+  const transferNotificationString = transferNotificationTx.inMessage?.msg
+  if (!transferNotificationString) {
+    warn('Empty transferNotificationString')
+    return
+  }
+  if (!poolAddress) {
+    warn('Empty poolAddress')
+    return
+  }
+  const { tokenWallet1, fromUser } = parseTransferNotification(
+    msgToCell(transferNotificationString),
   )
 
-  const { raw_body, source } =
-    transferNotificationTrace.transaction.in_msg || {}
-  if (!raw_body) {
-    warn('Empty raw_body')
-    return null
-  }
-  if (!source) {
-    warn('Empty source')
-    return null
-  }
-
-  const utime = transferNotificationTrace.transaction.utime
+  const utime = transferNotificationTx.now
   const timestamp = toISOString(utime)
 
   // router jetton wallets
-  const { tokenWallet1 } = parseTransferNotification(bodyToCell(raw_body))
-  const sourceAddress = parseRaw(source.address)
+  const sourceAddress = parseRaw(
+    transferNotificationTx.inMessage?.info?.src?.toString(),
+  )
   const sorted = sortByAddress([address(tokenWallet1), address(sourceAddress)])
   const tokenXAddress = sorted[0].toString()
   const tokenYAddress = sorted[1].toString()
@@ -146,7 +131,7 @@ export const handlePoolCreated = async ({
       tokenXAddress: tokenXAddress,
       tokenYAddress: tokenYAddress,
       timestamp,
-      creator,
+      creator: fromUser,
     },
     update: {},
   })

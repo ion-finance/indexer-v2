@@ -3,60 +3,41 @@ import BigNumber from 'bignumber.js'
 import prisma from 'src/clients/prisma'
 import { parseBurnNotification } from 'src/parsers/cpmm/parseBurnNotification'
 import { parsePayTo } from 'src/parsers/cpmm/parsePayTo'
-import { OP } from 'src/tasks/handleEvent/opCode'
-import { Trace } from 'src/types/ton-api'
-import {
-  findTracesByOpCode,
-  // findTracesOfPool,
-  parseRaw,
-} from 'src/utils/address'
-import { bodyToCell } from 'src/utils/cell'
+import { OP } from 'src/tasks/handleRouterTransaction/opCode'
+import { findOutMessage } from 'src/transactions'
+import { ParsedTransaction } from 'src/types/ton-center'
+import { msgToCell } from 'src/utils/cell'
 import { toISOString } from 'src/utils/date'
 import { warn } from 'src/utils/log'
 
 export const handleRemoveLiquidity = async ({
-  eventId,
-  trace,
+  burnNotificationTx,
 }: {
-  eventId: string
-  trace: Trace
+  burnNotificationTx: ParsedTransaction
 }) => {
   const routerAddress = process.env.ROUTER_ADDRESS || ''
-  const { hash, utime } = trace.transaction
-  const timestamp = toISOString(utime)
-  const payToTrace = findTracesByOpCode(trace, OP.PAY_TO)?.[0]
-  const burnNotificationTrace = findTracesByOpCode(
-    trace,
-    OP.BURN_NOTIFICATION,
-  )?.[0]
-  if (!payToTrace) {
-    warn('Empty payToTrace')
+  const poolAddress = burnNotificationTx.inMessage?.info?.dest?.toString()
+  const burnNotificationString = burnNotificationTx.inMessage?.msg
+  const payToString = findOutMessage(burnNotificationTx, OP.PAY_TO)?.msg
+  if (!poolAddress) {
+    warn('Empty poolAddress')
     return
   }
-  if (!burnNotificationTrace) {
-    warn('Empty burnNotificationTrace')
+  if (!burnNotificationString) {
+    warn('Empty burnNotificationString')
     return
   }
-  const payToRawBody = payToTrace.transaction.in_msg?.raw_body || ''
-  const burnNotificationRawBody =
-    burnNotificationTrace.transaction.in_msg?.raw_body || ''
-  if (!payToRawBody) {
-    warn('Empty raw_body payTo')
-    return null
+  if (!payToString) {
+    warn('Empty payToString')
+    return
   }
-  if (!burnNotificationRawBody) {
-    warn('Empty raw_body burnNotificationRawBody')
-    return null
-  }
+
   const { toAddress, amount0Out, amount1Out } = parsePayTo(
-    bodyToCell(payToRawBody),
+    msgToCell(payToString),
   )
 
   const { jettonAmount: burned, fromAddress } = parseBurnNotification(
-    bodyToCell(burnNotificationRawBody),
-  )
-  const poolAddress = parseRaw(
-    payToTrace.transaction.in_msg?.source?.address.toString(),
+    msgToCell(burnNotificationString),
   )
 
   const pool = await prisma.pool.findFirst({
@@ -70,8 +51,11 @@ export const handleRemoveLiquidity = async ({
     return
   }
 
+  const { hashHex, hash } = burnNotificationTx
+  const timestamp = toISOString(burnNotificationTx.now)
+
   const withdraw = await prisma.withdraw.findFirst({
-    where: { id: hash, eventId },
+    where: { id: hashHex },
   })
 
   if (withdraw) {
@@ -81,15 +65,10 @@ export const handleRemoveLiquidity = async ({
 
   const senderAddress = fromAddress
 
-  await prisma.withdraw.upsert({
-    where: {
-      id: hash,
-      eventId,
-    },
-    update: {},
-    create: {
-      id: hash,
-      eventId,
+  await prisma.withdraw.create({
+    data: {
+      id: hashHex,
+      hash,
       senderAddress,
       receiverAddress: toAddress,
       poolAddress,
@@ -100,19 +79,15 @@ export const handleRemoveLiquidity = async ({
     },
   })
 
-  const walletTrace = trace
-  // const poolTraces = findTracesOfPool(trace, poolAddress)
-  const poolTrace = burnNotificationTrace
   const { tokenXAddress, tokenYAddress } = pool
-  const { hash: poolTxHash, lt, utime: poolUtime } = poolTrace.transaction
 
   await prisma.operation.create({
     data: {
-      poolTxHash: poolTxHash,
+      poolTxHash: burnNotificationTx.hashHex,
       poolAddress: pool.id,
       routerAddress,
-      poolTxLt: String(lt),
-      poolTxTimestamp: new Date(poolUtime * 1000).toISOString(),
+      poolTxLt: String(burnNotificationTx.lt),
+      poolTxTimestamp: toISOString(burnNotificationTx.now),
       destinationWalletAddress: toAddress,
       operationType: 'withdraw_liquidity',
       exitCode: 'burn_ok',
@@ -133,13 +108,6 @@ export const handleRemoveLiquidity = async ({
       lpFeeAmount: '0', // always 0 for withdraw
       protocolFeeAmount: '0',
       referralFeeAmount: '0',
-
-      walletAddress: walletTrace.transaction.in_msg?.source?.address,
-      walletTxLt: String(walletTrace.transaction.lt),
-      walletTxHash: walletTrace.transaction.hash,
-      walletTxTimestamp: new Date(
-        walletTrace.transaction.utime * 1000,
-      ).toISOString(),
     },
   })
 

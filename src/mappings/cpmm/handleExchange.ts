@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { find } from 'lodash'
+import { find, map } from 'lodash'
 
 import prisma from 'src/clients/prisma'
 import getLatestTokenPrices from 'src/common/tokenPrice'
@@ -12,110 +12,104 @@ import {
 import { calculateOutAmount } from 'src/dex/simulate/utils'
 import { parsePayTo } from 'src/parsers/cpmm/parsePayTo'
 import { parseSwap } from 'src/parsers/cpmm/parseSwap'
-import { Trace } from 'src/types/ton-api'
-import { findTracesByOpCode, isSameAddress, parseRaw } from 'src/utils/address'
+import { parseTransferNotification } from 'src/parsers/cpmm/parseTransferNotification'
+import { EXIT_CODE } from 'src/tasks/handleRouterTransaction/opCode'
+import { ParsedTransaction } from 'src/types/ton-center'
+import { isSameAddress } from 'src/utils/address'
 import { bFormatUnits } from 'src/utils/bigNumber'
-import { bodyToCell } from 'src/utils/cell'
+import { msgToCell } from 'src/utils/cell'
 import { toISOString } from 'src/utils/date'
 import { warn } from 'src/utils/log'
 
-import { EXIT_CODE, OP } from '../../tasks/handleEvent/opCode'
-
 export const handleExchange = async ({
-  eventId,
-  trace,
+  transferNotificationTx,
+  swapTx,
+  payToTxs,
 }: {
-  eventId: string
-  trace: Trace
+  transferNotificationTx?: ParsedTransaction
+  swapTx?: ParsedTransaction
+  payToTxs?: ParsedTransaction[]
 }) => {
+  if (!transferNotificationTx || !swapTx || !payToTxs) {
+    warn('Empty tx data in handleExchange')
+    return
+  }
   const tokenPrices = await getLatestTokenPrices()
   const tokens = await prisma.token.findMany()
 
   const routerAddress = process.env.ROUTER_ADDRESS || ''
-  const { hash, utime } = trace.transaction
-  const timestamp = toISOString(utime)
+  const poolAddress = swapTx.inMessage?.info?.dest?.toString()
+  const transferNotificationString = transferNotificationTx.inMessage?.msg
+  const swapString = swapTx.inMessage?.msg
 
-  const swapTrace = findTracesByOpCode(trace, OP.SWAP)?.[0]
-  const payToTraces = findTracesByOpCode(trace, OP.PAY_TO)
-  if (!swapTrace) {
-    warn('Empty swapTrace')
+  if (!poolAddress) {
+    warn('Empty poolAddress')
     return
   }
-  if (!payToTraces) {
-    warn('Empty payToTraces')
+  if (!transferNotificationString) {
+    warn('Empty transferNotificationString')
+    return
+  }
+  if (!swapString) {
+    warn('Empty swapString')
     return
   }
 
-  const swapTraceRawBody = swapTrace.transaction.in_msg?.raw_body || ''
-  if (!swapTraceRawBody) {
-    warn('Empty raw_body swapTrace')
-    return null
-  }
+  const { fromUser } = parseTransferNotification(
+    msgToCell(transferNotificationString),
+  )
 
   const {
     senderAddress: sendTokenAddress,
     jettonAmount,
     hasRef,
     toAddress: receiverAddress,
-  } = parseSwap(bodyToCell(swapTraceRawBody))
+  } = parseSwap(msgToCell(swapString))
 
-  const payToNormalTrace = find(payToTraces, (payToTrace) => {
-    const rawBody = payToTrace.transaction.in_msg?.raw_body || ''
-    if (!rawBody) {
-      return false
-    }
-    const { exitCode } = parsePayTo(bodyToCell(rawBody))
+  const payToNormalTx = find(payToTxs, (payToTx) => {
+    const { exitCode } = parsePayTo(msgToCell(payToTx.inMessage?.msg || ''))
     return exitCode === Number(EXIT_CODE.SWAP_OK)
   })
 
-  const payToRefTrace = find(payToTraces, (payToTrace) => {
-    const rawBody = payToTrace.transaction.in_msg?.raw_body || ''
-    if (!rawBody) {
-      return false
-    }
-    const { exitCode } = parsePayTo(bodyToCell(rawBody))
+  const payToRefTx = find(payToTxs, (payToTx) => {
+    const { exitCode } = parsePayTo(msgToCell(payToTx.inMessage?.msg || ''))
     return exitCode === Number(EXIT_CODE.SWAP_OK_REF)
   })
 
-  if (!payToNormalTrace) {
-    const exitCodes = payToTraces.map((payToTrace) => {
-      const rawBody = payToTrace.transaction.in_msg?.raw_body || ''
-      if (!rawBody) {
-        return null
-      }
-      const { exitCode } = parsePayTo(bodyToCell(rawBody))
+  if (!payToNormalTx) {
+    const exitCodes = map(payToTxs, (payToTx) => {
+      const { exitCode } = parsePayTo(msgToCell(payToTx.inMessage?.msg || ''))
       return exitCode
     })
     exitCodes.forEach((exitCode) => {
       if (exitCode === Number(EXIT_CODE.SWAP_REFUND_NO_LIQ)) {
         warn(
-          'Skip failed swap. Empty payToNormalTrace. exit code: SWAP_REFUND_NO_LIQ',
+          'Skip failed swap. Empty payToNormalTx. exit code: SWAP_REFUND_NO_LIQ',
         )
         return
       } else if (exitCode === Number(EXIT_CODE.SWAP_REFUND_RESERVE_ERR)) {
         warn(
-          'Skip failed swap. Empty payToNormalTrace. exit code: SWAP_REFUND_RESERVE_ERR',
+          'Skip failed swap. Empty payToNormalTx. exit code: SWAP_REFUND_RESERVE_ERR',
         )
         return
       }
     })
+    warn('Skip failed swap. Empty payToNormalTx, exit code: ')
     return
   }
 
-  if (hasRef && !payToRefTrace) {
-    warn("Empty payToRefTrace given 'hasRef'")
+  if (hasRef && !payToRefTx) {
+    warn("Empty payToRefTx given 'hasRef'")
     return
   }
 
-  const payToNormal = parsePayTo(
-    bodyToCell(payToNormalTrace?.transaction.in_msg?.raw_body || ''),
-  )
+  const payToNormal = parsePayTo(msgToCell(payToNormalTx.inMessage?.msg || ''))
+
+  // TODO: write amountOut of paytoRef in Swap table
   const payToRef =
-    payToRefTrace &&
-    parsePayTo(bodyToCell(payToRefTrace?.transaction.in_msg?.raw_body || ''))
+    payToRefTx && parsePayTo(msgToCell(payToRefTx.inMessage?.msg || ''))
 
   const { amount0Out, amount1Out } = payToNormal
-  const poolAddress = parseRaw(swapTrace?.transaction.account.address)
 
   const amountIn = jettonAmount
 
@@ -150,8 +144,10 @@ export const handleExchange = async ({
   const priceY = BigNumber(tokenPriceY?.price || 0)
   const swapForY = sendTokenAddress === tokenXAddress
 
+  const { hashHex, hash } = swapTx
+
   const swap = await prisma.swap.findFirst({
-    where: { id: hash, eventId },
+    where: { id: hashHex },
   })
 
   if (swap) {
@@ -159,8 +155,7 @@ export const handleExchange = async ({
     return
   }
 
-  const walletTrace = trace
-  const senderAddress = parseRaw(walletTrace.transaction.account.address)
+  const senderAddress = fromUser
 
   const volumeUsd = swapForY
     ? BigNumber(bFormatUnits(amountIn, tokenX?.decimals || 0)).multipliedBy(
@@ -172,13 +167,12 @@ export const handleExchange = async ({
 
   await prisma.swap.upsert({
     where: {
-      id: hash,
-      eventId,
+      id: hashHex,
     },
     update: {},
     create: {
-      id: hash,
-      eventId,
+      id: hashHex,
+      hash,
       poolAddress,
       sendTokenAddress,
       receiveTokenAddress: swapForY ? tokenYAddress : tokenXAddress,
@@ -188,15 +182,10 @@ export const handleExchange = async ({
       amountOut: amountOut.toString(),
       swapForY,
       volumeUsd: volumeUsd.toString(),
-      timestamp,
+      timestamp: toISOString(swapTx.now),
     },
   })
 
-  const {
-    hash: poolTxHash,
-    lt,
-    utime: poolUtime,
-  } = payToNormalTrace.transaction
   const { protocolFeeOut } = calculateOutAmount({
     amountIn,
     hasRef: !!payToRef,
@@ -246,11 +235,11 @@ export const handleExchange = async ({
 
   await prisma.operation.create({
     data: {
-      poolTxHash: poolTxHash,
+      poolTxHash: swapTx.hashHex,
       poolAddress: pool.id,
       routerAddress,
-      poolTxLt: String(lt),
-      poolTxTimestamp: new Date(poolUtime * 1000).toISOString(), // save timestamp in UTC+0
+      poolTxLt: String(swapTx.lt),
+      poolTxTimestamp: toISOString(swapTx.now),
       destinationWalletAddress: receiverAddress,
       operationType: 'swap',
       exitCode: 'swap_ok',
@@ -274,11 +263,11 @@ export const handleExchange = async ({
       referralFeeAmount: referralFeeAmount.toString(),
 
       walletAddress: senderAddress,
-      walletTxLt: String(walletTrace.transaction.lt),
-      walletTxHash: walletTrace.transaction.hash,
-      walletTxTimestamp: new Date(
-        walletTrace.transaction.utime * 1000,
-      ).toISOString(),
+      // walletTxLt: String(walletTrace.transaction.lt),
+      // walletTxHash: walletTrace.transaction.hash,
+      // walletTxTimestamp: new Date(
+      //   walletTrace.transaction.utime * 1000,
+      // ).toISOString(),
     },
   })
 
