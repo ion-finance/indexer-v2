@@ -1,8 +1,9 @@
 import dotenv from 'dotenv'
+import { compact } from 'lodash'
 import { createClient, RedisClientType } from 'redis'
 
-import { CachedEvent } from './types/events'
-import { JettonInfo, Trace } from './types/ton-api'
+import { JettonInfo } from './types/ton-api'
+import { ParsedTransaction } from './types/ton-center'
 import { error, info } from './utils/log'
 
 dotenv.config()
@@ -34,6 +35,27 @@ const getRedisClient = () => {
   return redisClient
 }
 
+export const getDataHash = async <T>(key: string) => {
+  const redisClient = getRedisClient()
+  if (!redisClient) return {}
+  try {
+    const allData = await redisClient.hGetAll(key)
+    return allData
+  } catch (err) {
+    error('Redis get error:', err)
+    return {}
+  }
+}
+
+export const saveDataHash = async (key: string, field: string, value: any) => {
+  const redisClient = getRedisClient()
+  try {
+    await redisClient?.hSet(key, field, JSON.stringify(value))
+  } catch (err) {
+    error('Redis set error:', err)
+  }
+}
+
 export const saveData = async (key: string, value: any) => {
   const redisClient = getRedisClient()
   try {
@@ -55,15 +77,6 @@ export const getData = async <T>(key: string) => {
   }
 }
 
-export const saveTrace = async (eventId: string, trace: Trace) => {
-  const key = `trace:${eventId}`
-  await saveData(key, trace)
-}
-export const getTrace = async (eventId: string) => {
-  const key = `trace:${eventId}`
-  return await getData<Trace>(key)
-}
-
 export const saveTokenData = async (
   walletAddress: string,
   tokenData: JettonInfo & { minter_address: string },
@@ -79,29 +92,16 @@ export const getTokenData = async (walletAddress: string) => {
   return result
 }
 
-export const saveEventSummary = async (event: CachedEvent) => {
-  const redisClient = getRedisClient()
-  if (!redisClient) return
-  try {
-    await redisClient.zAdd('eventIds', {
-      score: event.lt,
-      value: JSON.stringify(event),
-    })
-  } catch (err) {
-    error('Redis zAdd error:', err)
-  }
-}
-
 // for whole data, from = 0, to = -1
-export const getEventSummary = async (from: number, to: number) => {
+export const getRouterTxsFromCache = async (from: number, to: number) => {
   const redisClient = getRedisClient()
   if (!redisClient) return []
   try {
-    const data = await redisClient.zRange('eventIds', from, to)
+    const data = await redisClient.zRange('router-txs', from, to)
     if (!data) {
       return []
     }
-    const result = data.map((summary) => JSON.parse(summary) as CachedEvent)
+    const result = data.map((tx) => JSON.parse(tx) as ParsedTransaction)
     return result
   } catch (err) {
     error('Redis get error:', err)
@@ -109,4 +109,183 @@ export const getEventSummary = async (from: number, to: number) => {
   }
 }
 
+export const saveRouterTxsToCache = async (txs: ParsedTransaction[]) => {
+  const redisClient = getRedisClient()
+  const data = await redisClient.zRange('router-txs', 0, -1)
+  const parsedTransactions = data.map(
+    (tx) => JSON.parse(tx) as ParsedTransaction,
+  )
+  const lastLtFromCache =
+    parsedTransactions[parsedTransactions.length - 1]?.lt || 0
+  if (!redisClient) return
+  try {
+    for (const tx of txs) {
+      if (tx.lt <= lastLtFromCache) {
+        continue
+      }
+      await redisClient.zAdd('router-txs', {
+        score: tx.lt,
+        value: JSON.stringify(tx),
+      })
+    }
+  } catch (err) {
+    error('Redis zAdd error:', err)
+  }
+}
+
+const getPoolTxKey = (
+  poolAddress: string,
+  messageHash: string,
+  isInMessage: boolean,
+) => {
+  if (isInMessage) {
+    return `poolAddress:${poolAddress}::inMessageHash:${messageHash}`
+  }
+  return `poolAddress:${poolAddress}::outMessageHash:${messageHash}`
+}
+
+export const savePoolTxsToCache = async (
+  poolAddress: string,
+  txs: ParsedTransaction[],
+) => {
+  // TODO: improve using bulk insert
+  for (const tx of txs) {
+    await savePoolTxToCache(poolAddress, tx)
+  }
+}
+
+// cache pool txs with inMessageHash and outMessageHash
+const savePoolTxToCache = async (
+  poolAddress: string,
+  tx: ParsedTransaction,
+) => {
+  const inMessageHash = tx.inMessage?.msg || ''
+  const outMessageHashes =
+    compact(tx.outMessages?.map((outMessage) => outMessage.msg)) || []
+  const lt = tx.lt
+  // for inMessage
+  const key = getPoolTxKey(poolAddress, inMessageHash, true)
+  await saveDataHash(key, lt.toString(), tx)
+  // for outMessages
+  for (const outMessageHash of outMessageHashes) {
+    const key = getPoolTxKey(poolAddress, outMessageHash, false)
+    await saveDataHash(key, lt.toString(), tx)
+  }
+}
+
+export const getCachedPoolTxFromPrevHash = async ({
+  poolAddress,
+  prevHashLt,
+  inMessageHash,
+}: {
+  poolAddress: string
+  prevHashLt: number
+  inMessageHash?: string
+}) => {
+  if (!prevHashLt) {
+    return null
+  }
+  if (!inMessageHash) {
+    return null
+  }
+  const key = getPoolTxKey(poolAddress, inMessageHash, true)
+  const allTransactions = await getDataHash<ParsedTransaction>(key)
+
+  const minimumLtDiffTransaction = findMinimumLtDiffTransaction(
+    allTransactions,
+    prevHashLt,
+    true,
+  )
+  return minimumLtDiffTransaction
+}
+
+export const getCachedPoolTxFromNextHash = async ({
+  poolAddress,
+  nextHashLt,
+  outMessageHash,
+}: {
+  poolAddress: string
+  nextHashLt: number
+  outMessageHash?: string
+}) => {
+  if (!nextHashLt) {
+    return null
+  }
+  if (!outMessageHash) {
+    return null
+  }
+  const key = getPoolTxKey(poolAddress, outMessageHash, false)
+  const allTransactions = await getDataHash<ParsedTransaction>(key)
+  const minimumLtDiffTransaction = findMinimumLtDiffTransaction(
+    allTransactions,
+    nextHashLt,
+    false,
+  )
+  return minimumLtDiffTransaction
+}
+
+const getLpAccountTxKey = (lpAccountAddress: string, inMessageHash: string) => {
+  return `lpAccountAddress:${lpAccountAddress}::inMessageHash:${inMessageHash}`
+}
+
+export const getLpAccountTxFromCache = async (
+  lpAccountAddress: string,
+  prevHashLt: number,
+  inMessageHash?: string,
+) => {
+  if (!inMessageHash || !prevHashLt) {
+    return null
+  }
+  const key = getLpAccountTxKey(lpAccountAddress, inMessageHash)
+  const allTransactions = await getDataHash<ParsedTransaction>(key)
+  const minimumLtDiffTransaction = findMinimumLtDiffTransaction(
+    allTransactions,
+    prevHashLt,
+    true,
+  )
+  return minimumLtDiffTransaction
+}
+
+const saveLpAccountTxToCache = async (
+  lpAccountAddress: string,
+  tx: ParsedTransaction,
+) => {
+  const inMessageHash = tx.inMessage?.msg || ''
+  const lt = tx.lt
+  const key = getLpAccountTxKey(lpAccountAddress, inMessageHash)
+  await saveDataHash(key, lt.toString(), tx)
+}
+
+export const saveLpAccountTxsToCache = async (
+  poolAddress: string,
+  txs: ParsedTransaction[],
+) => {
+  for (const tx of txs) {
+    await saveLpAccountTxToCache(poolAddress, tx)
+  }
+}
+
+const findMinimumLtDiffTransaction = (
+  allTransactions: Record<string, string>,
+  baseLt: number,
+  fromPrev: boolean,
+): ParsedTransaction | null => {
+  return Object.entries(allTransactions)
+    .map(
+      ([lt, transactionData]) =>
+        JSON.parse(transactionData) as ParsedTransaction,
+    )
+    .filter((transaction) => {
+      return fromPrev ? baseLt < transaction.lt : transaction.lt < baseLt
+    })
+    .reduce(
+      (minTx, currentTx) => {
+        if (!minTx || currentTx.lt - baseLt < minTx.lt - baseLt) {
+          return currentTx
+        }
+        return minTx
+      },
+      null as ParsedTransaction | null,
+    )
+}
 export default getRedisClient
