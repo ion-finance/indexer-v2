@@ -29,26 +29,35 @@ const fetchTxs = async ({
   toLt?: string
   lt?: string
   hash?: string
-}) =>
-  await tonClient.getTransactions(Address.parse(address), {
+}) => {
+  if (address === '') {
+    throw new Error('address is empty')
+  }
+  console.log(`address: ${address}, toLt: ${toLt}, lt: ${lt}, hash: ${hash}`)
+  return await tonClient.getTransactions(Address.parse(address), {
     to_lt: toLt ? toLt : undefined,
     lt: lt ? lt : undefined,
     hash,
     limit: FETCH_LENGTH,
     archival: true,
   })
+}
 
 // fetch transactions (toLt, lt]
-//to use lt, hash must be provided
+// to use 'lt', hash must be provided
 const fetchTransactions = async ({
-  routerAddress,
+  contractAddress,
   toLt = '',
+  baseLt,
+  baseHash,
 }: {
-  routerAddress: string
+  contractAddress: string
   toLt?: string
+  baseLt?: string
+  baseHash?: string
 }) => {
-  let lt = ''
-  let hash = ''
+  let lt = baseLt || ''
+  let hash = baseHash || ''
   const setLastFetchPoint = ({
     newLt,
     newHash,
@@ -56,7 +65,6 @@ const fetchTransactions = async ({
     newLt: string
     newHash: string
   }) => {
-    info(`Set last fetch point. lt: ${newLt}, hash: ${newHash}`)
     lt = newLt
     hash = newHash
   }
@@ -66,7 +74,7 @@ const fetchTransactions = async ({
   for (;;) {
     try {
       const res = await fetchTxs({
-        address: routerAddress,
+        address: contractAddress,
         toLt,
         lt,
         hash,
@@ -83,14 +91,8 @@ const fetchTransactions = async ({
       })
       transactions.push(...txs)
 
-      // last tx is fetched everytime, so skip log if txs.length == 1
-      if (txs.length > 1) {
-        info(`Fetched transactions (toLt: ${toLt} ~ lt: ${lt}]`)
-        if (txs.length >= FETCH_LENGTH) {
-          info(`${txs.length} transactions found. Fetch more.`)
-        } else {
-          info(`${txs.length} transactions found.`)
-        }
+      if (txs.length > 0) {
+        console.log(`Fetched transactions (toLt: ${toLt} ~ lt: ${lt}]`)
       }
 
       // TON CENTER API limit is 100 txs per request.
