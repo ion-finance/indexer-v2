@@ -19,39 +19,41 @@ const IndexerStateExtenstions = Prisma.defineExtension({
           create: { key: 'last_to_lt', toLt: toLt.toString() },
         })
       },
-      async getTotalEventsCount(): Promise<number> {
+      async getTotalTransactionsCount(): Promise<number> {
         const lastLt = await prisma.indexerState.findFirst({
           where: { key: 'last_to_lt' },
         })
-        return lastLt ? Number(lastLt.totalEventsCount) : 0
+        return lastLt ? Number(lastLt.totalTransactionsCount) : 0
       },
 
       async getLastState() {
         const state = await prisma.indexerState.findFirst({
           where: { key: 'last_to_lt' },
         })
-        const totalEventsCount = state ? Number(state.totalEventsCount) : 0
+        const totalTransactionsCount = state
+          ? Number(state.totalTransactionsCount)
+          : 0
         const toLt = state ? state.toLt : undefined
-        return { toLt, totalEventsCount }
+        return { toLt, totalTransactionsCount }
       },
 
       async setLastState({
         toLt,
-        totalEventsCount,
+        totalTransactionsCount,
       }: {
         toLt?: string
-        totalEventsCount: number
+        totalTransactionsCount: number
       }) {
         await prisma.indexerState.upsert({
           where: { key: 'last_to_lt' },
           update: {
             toLt: toLt ? toLt.toString() : '',
-            totalEventsCount,
+            totalTransactionsCount,
           },
           create: {
             key: 'last_to_lt',
             toLt: toLt ? toLt.toString() : '',
-            totalEventsCount,
+            totalTransactionsCount,
           },
         })
       },
