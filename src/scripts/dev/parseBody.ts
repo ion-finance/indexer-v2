@@ -41,9 +41,22 @@ const parseBody = async () => {
   parsers.forEach((parser) => {
     const { name, func } = parser
     try {
-      const res = func(cell)
+      const parsed = func(cell)
       console.log(`${name} successed`)
-      console.log('res', res)
+      if (name === 'parseSwap') {
+        const { jettonAmount, minOut, ...rest } = parsed as ReturnType<
+          typeof parseSwap
+        >
+        const jettonAmountStr = jettonAmount.toString()
+        const minOutStr = minOut.toString()
+        console.log('parsed', {
+          jettonAmount: jettonAmountStr,
+          minOut: minOutStr,
+          ...rest,
+        })
+      } else {
+        console.log('parsed', parsed)
+      }
     } catch {
       console.log(`${name} failed to parse body`)
     }

@@ -1,13 +1,13 @@
 import axios from 'axios'
 
-import { checkPathHasOp } from 'src/tasks/handleEvent'
-import extractPaths from 'src/tasks/handleEvent/extractPaths'
-import { CustomOP, OP, Ops } from 'src/tasks/handleEvent/opCode'
+import { checkPathHasOp } from 'src/tasks/handleTransaction'
+import extractPaths from 'src/tasks/handleTransaction/extractPaths'
+import { CustomOP, OP, Ops } from 'src/tasks/handleTransaction/opCode'
 import { Trace } from 'src/types/ton-api'
 import { getInput } from 'src/utils/userInput'
 
-const testTransaction = async () => {
-  const userInput = await getInput('Enter event id: ')
+const testTrace = async () => {
+  const userInput = await getInput('Enter tx root hash: ')
   console.log(`You entered: ${userInput}`)
 
   const routerAddress = process.env.ROUTER_ADDRESS || ''
@@ -58,4 +58,4 @@ const testTransaction = async () => {
   )
 }
 
-testTransaction()
+testTrace()

@@ -1,4 +1,4 @@
-import getRedisClient, { getEventSummary } from 'src/redisClient'
+import getRedisClient, { getRouterTxsFromCache } from 'src/redisClient'
 
 const showCache = async () => {
   const redisClient = getRedisClient()
@@ -6,8 +6,8 @@ const showCache = async () => {
     console.error('Empty redis client')
     return null
   }
-  const events = await getEventSummary(0, -1)
-  console.log('events', events)
+  const routerTxs = await getRouterTxsFromCache(0, -1)
+  console.log('routerTxs', routerTxs)
 
   const keys = await redisClient.keys('*')
   console.log('keys', keys)

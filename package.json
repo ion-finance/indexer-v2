@@ -7,8 +7,8 @@
     "build": "npm-run-all format lint clean && tsc",
     "start": "ts-node -r tsconfig-paths/register build/src",
     "ts-node": "ts-node -r tsconfig-paths/register",
-    "run-transactions-api": "ts-node -r tsconfig-paths/register src/scripts/dev/runTransactionsAPI.ts",
-    "test-transactions": "ts-node -r tsconfig-paths/register src/scripts/dev/testTransaction.ts",
+    "test-trace": "ts-node -r tsconfig-paths/register src/scripts/dev/testTrace.ts",
+    "fetch-transactions": "ts-node -r tsconfig-paths/register src/scripts/dev/testFetchtransactions.ts",
     "parse-body": "ts-node -r tsconfig-paths/register src/scripts/dev/parseBody.ts",
     "generate-test": "ts-node -r tsconfig-paths/register ./test/integrations/scenarios/generateTestScenario.ts",
     "generate-router-cache": "ts-node -r tsconfig-paths/register src/scripts/generateRouterTransactionsCache.ts",
@@ -22,6 +22,7 @@
     "format": "npx prettier --write src",
     "format:check": "npx prettier --check src",
     "test": "env-cmd -f .env.test yarn prisma db push --force-reset && DOTENV_CONFIG_PATH=.env.test jest",
+    "test-pool-reserve": "yarn test test/remote/index.spec.ts",
     "prepare": "husky"
   },
   "lint-staged": {
