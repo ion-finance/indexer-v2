@@ -1,7 +1,7 @@
 import { Address, beginCell } from '@ton/core'
 import { randomUUID } from 'crypto'
 import dotenv from 'dotenv'
-import { sortBy } from 'lodash'
+import { map, sortBy } from 'lodash'
 dotenv.config()
 
 const POOL_ADDRESS = 'EQCnrRZ7fZ8gtoHhDdMRWU_vMc7d2j4lkDwiCdGhat51SNxG'
@@ -101,7 +101,7 @@ export const pools = [
 
 export const tokens = [token1, token2]
 
-export const deposits = [
+export const rawDeposits = [
   {
     id: 'cc13210c97850650f379fe3443b97749fefde6708232e4d468d3517adb31d5f1',
     eventId: '5b1d29f752b2ab7bf8ad23f7350020607934945000719c35a1362ed5fb243438',
@@ -936,7 +936,7 @@ export const deposits = [
   },
 ]
 
-export const swaps = [
+export const rawSwaps = [
   {
     id: '1fd94809a2e4a5d4e4dfdfd36162000dc8fb1fe4f52f46e16c6850496dd6b1a9',
     eventId: 'd03cc5117c1300dd57175832848e9dc2e9e15505e1c041d3d44571633616c971',
@@ -2113,264 +2113,6 @@ export const orderHistory = [
   },
 ]
 
-// export const bins = [
-//   {
-//     id: '635b6f64-0093-47e3-a619-a6bcc242cd44',
-
-//     binId: 8388589,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '87500000000',
-//   },
-//   {
-//     id: 'd8efb788-f93d-4c6c-9646-6f11b8c15f36',
-
-//     binId: 8388594,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '87500000000',
-//   },
-//   {
-//     id: '2e8ea10e-fd41-4d2e-8a43-3f4bffa63b94',
-
-//     binId: 8388595,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '87500000000',
-//   },
-//   {
-//     id: '77086bae-23f2-4f52-8b93-8aa642582651',
-
-//     binId: 8388609,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '247453472684',
-//     reserveY: '0',
-//   },
-//   {
-//     id: 'd16ab68a-6f5f-4a61-972a-5f1c55fdbf41',
-
-//     binId: 8388588,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '87500000000',
-//   },
-//   {
-//     id: '716bf351-13f6-47cd-bc91-8f07dd6b678c',
-
-//     binId: 8388593,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '87500000000',
-//   },
-//   {
-//     id: 'd167432d-38ed-4a22-ae52-4b0b728b393d',
-
-//     binId: 8388592,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '87500000000',
-//   },
-//   {
-//     id: '656a5dbe-6f67-49bb-83df-7d2f1006eaaf',
-
-//     binId: 8388611,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '82785920303',
-//     reserveY: '0',
-//   },
-//   {
-//     id: '4a17f961-351f-468f-835a-dda2f31545de',
-
-//     binId: 8388603,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '49599999519',
-//   },
-//   {
-//     id: '33048af8-4c44-49ad-bfe0-bac767ea0ded',
-
-//     binId: 8388607,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '259829730762',
-//   },
-//   {
-//     id: 'd59ab415-d028-440b-8b46-6d0f63fc2e81',
-
-//     binId: 8388610,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '118446104746',
-//     reserveY: '0',
-//   },
-//   {
-//     id: '7e19fe17-f0dc-4759-9cad-79e635a7572f',
-
-//     binId: 8388590,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '87500000000',
-//   },
-//   {
-//     id: 'e3c78773-648c-487f-8dc4-c72c19f6557c',
-
-//     binId: 8388591,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '87500000000',
-//   },
-//   {
-//     id: '4e0e1be9-8e66-40cd-9cd0-db4643eb5848',
-
-//     binId: 8388604,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '50253253472',
-//   },
-//   {
-//     id: '080ffbb9-f565-4381-9ddc-1b51b969a8cb',
-
-//     binId: 8388605,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '89156062543',
-//   },
-//   {
-//     id: '401f2dac-d652-41f3-8eb5-59cf561c9171',
-
-//     binId: 8388608,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '213020331896',
-//     reserveY: '197270747918',
-//   },
-//   {
-//     id: 'b5497ad3-80b7-42c8-b8e9-916100b1de98',
-
-//     binId: 8388606,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '136322043820',
-//   },
-//   {
-//     id: 'e698a05b-8b26-43a5-bf9b-239127ff032f',
-
-//     binId: 8388619,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '18657310109',
-//     reserveY: '0',
-//   },
-//   {
-//     id: '3fbaa80f-b6da-454f-8679-145bd370fdb1',
-
-//     binId: 8388598,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '96566432632',
-//   },
-//   {
-//     id: '58df8d81-b5e0-4ec5-8e24-c20600c0ef4b',
-
-//     binId: 8388597,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '105091707367',
-//   },
-//   {
-//     id: 'd2b91bbb-e81c-4abc-9fd1-5edb0363b128',
-
-//     binId: 8388616,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '21648498528',
-//     reserveY: '0',
-//   },
-//   {
-//     id: '47c37438-37e6-45e3-bac0-6d84fc265c3c',
-
-//     binId: 8388601,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '61969292051',
-//   },
-//   {
-//     id: 'f1b7e50c-3f65-48b4-9382-b2cc90a85031',
-
-//     binId: 8388596,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '65649127247',
-//   },
-//   {
-//     id: 'e30e3f3d-dbf2-4d7c-b987-fd5045ccb050',
-
-//     binId: 8388618,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '18657210109',
-//     reserveY: '0',
-//   },
-//   {
-//     id: '853e5ed6-1878-4579-9079-0cc625f079ed',
-
-//     binId: 8388600,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '71837855339',
-//   },
-//   {
-//     id: 'f4ae37ee-726c-4baf-8a54-6206a340310a',
-
-//     binId: 8388599,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '84064388493',
-//   },
-//   {
-//     id: 'cf9f180a-6680-49fe-ac16-62d4371b5066',
-
-//     binId: 8388612,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '67046917550',
-//     reserveY: '0',
-//   },
-//   {
-//     id: 'b481220e-3d39-4bd9-b937-3e24b33bacc2',
-
-//     binId: 8388613,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '42387424505',
-//     reserveY: '0',
-//   },
-//   {
-//     id: '474520fd-fbd3-4a17-a6ca-2c13723d6983',
-
-//     binId: 8388614,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '32291833452',
-//     reserveY: '0',
-//   },
-//   {
-//     id: '0bbf6669-dc47-4655-8260-f77c5c710d18',
-
-//     binId: 8388615,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '25644875736',
-//     reserveY: '0',
-//   },
-//   {
-//     id: 'b0b5eb06-b91f-435d-8a06-78092b812fbc',
-
-//     binId: 8388602,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '0',
-//     reserveY: '54157281994',
-//   },
-//   {
-//     id: '3de14b71-9e1d-49c5-ae40-ee9a10c467ee',
-
-//     binId: 8388617,
-//     poolAddress: POOL_ADDRESS,
-//     reserveX: '19654269582',
-//     reserveY: '0',
-//   },
-
 const CENTER_BIN_ID = 8388608
 
 const priceToId = (price: number, binStep: number) =>
@@ -2407,5 +2149,21 @@ const upperBins = Array.from({ length: 20 }, (_, i) => {
 
 const bins = [...lowerBins, activeBin, ...upperBins]
 
+// add 'hash', remove 'eventId'
+const swaps = map(rawSwaps, (swap) => {
+  const { eventId, ...rest } = swap
+  return {
+    hash: '',
+    ...rest,
+  }
+})
+
+const deposits = map(rawDeposits, (deposit) => {
+  const { eventId, ...rest } = deposit
+  return {
+    hash: '',
+    ...rest,
+  }
+})
 const CLMM = { pools, tokens, deposits, swaps, orderHistory, orders, bins }
 export default CLMM
