@@ -11,7 +11,7 @@
     "test-transactions": "ts-node -r tsconfig-paths/register src/scripts/dev/testTransaction.ts",
     "parse-body": "ts-node -r tsconfig-paths/register src/scripts/dev/parseBody.ts",
     "generate-test": "ts-node -r tsconfig-paths/register ./test/integrations/scenarios/generateTestScenario.ts",
-    "generate-cache": "ts-node -r tsconfig-paths/register src/scripts/generateTraceCache.ts",
+    "generate-router-cache": "ts-node -r tsconfig-paths/register src/scripts/generateRouterTransactionsCache.ts",
     "show-cache": "ts-node -r tsconfig-paths/register src/scripts/dev/showCache.ts",
     "local": "ts-node -r tsconfig-paths/register src",
     "local:watch": "nodemon src -e ts,json,yaml --exec 'node -r tsconfig-paths/register -r ts-node/register src'",
