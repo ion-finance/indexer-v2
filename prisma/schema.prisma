@@ -59,8 +59,8 @@ model Bins {
 }
 
 model Deposit {
-  id              String   @id // txHash
-  eventId         String
+  id              String   @id // hashHex
+  hash            String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
   poolAddress     String
@@ -74,8 +74,8 @@ model Deposit {
 }
 
 model Withdraw {
-  id              String   @id // txHash
-  eventId         String
+  id              String   @id // hashHex
+  hash            String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
   poolAddress     String
@@ -88,8 +88,8 @@ model Withdraw {
 }
 
 model Swap {
-  id              String   @id // txHash
-  eventId         String
+  id              String   @id // hashHex
+  hash            String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
   poolAddress     String
@@ -205,9 +205,6 @@ model Operation {
   protocolFeeAmount         String?
   referralFeeAmount         String?
   walletAddress             String?
-  walletTxLt                String?
-  walletTxHash              String?   
-  walletTxTimestamp         DateTime?
 }
 
 // last block or tx data
