@@ -1,3 +1,4 @@
+import { updateTokenPrices } from 'src/common/updateTokenPrices'
 import handleAddLiquidity from 'src/mappings/cpmm/handleAddLiquidity'
 import handleExchange from 'src/mappings/cpmm/handleExchange'
 import handlePoolCreated from 'src/mappings/cpmm/handlePoolCreated'
@@ -50,6 +51,7 @@ const handleRouterTransaction = async ({
       swapTx,
       payToTxs,
     })
+    await updateTokenPrices(transferNotificationTx.now * 1000)
     return true
   } else if (isProvideLp) {
     const poolCreatedTxs = await findPoolCreatedTxs({
@@ -97,6 +99,7 @@ const handleRouterTransaction = async ({
         addLiquidityTx,
         cbAddLiquidityTx,
       })
+      await updateTokenPrices(cbAddLiquidityTx.now * 1000)
       return true
     }
     return false
