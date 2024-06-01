@@ -33,7 +33,6 @@ const fetchTxs = async ({
   if (address === '') {
     throw new Error('address is empty')
   }
-  console.log(`address: ${address}, toLt: ${toLt}, lt: ${lt}, hash: ${hash}`)
   return await tonClient.getTransactions(Address.parse(address), {
     to_lt: toLt ? toLt : undefined,
     lt: lt ? lt : undefined,
@@ -92,7 +91,9 @@ const fetchTransactions = async ({
       transactions.push(...txs)
 
       if (txs.length > 0) {
-        console.log(`Fetched transactions (toLt: ${toLt} ~ lt: ${lt}]`)
+        console.log(
+          `Fetched ${txs.length} transactions. address: ${contractAddress}, (toLt: ${toLt} ~ lt: ${lt}]`,
+        )
       }
 
       // TON CENTER API limit is 100 txs per request.

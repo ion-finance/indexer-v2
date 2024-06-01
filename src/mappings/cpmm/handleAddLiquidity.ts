@@ -4,7 +4,7 @@ import prisma from 'src/clients/prisma'
 import { parseCbAddLiquidity } from 'src/parsers/cpmm/parseCbAddLiquidity'
 import { parseMint } from 'src/parsers/cpmm/parseMint'
 import { OP } from 'src/tasks/handleRouterTransaction/opCode'
-import { findOutMessage } from 'src/transactions'
+import { findOutMessageWithOp } from 'src/transactions'
 import { ParsedTransaction } from 'src/types/ton-center'
 import { msgToCell } from 'src/utils/cell'
 import { toISOString } from 'src/utils/date'
@@ -24,7 +24,10 @@ export const handleAddLiquidity = async ({
   const routerAddress = process.env.ROUTER_ADDRESS || ''
   const poolAddress = provideLpTx.inMessage?.info?.dest?.toString()
   const cbAddLiquidityString = cbAddLiquidityTx.inMessage?.msg
-  const mintString = findOutMessage(cbAddLiquidityTx, OP.INTERNAL_TRANSFER)?.msg
+  const mintString = findOutMessageWithOp(
+    cbAddLiquidityTx,
+    OP.INTERNAL_TRANSFER,
+  )?.msg
 
   if (!poolAddress) {
     warn('Empty poolAddress')

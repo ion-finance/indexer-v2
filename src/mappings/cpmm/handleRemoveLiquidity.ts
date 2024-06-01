@@ -4,7 +4,7 @@ import prisma from 'src/clients/prisma'
 import { parseBurnNotification } from 'src/parsers/cpmm/parseBurnNotification'
 import { parsePayTo } from 'src/parsers/cpmm/parsePayTo'
 import { OP } from 'src/tasks/handleRouterTransaction/opCode'
-import { findOutMessage } from 'src/transactions'
+import { findOutMessageWithOp } from 'src/transactions'
 import { ParsedTransaction } from 'src/types/ton-center'
 import { msgToCell } from 'src/utils/cell'
 import { toISOString } from 'src/utils/date'
@@ -18,7 +18,7 @@ export const handleRemoveLiquidity = async ({
   const routerAddress = process.env.ROUTER_ADDRESS || ''
   const poolAddress = burnNotificationTx.inMessage?.info?.dest?.toString()
   const burnNotificationString = burnNotificationTx.inMessage?.msg
-  const payToString = findOutMessage(burnNotificationTx, OP.PAY_TO)?.msg
+  const payToString = findOutMessageWithOp(burnNotificationTx, OP.PAY_TO)?.msg
   if (!poolAddress) {
     warn('Empty poolAddress')
     return

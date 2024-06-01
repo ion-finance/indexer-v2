@@ -106,7 +106,7 @@ router.get(
     if (!transactions.length) {
       return res.json({
         status: 400,
-        data: [],
+        data: null,
       })
     }
 

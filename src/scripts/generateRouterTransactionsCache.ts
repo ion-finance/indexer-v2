@@ -15,8 +15,9 @@ const generate = async () => {
     contractAddress: routerAddress,
   })
   const parsedTxs = txs.map((tx) => parseTransaction(tx))
-  console.log('parsedTxs', parsedTxs.length)
+  console.log(`Fetched ${parsedTxs.length} transactions.`)
   await saveRouterTxsToCache(parsedTxs)
+  console.log('Saved transactions to cache.')
 }
 
 generate().then(async () => {

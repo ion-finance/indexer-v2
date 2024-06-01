@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { find, map } from 'lodash'
+import { find, isEmpty, map } from 'lodash'
 
 import prisma from 'src/clients/prisma'
 import getLatestTokenPrices from 'src/common/tokenPrice'
@@ -30,7 +30,11 @@ export const handleExchange = async ({
   swapTx?: ParsedTransaction
   payToTxs?: ParsedTransaction[]
 }) => {
-  if (!transferNotificationTx || !swapTx || !payToTxs) {
+  if (isEmpty(payToTxs)) {
+    warn('Empty payToTxs')
+    return
+  }
+  if (!transferNotificationTx || !swapTx) {
     warn('Empty tx data in handleExchange')
     return
   }

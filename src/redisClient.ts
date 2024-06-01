@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import { compact } from 'lodash'
+import { compact, map } from 'lodash'
 import { createClient, RedisClientType } from 'redis'
 
 import { JettonInfo } from './types/ton-api'
@@ -101,7 +101,7 @@ export const getRouterTxsFromCache = async (from: number, to: number) => {
     if (!data) {
       return []
     }
-    const result = data.map((tx) => JSON.parse(tx) as ParsedTransaction)
+    const result = map(data, (tx) => JSON.parse(tx)) as ParsedTransaction[]
     return result
   } catch (err) {
     error('Redis get error:', err)
@@ -148,7 +148,6 @@ export const savePoolTxsToCache = async (
   poolAddress: string,
   txs: ParsedTransaction[],
 ) => {
-  // TODO: improve using bulk insert
   for (const tx of txs) {
     await savePoolTxToCache(poolAddress, tx)
   }
