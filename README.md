@@ -63,6 +63,15 @@ So after initializing the data in the table, some instruction needed for applyin
 yarn restart
 ```
 
+## Generate cache
+
+For re-generating transactions on router with ease, we use redis cache.
+It caches transactions of router contract through all time.
+
+```
+yarn generate-router-cache
+```
+
 ## Testing
 
 In '.env.test' file, you have to set DATABASE_URL to test database.
