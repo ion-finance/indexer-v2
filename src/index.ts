@@ -47,15 +47,19 @@ const handleRouterTxs = async ({
       if (!routerTx) {
         return { error: false, txsLeft: [] }
       }
-      // TODO: try catch here?
-      const success = await handleRouterTransaction({
-        routerTxs,
-        routerTx,
-        txsCount: txsCount + 1,
-        toLt,
-      })
-      if (success) {
-        txsCount += 1
+      try {
+        const success = await handleRouterTransaction({
+          routerTxs,
+          routerTx,
+          txsCount: txsCount + 1,
+          toLt,
+        })
+        if (success) {
+          txsCount += 1
+        }
+      } catch {
+        const txsLeft = [routerTx, ...routerTxs]
+        return { error: true, txsLeft }
       }
     }
     return { error: false, txsLeft: [] }
@@ -69,12 +73,12 @@ const handleRouterTxs = async ({
       return
     }
     // minus 1, toLt is exclusive
-    // const toLt = (Number(txsLeft[0].lt) - 1).toString()
-    // info('set toLt', toLt)
-    // await prisma.indexerState.setLastState({
-    //   toLt,
-    //   totalTransactionsCount: txsCount,
-    // })
+    const toLt = (Number(txsLeft[0].lt) - 1).toString()
+    info('set toLt', toLt)
+    await prisma.indexerState.setLastState({
+      toLt,
+      totalTransactionsCount: txsCount,
+    })
     sleep(MIN_POOL)
     return
   }
