@@ -7,7 +7,6 @@ import parseTransferBatch from '../../parsers/clmm/parseTransferBatch'
 import { Event } from '../../types/events'
 
 const handleTransferBatch = async (event: Event) => {
-  console.log('TransferBatch event is indexed.')
   const params = parseTransferBatch(event.body)
 
   const amountArray = params.amounts.keys().map((key) => {

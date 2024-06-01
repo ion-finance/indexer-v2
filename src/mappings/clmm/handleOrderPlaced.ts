@@ -7,8 +7,6 @@ import { Event } from '../../types/events'
 
 const handleOrderPlaced = async (event: Event) => {
   const params = parseOrder(event.body)
-  console.log('OrderPlaced event is indexed.')
-  // console.log(event)
 
   const order = await prisma.order.findFirst({
     where: {

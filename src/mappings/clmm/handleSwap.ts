@@ -5,8 +5,6 @@ import { Event } from '../../types/events'
 
 const handleSwap = async (event: Event) => {
   const params = parseSwap(event.body)
-  console.log('Swap event is indexed.')
-  // console.log(event)
 
   await prisma.swap.upsert({
     where: {

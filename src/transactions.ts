@@ -240,8 +240,8 @@ export const getPoolTransactionFromPrevHash = async ({
   if (cached) {
     return cached
   }
-  // console.log('not cached prev', prevHashLt)
-  // console.log(`poolAddress:${poolAddress}::inMessageHash:${inMessageHash}`)
+  // warn('not cached prev', prevHashLt)
+  // warn(`poolAddress:${poolAddress}::inMessageHash:${inMessageHash}`)
 
   const { tx, parsed } = await findTxWithWait({
     contractAddress: poolAddress,
@@ -273,8 +273,8 @@ export const getPoolTransactionFromNextHash = async ({
   if (cached) {
     return cached
   }
-  // console.log('not cached next', nextHashLt)
-  // console.log(`poolAddress:${poolAddress}::outMessageHash:${outMessageHash}`)
+  // warn('not cached next', nextHashLt)
+  // warn(`poolAddress:${poolAddress}::outMessageHash:${outMessageHash}`)
 
   // do not use 'toLt' because it search from the next hash
   const { tx, parsed } = await findTxWithWaitOutMessage({
@@ -338,13 +338,13 @@ export const logUnknownTransaction = (tx: ParsedTransaction) => {
   const hasNFTTransfer = tx.inMessage?.opHex === OP.NFT_TRANSFER
   const hasTextComment = tx.inMessage?.opHex === OP.TEXT_COMMENT
   if (isAlreadyChecked) {
-    console.log(`Already checked, tx: ${tx.hashHex}`)
+    warn(`Already checked, tx: ${tx.hashHex}`)
   } else if (hasNFTTransfer) {
-    console.log(`NFT Transfer, tx: ${tx.hashHex}`)
+    warn(`NFT Transfer, tx: ${tx.hashHex}`)
   } else if (hasTextComment) {
-    console.log(`Text Comment, tx: ${tx.hashHex}`)
+    warn(`Text Comment, tx: ${tx.hashHex}`)
   } else {
-    console.log(
+    warn(
       `Unknown Transaction \ntx.hashHex: ${tx.hashHex}, tx.lt: ${tx.lt}, tx.inMessage?.opHex: ${tx.inMessage?.opHex}, tx.outMessages?.[0]?.opHex: ${tx.outMessages?.[0]?.opHex}`,
     )
   }

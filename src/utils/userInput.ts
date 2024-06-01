@@ -13,5 +13,3 @@ export const getInput = (prompt: string): Promise<string> => {
     })
   })
 }
-// const userInput = await getInput('Enter event id: ')
-// console.log(`You entered: ${userInput}`)

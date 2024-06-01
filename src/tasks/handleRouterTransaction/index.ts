@@ -4,6 +4,7 @@ import handlePoolCreated from 'src/mappings/cpmm/handlePoolCreated'
 import handleRemoveLiquidity from 'src/mappings/cpmm/handleRemoveLiquidity'
 import { findOutMessageWithOp, logUnknownTransaction } from 'src/transactions'
 import { ParsedTransaction } from 'src/types/ton-center'
+import { info } from 'src/utils/log'
 
 import {
   findAddLiquidityTxs,
@@ -43,7 +44,7 @@ const handleRouterTransaction = async ({
       return false
     }
     const { transferNotificationTx, swapTx, payToTxs } = exchangeTxs
-    console.log(`${txsCount}. Handle Exchange, swapTx: ${swapTx?.hashHex}`)
+    info(`${txsCount}. Handle Exchange, swapTx: ${swapTx?.hashHex}`)
     await handleExchange({
       transferNotificationTx,
       swapTx,
@@ -66,7 +67,7 @@ const handleRouterTransaction = async ({
       provideLpTx.endStatus === 'active'
 
     if (isPoolCreated) {
-      console.log(
+      info(
         `${txsCount}. Handle Pool Created, provideLpTx: ${provideLpTx.hashHex}`,
       )
       await handlePoolCreated({
@@ -88,7 +89,7 @@ const handleRouterTransaction = async ({
     const { cbAddLiquidityTx } = addLiquidityTxs
 
     if (cbAddLiquidityTx) {
-      console.log(
+      info(
         `${txsCount}. Handle Add Liquidity, provideLpTx: ${provideLpTx.hashHex}`,
       )
       await handleAddLiquidity({
@@ -112,7 +113,7 @@ const handleRouterTransaction = async ({
     }
     const { poolTx, burnNotificationTx } = burnNotificationTxs
     if (burnNotificationTx) {
-      console.log(
+      info(
         `${txsCount}. Handle Remove Liquidity, burnNotificationTx: ${burnNotificationTx.hashHex}, poolTx: ${poolTx?.hashHex}`,
       )
       await handleRemoveLiquidity({
@@ -125,11 +126,11 @@ const handleRouterTransaction = async ({
     const isSwapPayTo = poolTx?.inMessage?.opHex === OP.SWAP
     const isCbRefundMe = poolTx?.inMessage?.opHex === OP.CB_REFUND_ME
     if (isSwapPayTo) {
-      // console.log(
+      // info(
       //   `Unmatched Transaction - swap pay to, routerTx: ${routerTx?.hashHex}`,
       // )
     } else if (isCbRefundMe) {
-      // console.log(
+      // info(
       //   `Unmatched Transaction - cb refund me, routerTx: ${routerTx?.hashHex}`,
       // )
     } else {
