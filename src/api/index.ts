@@ -21,7 +21,6 @@ import taskRouter from './routers/tasks'
 import tokenPricesRouter from './routers/tokenPrices'
 import tokenPricesHistoryRouter from './routers/tokenPricesHistory'
 import tokenRouter from './routers/tokens'
-import traceRouter from './routers/trace'
 import transactionRouter from './routers/transactions'
 import trendingAssetsRouter from './routers/trendingAssets'
 import updateTokenPrices from './routers/updateTokenPrices'
@@ -56,7 +55,6 @@ api.use(tokenPricesRouter)
 api.use(tokenPricesHistoryRouter)
 api.use(trendingAssetsRouter)
 api.use(updateTokenPrices)
-api.use(traceRouter)
 api.use(operationsRouter)
 api.use(simulateSwapRouter)
 api.use(simulateSwapReverseRouter)
