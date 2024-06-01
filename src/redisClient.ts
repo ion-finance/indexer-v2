@@ -119,15 +119,24 @@ export const saveRouterTxsToCache = async (txs: ParsedTransaction[]) => {
     parsedTransactions[parsedTransactions.length - 1]?.lt || 0
   if (!redisClient) return
   try {
-    for (const tx of txs) {
+    const multi = redisClient.multi()
+
+    for (let i = 0; i < txs.length; i++) {
+      const tx = txs[i]
       if (tx.lt <= lastLtFromCache) {
         continue
       }
-      await redisClient.zAdd('router-txs', {
+      multi.zAdd('router-txs', {
         score: tx.lt,
         value: JSON.stringify(tx),
       })
+      if (i % 100 === 0) {
+        info('Adding router txs to multi', i)
+      }
     }
+
+    await multi.exec()
+    info('All router txs saved to cache successfully')
   } catch (err) {
     error('Redis zAdd error:', err)
   }
