@@ -87,8 +87,7 @@ const handleRouterTxs = async ({
   const from = txs[0].lt.toString()
   const to = txs[txs.length - 1].lt.toString()
   const indexedTxs = txs.length - (txsLeft?.length || 0)
-  info(`${indexedTxs} txs are indexed.`)
-  info(`${from} ~ ${to}`)
+  info(`${indexedTxs} txs are indexed, ${from} ~ ${to}`)
 
   if (txs.length > 0) {
     info(`Set lastState, toLt: ${to}`)
