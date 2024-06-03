@@ -124,10 +124,10 @@ const transactionPooling = async () => {
 
 const main = async () => {
   info('Tx pooling is started. ')
-  await updateBaseTokenPrices()
   if (isCLMM) {
     await seedCLMM()
   } else {
+    await updateBaseTokenPrices()
     for (;;) {
       await transactionPooling()
     }
