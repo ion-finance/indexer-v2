@@ -157,28 +157,27 @@ export const savePoolTxsToCache = async (
   poolAddress: string,
   txs: ParsedTransaction[],
 ) => {
-  for (const tx of txs) {
-    await savePoolTxToCache(poolAddress, tx)
-  }
-}
+  const redisClient = getRedisClient()
+  const multi = redisClient.multi()
 
-// cache pool txs with inMessageHash and outMessageHash
-const savePoolTxToCache = async (
-  poolAddress: string,
-  tx: ParsedTransaction,
-) => {
-  const inMessageHash = tx.inMessage?.msg || ''
-  const outMessageHashes =
-    compact(tx.outMessages?.map((outMessage) => outMessage.msg)) || []
-  const lt = tx.lt
-  // for inMessage
-  const key = getPoolTxKey(poolAddress, inMessageHash, true)
-  await saveDataHash(key, lt.toString(), tx)
-  // for outMessages
-  for (const outMessageHash of outMessageHashes) {
-    const key = getPoolTxKey(poolAddress, outMessageHash, false)
-    await saveDataHash(key, lt.toString(), tx)
+  for (const tx of txs) {
+    // cache pool txs with inMessageHash and outMessageHash
+    const inMessageHash = tx.inMessage?.msg || ''
+    const outMessageHashes =
+      compact(tx.outMessages?.map((outMessage) => outMessage.msg)) || []
+    const lt = tx.lt
+
+    // for inMessage
+    const key = getPoolTxKey(poolAddress, inMessageHash, true)
+    multi.addCommand(['HSET', key, lt.toString(), JSON.stringify(tx)])
+    // for outMessages
+    for (const outMessageHash of outMessageHashes) {
+      const key = getPoolTxKey(poolAddress, outMessageHash, false)
+      multi.addCommand(['HSET', key, lt.toString(), JSON.stringify(tx)])
+    }
   }
+
+  await multi.exec()
 }
 
 export const getCachedPoolTxFromPrevHash = async ({
@@ -254,23 +253,21 @@ export const getLpAccountTxFromCache = async (
   return minimumLtDiffTransaction
 }
 
-const saveLpAccountTxToCache = async (
-  lpAccountAddress: string,
-  tx: ParsedTransaction,
-) => {
-  const inMessageHash = tx.inMessage?.msg || ''
-  const lt = tx.lt
-  const key = getLpAccountTxKey(lpAccountAddress, inMessageHash)
-  await saveDataHash(key, lt.toString(), tx)
-}
-
 export const saveLpAccountTxsToCache = async (
-  poolAddress: string,
+  lpAccountAddress: string,
   txs: ParsedTransaction[],
 ) => {
+  const redisClient = getRedisClient()
+  const multi = redisClient.multi()
+
   for (const tx of txs) {
-    await saveLpAccountTxToCache(poolAddress, tx)
+    const inMessageHash = tx.inMessage?.msg || ''
+    const lt = tx.lt
+    const key = getLpAccountTxKey(lpAccountAddress, inMessageHash)
+    multi.addCommand(['HSET', key, lt.toString(), JSON.stringify(tx)])
   }
+
+  await multi.exec()
 }
 
 const findMinimumLtDiffTransaction = (

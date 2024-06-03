@@ -187,7 +187,9 @@ export const findTxWithWait = async ({
     })
     parsed = compact(map(txs, (tx) => parseTransaction(tx)))
     tx = find(parsed, (tx) => tx.inMessage?.msg === inMessageHash)
-    await sleep(2000)
+    if (!tx) {
+      await sleep(2000)
+    }
   }
   return { tx, parsed }
 }
