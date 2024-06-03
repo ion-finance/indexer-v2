@@ -29,7 +29,8 @@ let serverPools: ServerPool[] = []
 let contractPools: ContractPool[] = []
 
 // const endpoint = 'https://api.app.ionfi.xyz/pools'
-const endpoint = 'http://localhost:3000/pools'
+const endpoint = 'https://indexer-cpmm-2.up.railway.app/pools'
+// const endpoint = 'http://localhost:3000/pools'
 
 describe('Reserve Compare', () => {
   beforeAll(async () => {
