@@ -1,40 +1,17 @@
 import fs from 'fs'
 
 import { saveMultiTokenPrice } from '../tokenPriceRedisClient'
-import { roundUpTimestampByMinutes } from '../utils/timestamp'
 
 const generate = async () => {
   const env = 'mainnet'
-  const priceFolderPath = `./cache/events/${env}/price/`
+  const staticPrice = `./cache/events/mainnet/price/staticTokenPrice.json`
 
-  const files = await fs.promises.readdir(priceFolderPath)
+  const data = await fs.promises.readFile(staticPrice, 'utf8')
 
-  const prices: any = {}
+  const jsonData = JSON.parse(data)
 
-  for (const file of files) {
-    const data = await fs.promises.readFile(priceFolderPath + file, 'utf8')
-
-    const jsonData = JSON.parse(data)
-
-    for (const utime of Object.keys(jsonData)) {
-      prices[utime] = jsonData[utime]
-    }
-  }
-
-  const record: any = {}
-
-  if (prices) {
-    for (const utime of Object.keys(prices)) {
-      const tonKey = `ton:${roundUpTimestampByMinutes(parseInt(utime))}`
-      const usdtKey = `usdt:${roundUpTimestampByMinutes(parseInt(utime))}`
-
-      record[tonKey] = prices[utime].TON
-      record[usdtKey] = prices[utime].USDT
-    }
-  }
-
-  if (Object.keys(record).length > 0) {
-    await saveMultiTokenPrice(record)
+  if (Object.keys(jsonData).length > 0) {
+    await saveMultiTokenPrice(jsonData)
   }
 }
 
