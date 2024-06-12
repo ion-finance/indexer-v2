@@ -7,6 +7,7 @@ import * as swaggerUI from 'swagger-ui-express'
 import updateQuoteTokenPrices, {
   updateBaseTokenPrices,
 } from 'src/common/updateTokenPrices'
+import { GlobalVariables } from 'src/utils/globalVariable'
 
 import binRouter from './routers/bins'
 import myPoolsRouter from './routers/myPools'
@@ -66,8 +67,10 @@ cron.schedule('*/5 * * * *', async () => {
   if (isCLMM) {
     return
   }
-  await updateBaseTokenPrices()
-  await updateQuoteTokenPrices()
+  if (GlobalVariables.initialized) {
+    await updateBaseTokenPrices()
+    await updateQuoteTokenPrices()
+  }
 })
 
 export default api

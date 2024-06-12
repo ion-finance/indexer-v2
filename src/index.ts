@@ -5,6 +5,7 @@ import { filter, map } from 'lodash'
 import api from 'src/api'
 import prisma from 'src/clients/prisma'
 import { routerAddress } from 'src/constant/address'
+import { GlobalVariables } from 'src/utils/globalVariable'
 
 import { updateBaseTokenPrices } from './common/updateTokenPrices'
 import { MIN_POOL, PORT, isCLMM } from './constant'
@@ -35,6 +36,7 @@ const handleRouterTxs = async ({
 }) => {
   let txsCount = totalTransactionsCount
   if (txs.length === 0) {
+    GlobalVariables.initialized = true
     await sleep(MIN_POOL)
     return
   }
