@@ -4,6 +4,7 @@ import { query } from 'express-validator'
 
 import prisma from 'src/clients/prisma'
 import { validate } from 'src/common/expressValidator'
+import { getUsdtIdFromTonUsdtPool } from 'src/utils/address'
 
 const router = Router()
 
@@ -47,6 +48,31 @@ const operationValidationRules = [
   validate,
 ]
 
+function checkIsTonUsdtPool(ids: string[]) {
+  return (
+    ids.length === 2 &&
+    ids.findIndex(
+      (id) => id === (process.env.USDT_WALLET_ADDRESS as string),
+    ) !== -1 &&
+    ids.findIndex((id) => id === (process.env.TON_WALLET_ADDRESS as string)) !==
+      -1
+  )
+}
+
+function changeIdAndSymbolOfUSDT(array: TokenPrice[]) {
+  return array.map((obj) => {
+    if (obj.id === getUsdtIdFromTonUsdtPool()) {
+      return {
+        ...obj,
+        id: process.env.USDT_WALLET_ADDRESS as string,
+        tokenSymbol: 'USDT',
+      }
+    } else {
+      return obj
+    }
+  })
+}
+
 router.get(
   '/token-prices-history',
   operationValidationRules,
@@ -56,8 +82,17 @@ router.get(
     const range = req.query.range as string
 
     const interval = getMilliseconds(range)
+    const isTonUsdtPool = checkIsTonUsdtPool(ids)
 
-    const allTokenPrices = await prisma.tokenPrice.findMany({
+    if (isTonUsdtPool) {
+      // change id to query USDT(TON-USDT)
+      const idx = ids.findIndex(
+        (id) => id === (process.env.USDT_WALLET_ADDRESS as string),
+      )
+      ids[idx] = getUsdtIdFromTonUsdtPool()
+    }
+
+    let allTokenPrices = await prisma.tokenPrice.findMany({
       where: {
         id: {
           in: ids,
@@ -67,6 +102,11 @@ router.get(
         timestamp: 'asc',
       },
     })
+
+    if (isTonUsdtPool) {
+      // remove prefix(POOL-) of id and postfix(TON-USD) of symbol
+      allTokenPrices = changeIdAndSymbolOfUSDT(allTokenPrices)
+    }
 
     const groupedByTokenId = {} as { [key: string]: TokenPrice[] }
     // group

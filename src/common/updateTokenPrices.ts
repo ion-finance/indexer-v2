@@ -15,7 +15,11 @@ import {
 import prisma from 'src/clients/prisma'
 import getLatestTokenPrices from 'src/common/tokenPrice'
 import { getTokenPrice, saveTokenPrice } from 'src/tokenPriceRedisClient'
-import { isSameAddress } from 'src/utils/address'
+import {
+  getUsdtIdFromTonUsdtPool,
+  getUsdtSymbolFromTonUsdtPool,
+  isSameAddress,
+} from 'src/utils/address'
 import { error, logError } from 'src/utils/log'
 import sleep from 'src/utils/sleep'
 
@@ -126,12 +130,19 @@ const updateQuoteTokenPrices = async (timestamp?: Date) => {
   const tokenPrices = await getLatestTokenPrices()
   const sortedTokenPrices = sortBy(tokenPrices, 'timestamp').reverse() // to get latest price
 
-  const tonPrice = Number(
-    find(sortedTokenPrices, { id: TON_WALLET_ADDRESS })?.price,
-  )
-  const usdtPrice = Number(
-    find(sortedTokenPrices, { id: USDT_WALLET_ADDRESS })?.price,
-  )
+  const tonHistoricalPrice = timestamp
+    ? (await getPrice(timestamp.getTime())).TON
+    : null
+  const usdtHistoricalPrice = timestamp
+    ? (await getPrice(timestamp.getTime())).USDT
+    : null
+
+  const tonPrice =
+    tonHistoricalPrice ||
+    Number(find(sortedTokenPrices, { id: TON_WALLET_ADDRESS })?.price)
+  const usdtPrice =
+    usdtHistoricalPrice ||
+    Number(find(sortedTokenPrices, { id: USDT_WALLET_ADDRESS })?.price)
   if (!tonPrice || !usdtPrice) {
     console.warn('TON or USDT price is not found.')
     return
@@ -185,7 +196,33 @@ const updateQuoteTokenPrices = async (timestamp?: Date) => {
     }
     if (xIsBase && yIsBase) {
       // TON - USDT pool
-      return
+
+      const price = calcQuoteTokenPrice({
+        baseTokenPrice: tonPrice,
+        baseTokenReserve:
+          tokenXAddress !== USDT_WALLET_ADDRESS
+            ? Number(reserveX)
+            : Number(reserveY), // Ton Reserve
+        baseTokenDecimals:
+          tokenXAddress !== USDT_WALLET_ADDRESS
+            ? tokenX.decimals
+            : tokenY.decimals, // Ton Decimals
+        quoteTokenReserve:
+          tokenXAddress === USDT_WALLET_ADDRESS
+            ? Number(reserveX)
+            : Number(reserveY), // Usdt Reserve
+        quoteTokenDecimals:
+          tokenXAddress === USDT_WALLET_ADDRESS
+            ? tokenX.decimals
+            : tokenY.decimals, // Usdt Decimals
+      })
+
+      return {
+        id: getUsdtIdFromTonUsdtPool(),
+        tokenSymbol: getUsdtSymbolFromTonUsdtPool(),
+        price,
+        timestamp: timestamp || new Date(),
+      }
     }
 
     const quote = xIsBase ? tokenY : tokenX
