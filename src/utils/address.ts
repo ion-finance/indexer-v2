@@ -100,3 +100,11 @@ export const isTONAddress = (a?: string) => {
   const TON_WALLET_ADDRESS = process.env.TON_WALLET_ADDRESS || ''
   return isSameAddress(a, TON_WALLET_ADDRESS)
 }
+
+export const getUsdtIdFromTonUsdtPool = () => {
+  return `POOL-${process.env.USDT_WALLET_ADDRESS as string}`
+}
+
+export const getUsdtSymbolFromTonUsdtPool = () => {
+  return `USDT(TON-USDT)`
+}
