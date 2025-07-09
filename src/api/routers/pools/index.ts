@@ -46,11 +46,7 @@ router.get('/pools', async function handler(req, res) {
     const priceX = BigNumber(tokenPriceX?.price || 0)
     const priceY = BigNumber(tokenPriceY?.price || 0)
 
-    let reserveData = {
-      reserveX: 0,
-      reserveY: 0,
-      totalSupply: 0,
-    }
+    let reserveData = {}
 
     if (type === 'CLMM') {
       return
