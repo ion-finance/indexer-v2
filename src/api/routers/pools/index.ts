@@ -46,36 +46,11 @@ router.get('/pools', async function handler(req, res) {
     const priceX = BigNumber(tokenPriceX?.price || 0)
     const priceY = BigNumber(tokenPriceY?.price || 0)
 
-    if (type === 'CPMM') {
-      if (BigNumber(reserveX).isZero() || BigNumber(reserveY).isZero()) {
-        if (misIndexedPoolIds.includes(pool.id)) {
-          return
-        }
-
-        if (!alreadyWarnedReserve.has(pool.id)) {
-          console.warn('Reserve not found', pool.id)
-          alreadyWarnedReserve.add(pool.id)
-        }
-        return
-      }
+    let reserveData = {
+      reserveX: 0,
+      reserveY: 0,
+      totalSupply: 0,
     }
-    if (!tokenX) {
-      if (!alreadyWarnedTokenX.has(tokenXAddress)) {
-        console.warn('TokenX not found', tokenXAddress)
-        alreadyWarnedTokenX.add(tokenXAddress)
-      }
-      return
-    }
-
-    if (!tokenY) {
-      if (!alreadyWarnedTokenY.has(tokenYAddress)) {
-        console.warn('TokenY not found', tokenYAddress)
-        alreadyWarnedTokenY.add(tokenYAddress)
-      }
-      return
-    }
-
-    let reserveData = {}
 
     if (type === 'CLMM') {
       return
@@ -122,6 +97,8 @@ router.get('/pools', async function handler(req, res) {
       apy30d: 0,
     }
   })
+
+  console.log(`final pools: ${pools.length}`)
 
   return res.json(compact(pools))
 })
