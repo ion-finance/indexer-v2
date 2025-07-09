@@ -28,6 +28,8 @@ router.get(
   async (req: Request, res: Response) => {
     const { tokenIds } = req.query as { tokenIds: string[] }
 
+    return res.json([])
+
     // get latest token prices
     const latestTokenPrices = (await prisma.$queryRaw`
       SELECT DISTINCT ON (id) *

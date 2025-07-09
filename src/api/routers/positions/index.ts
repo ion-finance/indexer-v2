@@ -24,7 +24,7 @@ router.get(
     if (!parsedAddress) {
       return res.status(400).json({ message: 'Invalid address' })
     }
-    const tokenPrices = await getLatestTokenPrices()
+    // const tokenPrices = await getLatestTokenPrices()
 
     const [tokens, pools, lpTokenWallets, deposits] = await Promise.all([
       prisma.token.findMany(),
@@ -45,16 +45,8 @@ router.get(
       const pool = pools.find((p) => p.id === wallet.poolAddress)
       const tokenX = tokens.find((t) => t.id === pool?.tokenXAddress)
       const tokenY = tokens.find((t) => t.id === pool?.tokenYAddress)
-      const tokenPriceX = tokenPrices.find((t) =>
-        isSameAddress(t.id, tokenX?.id),
-      )
-      const tokenPriceY = tokenPrices.find((t) =>
-        isSameAddress(t.id, tokenY?.id),
-      )
-      const priceX = BigNumber(tokenPriceX?.price || 0)
-      const priceY = BigNumber(tokenPriceY?.price || 0)
 
-      if (!pool || !tokenX || !tokenY || !tokenPriceX || !tokenPriceY) {
+      if (!pool || !tokenX || !tokenY) {
         return null
       }
 
@@ -90,13 +82,7 @@ router.get(
       )
 
       // total usd price of pool reserve
-      const usdValueX = priceX.multipliedBy(
-        bFormatUnits(BigNumber(pool.reserveX), tokenX?.decimals || 0),
-      )
-      const usdValueY = priceY.multipliedBy(
-        bFormatUnits(BigNumber(pool.reserveY), tokenY?.decimals || 0),
-      )
-      const totalUsdValue = usdValueX.plus(usdValueY)
+      const totalUsdValue = BigNumber(1)
 
       // const balanceUsd = totalUsdValue * (lpBalance / totalLpAmount)
       const balanceUsd = totalUsdValue
