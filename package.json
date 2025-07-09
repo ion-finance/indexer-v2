@@ -5,7 +5,7 @@
   "scripts": {
     "clean": "rimraf ./build",
     "build": "npm-run-all format lint clean && tsc",
-    "start": "yarn prisma generate && yarn prisma migrate deploy && ts-node -r tsconfig-paths/register build/src",
+    "start": "yarn prisma generate && ts-node -r tsconfig-paths/register build/src",
     "ts-node": "ts-node -r tsconfig-paths/register",
     "fetch-transactions": "ts-node -r tsconfig-paths/register src/scripts/dev/testFetchtransactions.ts",
     "parse-body": "ts-node -r tsconfig-paths/register src/scripts/dev/parseBody.ts",
