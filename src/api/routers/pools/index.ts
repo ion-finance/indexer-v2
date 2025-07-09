@@ -30,31 +30,10 @@ const misIndexedPoolIds = [
 
 router.get('/pools', async function handler(req, res) {
   const rawPools = await prisma.pool.findMany()
+  console.log(`pools: ${rawPools.length}`)
   const tokens = await prisma.token.findMany()
-  const bins = await prisma.bins.findMany()
+  console.log(`tokens: ${tokens.length}`)
   const tokenPrices = await getLatestTokenPrices()
-
-  const exchanges30d = await prisma.swap.findMany({
-    where: {
-      timestamp: {
-        gte: moment().subtract(30, 'days').toDate(),
-      },
-    },
-  })
-  const exchanges7d = await prisma.swap.findMany({
-    where: {
-      timestamp: {
-        gte: moment().subtract(7, 'days').toDate(),
-      },
-    },
-  })
-  const exchanges1d = await prisma.swap.findMany({
-    where: {
-      timestamp: {
-        gte: moment().subtract(1, 'days').toDate(),
-      },
-    },
-  })
 
   const pools = rawPools.map((pool) => {
     const { reserveX, reserveY, tokenXAddress, tokenYAddress, type, lpSupply } =
@@ -99,17 +78,7 @@ router.get('/pools', async function handler(req, res) {
     let reserveData = {}
 
     if (type === 'CLMM') {
-      const poolBins = bins.filter((bin) => bin.poolAddress === pool.id)
-
-      reserveData = {
-        reserveX: poolBins
-          .reduce((acc, bin) => acc + BigInt(bin.reserveX), BigInt(0))
-          .toString(),
-        reserveY: poolBins
-          .reduce((acc, bin) => acc + BigInt(bin.reserveY), BigInt(0))
-          .toString(),
-        totalSupply: lpSupply,
-      }
+      return
     } else {
       reserveData = {
         reserveX,
@@ -138,48 +107,22 @@ router.get('/pools', async function handler(req, res) {
     //       formatUnits(BigInt(pool.collectedYProtocolFee), tokenY?.decimals),
     //     )
 
-    const volumeUsd30d = getVolumeUsdOfExchange(
-      filter(exchanges30d, (d) => d.poolAddress === pool.id),
-      priceX,
-      priceY,
-      tokenX.decimals,
-      tokenY.decimals,
-    )
-    const volumeUsd7d = getVolumeUsdOfExchange(
-      filter(exchanges7d, (d) => d.poolAddress === pool.id),
-      priceX,
-      priceY,
-      tokenX.decimals,
-      tokenY.decimals,
-    )
-
-    const volumeUsd1d = getVolumeUsdOfExchange(
-      filter(exchanges1d, (d) => d.poolAddress === pool.id),
-      priceX,
-      priceY,
-      tokenX.decimals,
-      tokenY.decimals,
-    )
-
-    const apy1d = getApy(volumeUsd1d, tvl, 365)
-    const apy7d = getApy(volumeUsd7d, tvl, 365 / 7)
-    const apy30d = getApy(volumeUsd30d, tvl, 365 / 30)
-
     return {
       ...pool,
       tokenX,
       tokenY,
       ...reserveData,
       tvl,
-      volumeUsd: volumeUsd1d, // 24h volume (sum of all exchanges)
-      volumeUsd7d: volumeUsd7d,
-      volumeUsd30d: volumeUsd30d,
+      volumeUsd: 0, // 24h volume (sum of all exchanges)
+      volumeUsd7d: 0,
+      volumeUsd30d: 0,
       // feeUsd,
-      apy: apy1d,
-      apy7d,
-      apy30d,
+      apy: 0,
+      apy7d: 0,
+      apy30d: 0,
     }
   })
+
   return res.json(compact(pools))
 })
 
