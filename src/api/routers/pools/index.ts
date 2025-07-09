@@ -33,18 +33,12 @@ router.get('/pools', async function handler(req, res) {
   console.log(`pools: ${rawPools.length}`)
   const tokens = await prisma.token.findMany()
   console.log(`tokens: ${tokens.length}`)
-  const tokenPrices = await getLatestTokenPrices()
 
   const pools = rawPools.map((pool) => {
     const { reserveX, reserveY, tokenXAddress, tokenYAddress, type, lpSupply } =
       pool
     const tokenX = tokens.find((token) => token.id === tokenXAddress)
     const tokenY = tokens.find((token) => token.id === tokenYAddress)
-
-    const tokenPriceX = tokenPrices.find((t) => isSameAddress(t.id, tokenX?.id))
-    const tokenPriceY = tokenPrices.find((t) => isSameAddress(t.id, tokenY?.id))
-    const priceX = BigNumber(tokenPriceX?.price || 0)
-    const priceY = BigNumber(tokenPriceY?.price || 0)
 
     let reserveData = {}
 
@@ -59,13 +53,6 @@ router.get('/pools', async function handler(req, res) {
     }
 
     // total usd price of pool reserve
-    const tvl = priceX
-      .multipliedBy(bFormatUnits(BigNumber(reserveX), tokenX?.decimals || 0))
-      .plus(
-        priceY.multipliedBy(
-          bFormatUnits(BigNumber(reserveY), tokenY?.decimals || 0),
-        ),
-      )
 
     // total usd price of pool collected protocol fee
     // const feeUsd =
@@ -83,7 +70,7 @@ router.get('/pools', async function handler(req, res) {
       tokenX,
       tokenY,
       ...reserveData,
-      tvl,
+      tvl: 0,
       volumeUsd: 0, // 24h volume (sum of all exchanges)
       volumeUsd7d: 0,
       volumeUsd30d: 0,
