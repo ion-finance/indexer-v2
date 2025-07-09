@@ -1,4 +1,4 @@
-# Ion Indexer
+# Ion Indexer v2
 
 Ion Indexer is a indexer to index events of Ion contracts. It is used to provide data for IonFi app.
 
